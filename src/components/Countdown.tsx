@@ -50,6 +50,7 @@ export const Countdown = ({ endDate }: CountdownProps) => {
         fontFamily: "monospace",
         textAlign: "center",
       }}
+      title={`This event ends on ${endDate.toString()}!`}
     >
       <CountdownCircleTimer
         {...timerProps}

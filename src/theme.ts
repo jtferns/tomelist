@@ -7,6 +7,13 @@ const theme: Theme = {
     heading: "inherit",
     monospace: '"Open Sans", "Menlo, monospace"',
   },
+  badges: {
+    outline: {
+      color: "secondary",
+      bg: "transparent",
+      boxShadow: "inset 0 0 0 1px",
+    },
+  },
   buttons: {
     add: {
       color: "background",

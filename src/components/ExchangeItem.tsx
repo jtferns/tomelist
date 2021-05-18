@@ -1,6 +1,7 @@
 import { faMeteor, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  Badge,
   Box,
   Button,
   Card,
@@ -71,6 +72,7 @@ export const ExchangeItem = ({
             >
               {exchange.name}
             </Link>
+            <Badge variant="outline">{exchange.type}</Badge>
           </Box>
           <Box>
             <Button
