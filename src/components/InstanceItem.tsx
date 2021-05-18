@@ -1,11 +1,13 @@
+import { faMeteor, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Box,
-  Flex,
   Button,
   Card,
+  Flex,
   Image,
-  Text,
   Link,
+  Text,
 } from "@theme-ui/components";
 import { useCallback } from "react";
 import { InstanceObjective } from "../hooks/useGetEventData";
@@ -38,12 +40,13 @@ export const InstanceItem = ({
           }}
           src={objective.img}
         />
-        <Flex sx={{ flexDirection: "column" }}>
+        <Flex sx={{ flexDirection: "column", flexGrow: 1 }}>
           <Box>
             <Text
               mr={2}
               sx={{
                 fontWeight: 700,
+                fontSize: 4,
               }}
             >
               {`${Math.max(
@@ -56,6 +59,7 @@ export const InstanceItem = ({
               sx={{
                 fontWeight: 700,
                 textDecoration: "none",
+                fontSize: 3,
               }}
               href={objective.guideLink}
               className="eorzeadb_link"
@@ -64,7 +68,6 @@ export const InstanceItem = ({
             >
               {objective.name}
             </Link>
-            <Text>{objective.tomestonesCount}</Text>
           </Box>
           <Box>
             <Button
@@ -73,17 +76,22 @@ export const InstanceItem = ({
               variant="add"
               onClick={onAddRun}
             >
-              +Run
+              <FontAwesomeIcon icon={faPlus} />
             </Button>
             <Button
               sx={{ cursor: "pointer" }}
               variant="remove"
               onClick={onRemoveRun}
             >
-              -Run
+              <FontAwesomeIcon icon={faMinus} />
             </Button>
           </Box>
         </Flex>
+        <Text sx={{ fontSize: 5 }}>
+          <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
+          &nbsp;
+          {objective.tomestonesCount}
+        </Text>
       </Flex>
     </Card>
   );

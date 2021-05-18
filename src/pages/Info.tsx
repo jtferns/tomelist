@@ -22,6 +22,8 @@ import {
 } from "../hooks/useGetEventData";
 import { usePersistReducer } from "../hooks/usePersistReducer";
 import { sumBy } from "lodash";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSlash } from "@fortawesome/free-solid-svg-icons";
 
 export const Info = () => {
   const eventData = useGetEventData();
@@ -125,8 +127,10 @@ export const Info = () => {
                   onChange={onTomesChange}
                 />
               </Box>
-              <Box p={2}>
-                <Text>{` / ${totalRequiredTomes}`}</Text>
+              <Box py={2} pr={2}>
+                <FontAwesomeIcon icon={faSlash} rotation={90} />
+                &nbsp;
+                <Text>{totalRequiredTomes}</Text>
               </Box>
             </Flex>
             <Divider />

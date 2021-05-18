@@ -1,3 +1,5 @@
+import { faMeteor, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Box,
   Button,
@@ -42,12 +44,13 @@ export const ExchangeItem = ({
         <Box p={1} mr={2} bg="muted" sx={{ maxHeight: 56 }}>
           <Image sx={{ maxHeight: 40 }} src={exchange.img} />
         </Box>
-        <Flex sx={{ flexDirection: "column" }}>
+        <Flex sx={{ flexDirection: "column", flexGrow: 1 }}>
           <Box>
             <Text
               mr={2}
               sx={{
                 fontWeight: 700,
+                fontSize: 4,
               }}
               variant={isInsufficient ? "insufficient" : "sufficient"}
             >
@@ -58,6 +61,7 @@ export const ExchangeItem = ({
               sx={{
                 fontWeight: 700,
                 textDecoration: "none",
+                fontSize: 3,
               }}
               variant={isInsufficient ? "insufficient" : "sufficient"}
               href={exchange.guideLink}
@@ -67,9 +71,6 @@ export const ExchangeItem = ({
             >
               {exchange.name}
             </Link>
-            <Text variant={isInsufficient ? "insufficient" : "sufficient"}>
-              {exchange.tomestonesCost}
-            </Text>
           </Box>
           <Box>
             <Button
@@ -78,17 +79,24 @@ export const ExchangeItem = ({
               variant="add"
               onClick={onAddSelection}
             >
-              +
+              <FontAwesomeIcon icon={faPlus} />
             </Button>
             <Button
               sx={{ cursor: "pointer" }}
               variant="remove"
               onClick={onRemoveSelection}
             >
-              -
+              <FontAwesomeIcon icon={faMinus} />
             </Button>
           </Box>
         </Flex>
+        <Text
+          sx={{ fontSize: 5 }}
+          variant={isInsufficient ? "insufficient" : "sufficient"}
+        >
+          <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
+          &nbsp;{exchange.tomestonesCost}
+        </Text>
       </Flex>
     </Card>
   );
