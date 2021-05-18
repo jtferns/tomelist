@@ -33,6 +33,7 @@ export const InstanceItem = ({
     <Card m={2}>
       <Flex>
         <Image
+          pr={2}
           sx={{
             objectFit: "cover",
             objectPosition: "center",

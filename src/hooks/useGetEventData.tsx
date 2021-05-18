@@ -21,8 +21,15 @@ export type EventExchange = {
 export type EventData = {
   objectives: EventObjective[];
   exchange: EventExchange[];
+  startDate: Date;
+  endDate: Date;
 };
-const DEFAULT_EVENT_DATA = { objectives: [], exchange: [] };
+const DEFAULT_EVENT_DATA = {
+  objectives: [],
+  exchange: [],
+  startDate: new Date(0),
+  endDate: new Date(),
+};
 
 export const useGetEventData = () => {
   const [data, setData] = useState<EventData>(DEFAULT_EVENT_DATA);
@@ -34,7 +41,15 @@ export const useGetEventData = () => {
         "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/44d0655dfabf659ff3c017cd3ea0c66f0aadcd55/itop_ffxiv_ff2021.json"
       )
         .then((fetchedData) => fetchedData.json())
-        .then((jsonData) => mounted && setData(jsonData["2021_pageantry"]));
+        .then(
+          (jsonData) =>
+            mounted &&
+            setData({
+              ...jsonData["2021_pageantry"],
+              startDate: new Date("2021-05-14T08:00:00.000Z"),
+              endDate: new Date("2021-06-14T14:59:00.000Z"),
+            })
+        );
     }
     fetchData();
     return () => {

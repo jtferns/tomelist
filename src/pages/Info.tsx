@@ -1,3 +1,5 @@
+import { faMeteor, faSlash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Box,
   Container,
@@ -9,21 +11,18 @@ import {
   Progress,
   Text,
 } from "@theme-ui/components";
+import { sumBy } from "lodash";
 import { useCallback } from "react";
+import { Redirect, Route, Switch } from "react-router-dom";
+import pJson from "../../package.json";
 import { EventItem } from "../components/EventItem";
 import { ExchangeItem } from "../components/ExchangeItem";
-import { Switch, Route, Redirect } from "react-router-dom";
-import pJson from "../../package.json";
-
 import {
   EventExchange,
   InstanceObjective,
   useGetEventData,
 } from "../hooks/useGetEventData";
 import { usePersistReducer } from "../hooks/usePersistReducer";
-import { sumBy } from "lodash";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSlash } from "@fortawesome/free-solid-svg-icons";
 
 export const Info = () => {
   const eventData = useGetEventData();
@@ -130,11 +129,14 @@ export const Info = () => {
               <Box py={2} pr={2}>
                 <FontAwesomeIcon icon={faSlash} rotation={90} />
                 &nbsp;
-                <Text>{totalRequiredTomes}</Text>
+                <Text sx={{ fontSize: 4 }}>
+                  <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
+                  &nbsp;{totalRequiredTomes}
+                </Text>
               </Box>
             </Flex>
             <Divider />
-            <Box p={4} sx={{ height: "calc(100vh - 168px)", overflow: "auto" }}>
+            <Box p={2} sx={{ height: "calc(100vh - 182px)", overflow: "auto" }}>
               {eventData.exchange.map((e, i) => (
                 <ExchangeItem
                   key={`${i}-${e.type}`}
@@ -184,12 +186,17 @@ export const Info = () => {
                   onChange={onTomesChange}
                 />
               </Box>
-              <Box p={2}>
-                <Text>{` / ${totalRequiredTomes}`}</Text>
+              <Box py={2} pr={2}>
+                <FontAwesomeIcon icon={faSlash} rotation={90} />
+                &nbsp;
+                <Text sx={{ fontSize: 4 }}>
+                  <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
+                  &nbsp;{totalRequiredTomes}
+                </Text>
               </Box>
             </Flex>
             <Divider />
-            <Box p={4} sx={{ height: "calc(100vh - 168px)", overflow: "auto" }}>
+            <Box p={2} sx={{ height: "calc(100vh - 182px)", overflow: "auto" }}>
               {eventData.objectives.map((o, i) => (
                 <EventItem
                   key={`${i}-${o.type}`}
