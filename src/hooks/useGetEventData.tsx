@@ -21,14 +21,12 @@ export type EventExchange = {
 export type EventData = {
   objectives: EventObjective[];
   exchange: EventExchange[];
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
 };
 const DEFAULT_EVENT_DATA = {
   objectives: [],
   exchange: [],
-  startDate: new Date(0),
-  endDate: new Date(),
 };
 
 export const useGetEventData = () => {

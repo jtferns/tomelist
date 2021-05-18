@@ -15,6 +15,7 @@ import { sumBy } from "lodash";
 import { useCallback } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import pJson from "../../package.json";
+import { Countdown } from "../components/Countdown";
 import { EventItem } from "../components/EventItem";
 import { ExchangeItem } from "../components/ExchangeItem";
 import {
@@ -87,6 +88,8 @@ export const Info = () => {
       }),
     [dispatch]
   );
+
+  console.warn({ endDate: eventData.endDate });
   return (
     <Container p={2}>
       <Switch>
@@ -108,6 +111,7 @@ export const Info = () => {
                   Exchanges
                 </Heading>
               </Box>
+              {eventData.endDate && <Countdown endDate={eventData.endDate} />}
               <Box p={2} sx={{ flex: "1 1 auto" }}>
                 <Progress
                   max={totalRequiredTomes}
@@ -130,8 +134,9 @@ export const Info = () => {
                 <FontAwesomeIcon icon={faSlash} rotation={90} />
                 &nbsp;
                 <Text sx={{ fontSize: 4 }}>
+                  {totalRequiredTomes}
+                  &nbsp;
                   <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
-                  &nbsp;{totalRequiredTomes}
                 </Text>
               </Box>
             </Flex>
@@ -168,6 +173,7 @@ export const Info = () => {
                   Objectives
                 </Heading>
               </Box>
+              {eventData.endDate && <Countdown endDate={eventData.endDate} />}
               <Box p={2} sx={{ flex: "1 1 auto" }}>
                 <Progress
                   max={totalRequiredTomes}
@@ -190,8 +196,9 @@ export const Info = () => {
                 <FontAwesomeIcon icon={faSlash} rotation={90} />
                 &nbsp;
                 <Text sx={{ fontSize: 4 }}>
+                  {totalRequiredTomes}
+                  &nbsp;
                   <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
-                  &nbsp;{totalRequiredTomes}
                 </Text>
               </Box>
             </Flex>

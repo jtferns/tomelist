@@ -89,9 +89,9 @@ export const InstanceItem = ({
           </Box>
         </Flex>
         <Text sx={{ fontSize: 5 }}>
-          <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
-          &nbsp;
           {objective.tomestonesCount}
+          &nbsp;
+          <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
         </Text>
       </Flex>
     </Card>

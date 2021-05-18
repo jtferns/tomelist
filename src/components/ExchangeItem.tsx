@@ -94,8 +94,9 @@ export const ExchangeItem = ({
           sx={{ fontSize: 5 }}
           variant={isInsufficient ? "insufficient" : "sufficient"}
         >
+          {exchange.tomestonesCost}
+          &nbsp;
           <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
-          &nbsp;{exchange.tomestonesCost}
         </Text>
       </Flex>
     </Card>
