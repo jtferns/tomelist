@@ -1,4 +1,4 @@
-import { faMeteor, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Badge,
@@ -12,6 +12,7 @@ import {
 } from "@theme-ui/components";
 import { useCallback } from "react";
 import { EventExchange } from "../hooks/useGetEventData";
+import { TomeIcon } from "./TomeIcon";
 
 type ExchangeItemProps = {
   exchange: EventExchange;
@@ -31,14 +32,14 @@ export const ExchangeItem = ({
     selectionCount === 0 ||
     tomesCount === 0 ||
     exchange.tomestonesCost * selectionCount > tomesCount;
-  const onAddSelection = useCallback(() => addSelection(exchange), [
-    addSelection,
-    exchange,
-  ]);
-  const onRemoveSelection = useCallback(() => removeSelection(exchange), [
-    exchange,
-    removeSelection,
-  ]);
+  const onAddSelection = useCallback(
+    () => addSelection(exchange),
+    [addSelection, exchange]
+  );
+  const onRemoveSelection = useCallback(
+    () => removeSelection(exchange),
+    [exchange, removeSelection]
+  );
   return (
     <Card m={2}>
       <Flex sx={{ alignItems: "center" }}>
@@ -98,7 +99,7 @@ export const ExchangeItem = ({
         >
           {exchange.tomestonesCost}
           &nbsp;
-          <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
+          <TomeIcon />
         </Text>
       </Flex>
     </Card>

@@ -1,4 +1,4 @@
-import { faMeteor, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Box,
@@ -11,6 +11,7 @@ import {
 } from "@theme-ui/components";
 import { useCallback } from "react";
 import { InstanceObjective } from "../hooks/useGetEventData";
+import { TomeIcon } from "./TomeIcon";
 
 type InstanceItemProps = {
   objective: InstanceObjective;
@@ -25,10 +26,10 @@ export const InstanceItem = ({
   removeRun,
 }: InstanceItemProps) => {
   const onAddRun = useCallback(() => addRun(objective), [addRun, objective]);
-  const onRemoveRun = useCallback(() => removeRun(objective), [
-    objective,
-    removeRun,
-  ]);
+  const onRemoveRun = useCallback(
+    () => removeRun(objective),
+    [objective, removeRun]
+  );
   return (
     <Card m={2}>
       <Flex>
@@ -91,7 +92,7 @@ export const InstanceItem = ({
         <Text sx={{ fontSize: 5 }}>
           {objective.tomestonesCount}
           &nbsp;
-          <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
+          <TomeIcon />
         </Text>
       </Flex>
     </Card>

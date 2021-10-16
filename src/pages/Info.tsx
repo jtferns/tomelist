@@ -1,4 +1,4 @@
-import { faMeteor, faSlash } from "@fortawesome/free-solid-svg-icons";
+import { faSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Box,
@@ -18,6 +18,7 @@ import pJson from "../../package.json";
 import { Countdown } from "../components/Countdown";
 import { EventItem } from "../components/EventItem";
 import { ExchangeItem } from "../components/ExchangeItem";
+import { TomeIcon } from "../components/TomeIcon";
 import {
   EventExchange,
   InstanceObjective,
@@ -104,9 +105,9 @@ export const Info = () => {
                     }}
                     target="_blank"
                     rel="noreferrer"
-                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202105/dubrw051tv"
+                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202110/7pBwXOpUFp"
                   >
-                    Pageantry
+                    Lore
                   </Link>{" "}
                   Exchanges
                 </Heading>
@@ -136,7 +137,7 @@ export const Info = () => {
                 <Text sx={{ fontSize: 4 }}>
                   {totalRequiredTomes}
                   &nbsp;
-                  <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
+                  <TomeIcon />
                 </Text>
               </Box>
             </Flex>
@@ -166,9 +167,9 @@ export const Info = () => {
                     }}
                     target="_blank"
                     rel="noreferrer"
-                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202105/dubrw051tv"
+                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202110/7pBwXOpUFp"
                   >
-                    Pageantry
+                    Lore
                   </Link>{" "}
                   Objectives
                 </Heading>
@@ -198,7 +199,7 @@ export const Info = () => {
                 <Text sx={{ fontSize: 4 }}>
                   {totalRequiredTomes}
                   &nbsp;
-                  <FontAwesomeIcon icon={faMeteor} inverse size="xs" />
+                  <TomeIcon />
                 </Text>
               </Box>
             </Flex>
