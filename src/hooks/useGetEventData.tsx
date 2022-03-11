@@ -36,16 +36,16 @@ export const useGetEventData = () => {
     let mounted = true;
     async function fetchData() {
       await fetch(
-        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/0e5237789e54ae622b34529f639ebe376f1078ca/itop_ffxiv_ff2021.json"
+        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/d800a6fba10b99d3ef697c2f6d027d45b7fef88f/itop_ffxiv_ff2021.json"
       )
         .then((fetchedData) => fetchedData.json())
         .then(
           (jsonData) =>
             mounted &&
             setData({
-              ...jsonData["2021_lore"],
-              startDate: new Date("2021-10-19T08:00:00.000Z"),
-              endDate: new Date("2021-11-19T14:59:00.000Z"),
+              ...jsonData["2022_scripture"],
+              startDate: new Date("2022-03-14T08:00:00.000Z"),
+              endDate: new Date("2022-04-15T14:59:00.000Z"),
             })
         );
     }

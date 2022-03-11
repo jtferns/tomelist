@@ -73,6 +73,8 @@ export const InstanceItem = ({
           </Box>
           <Box>
             <Button
+              py={0}
+              px={3}
               mr={2}
               sx={{ cursor: "pointer" }}
               variant="add"
@@ -81,6 +83,8 @@ export const InstanceItem = ({
               <FontAwesomeIcon icon={faPlus} />
             </Button>
             <Button
+              py={0}
+              px={2}
               sx={{ cursor: "pointer" }}
               variant="remove"
               onClick={onRemoveRun}

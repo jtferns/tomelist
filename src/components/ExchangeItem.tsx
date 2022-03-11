@@ -43,11 +43,11 @@ export const ExchangeItem = ({
   return (
     <Card m={2}>
       <Flex sx={{ alignItems: "center" }}>
-        <Box p={1} mr={2} bg="muted" sx={{ maxHeight: 56 }}>
+        <Box p={1} mr={2} bg="muted" sx={{ maxHeight: 48, borderRadius: 4 }}>
           <Image sx={{ maxHeight: 40 }} src={exchange.img} />
         </Box>
         <Flex sx={{ flexDirection: "column", flexGrow: 1 }}>
-          <Box>
+          <Box sx={{ maxHeight: 34, display: "flex", alignItems: "center" }}>
             <Text
               mr={2}
               sx={{
@@ -75,23 +75,27 @@ export const ExchangeItem = ({
             </Link>
             <Badge variant="outline">{exchange.type}</Badge>
           </Box>
-          <Box>
+          <Flex>
             <Button
+              py={0}
+              px={3}
               mr={2}
-              sx={{ cursor: "pointer" }}
+              sx={{ cursor: "pointer", fontSize: 12 }}
               variant="add"
               onClick={onAddSelection}
             >
               <FontAwesomeIcon icon={faPlus} />
             </Button>
             <Button
-              sx={{ cursor: "pointer" }}
+              py={0}
+              px={2}
+              sx={{ cursor: "pointer", fontSize: 12 }}
               variant="remove"
               onClick={onRemoveSelection}
             >
               <FontAwesomeIcon icon={faMinus} />
             </Button>
-          </Box>
+          </Flex>
         </Flex>
         <Text
           sx={{ fontSize: 5 }}

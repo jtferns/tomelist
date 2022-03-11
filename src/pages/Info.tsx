@@ -30,10 +30,13 @@ export const Info = () => {
   const eventData = useGetEventData();
   const [state, dispatch] = usePersistReducer();
 
-  const totalRequiredTomes = sumBy(
-    eventData.exchange,
-    (e: EventExchange) =>
-      (state.exchangeSelections[e.name] || 0) * e.tomestonesCost
+  const totalRequiredTomes = Math.max(
+    sumBy(
+      eventData.exchange,
+      (e: EventExchange) =>
+        (state.exchangeSelections[e.name] || 0) * e.tomestonesCost
+    ),
+    0
   );
   const onTomesChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -90,7 +93,6 @@ export const Info = () => {
     [dispatch]
   );
 
-  console.warn({ endDate: eventData.endDate });
   return (
     <Container p={2}>
       <Switch>
@@ -107,7 +109,7 @@ export const Info = () => {
                     rel="noreferrer"
                     href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202110/7pBwXOpUFp"
                   >
-                    Lore
+                    Scripture
                   </Link>{" "}
                   Exchanges
                 </Heading>
@@ -169,7 +171,7 @@ export const Info = () => {
                     rel="noreferrer"
                     href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202110/7pBwXOpUFp"
                   >
-                    Lore
+                    Scripture
                   </Link>{" "}
                   Objectives
                 </Heading>
@@ -221,9 +223,15 @@ export const Info = () => {
           <Redirect to="/objectives" />
         </Route>
       </Switch>
-      <Box sx={{ textAlign: "center" }}>
+      <Box
+        sx={{
+          textAlign: "center",
+          position: "relative",
+          boxShadow: "0px -3px 10px #1a1a1a",
+        }}
+      >
         <Text sx={{ fontSize: "8px" }}>
-          All referenced content are subject to © 2010 - 2021 SQUARE ENIX CO.,
+          All referenced content are subject to © 2010 - 2022 SQUARE ENIX CO.,
           LTD. All Rights Reserved. | Tomelist v{pJson.version}
         </Text>
       </Box>
