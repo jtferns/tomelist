@@ -107,7 +107,7 @@ export const Info = () => {
                     }}
                     target="_blank"
                     rel="noreferrer"
-                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202110/7pBwXOpUFp"
+                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202203/dceh8sj926"
                   >
                     Scripture
                   </Link>{" "}
@@ -169,7 +169,7 @@ export const Info = () => {
                     }}
                     target="_blank"
                     rel="noreferrer"
-                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202110/7pBwXOpUFp"
+                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202203/dceh8sj926"
                   >
                     Scripture
                   </Link>{" "}
