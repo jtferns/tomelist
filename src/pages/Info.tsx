@@ -133,15 +133,13 @@ export const Info = () => {
                   onChange={onTomesChange}
                 />
               </Box>
-              <Box py={2} pr={2}>
+              <Flex py={2} pr={2} sx={{ alignItems: "center" }}>
                 <FontAwesomeIcon icon={faSlash} rotation={90} />
                 &nbsp;
-                <Text sx={{ fontSize: 4 }}>
-                  {totalRequiredTomes}
-                  &nbsp;
-                  <TomeIcon />
+                <Text sx={{ fontSize: 4, display: "inline-flex" }}>
+                  <TomeIcon />x{totalRequiredTomes}
                 </Text>
-              </Box>
+              </Flex>
             </Flex>
             <Divider />
             <Box p={2} sx={{ height: "calc(100vh - 182px)", overflow: "auto" }}>
@@ -195,15 +193,13 @@ export const Info = () => {
                   onChange={onTomesChange}
                 />
               </Box>
-              <Box py={2} pr={2}>
+              <Flex py={2} pr={2} sx={{ alignItems: "center" }}>
                 <FontAwesomeIcon icon={faSlash} rotation={90} />
                 &nbsp;
-                <Text sx={{ fontSize: 4 }}>
-                  {totalRequiredTomes}
-                  &nbsp;
-                  <TomeIcon />
+                <Text sx={{ fontSize: 4, display: "inline-flex" }}>
+                  <TomeIcon />x{totalRequiredTomes}
                 </Text>
-              </Box>
+              </Flex>
             </Flex>
             <Divider />
             <Box p={2} sx={{ height: "calc(100vh - 182px)", overflow: "auto" }}>

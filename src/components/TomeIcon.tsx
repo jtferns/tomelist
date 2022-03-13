@@ -1,12 +1,5 @@
-import { faMemory } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Image } from "theme-ui";
 
 export const TomeIcon = () => (
-  <FontAwesomeIcon
-    icon={faMemory}
-    inverse
-    size="xs"
-    flip="horizontal"
-    transform={{ rotate: 75 }}
-  />
+  <Image sx={{ maxHeight: 40 }} src="/images/tome.png" />
 );

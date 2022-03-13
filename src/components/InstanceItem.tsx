@@ -31,7 +31,17 @@ export const InstanceItem = ({
     [objective, removeRun]
   );
   return (
-    <Card m={2}>
+    <Card
+      m={2}
+      p={2}
+      sx={{
+        borderRadius: 8,
+        transition: "box-shadow .2s ease-in",
+        ":hover": {
+          boxShadow: "0 0 12px #0fc",
+        },
+      }}
+    >
       <Flex>
         <Image
           pr={2}
@@ -93,10 +103,8 @@ export const InstanceItem = ({
             </Button>
           </Box>
         </Flex>
-        <Text sx={{ fontSize: 5 }}>
-          {objective.tomestonesCount}
-          &nbsp;
-          <TomeIcon />
+        <Text sx={{ fontSize: 5, display: "flex", alignItems: "center" }}>
+          <TomeIcon />x{objective.tomestonesCount}
         </Text>
       </Flex>
     </Card>

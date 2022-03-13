@@ -41,7 +41,17 @@ export const ExchangeItem = ({
     [exchange, removeSelection]
   );
   return (
-    <Card m={2}>
+    <Card
+      m={2}
+      p={2}
+      sx={{
+        borderRadius: 8,
+        transition: "box-shadow .2s ease-in",
+        ":hover": {
+          boxShadow: "0 0 12px #0fc",
+        },
+      }}
+    >
       <Flex sx={{ alignItems: "center" }}>
         <Box p={1} mr={2} bg="muted" sx={{ maxHeight: 48, borderRadius: 4 }}>
           <Image sx={{ maxHeight: 40 }} src={exchange.img} />
@@ -98,12 +108,10 @@ export const ExchangeItem = ({
           </Flex>
         </Flex>
         <Text
-          sx={{ fontSize: 5 }}
+          sx={{ fontSize: 5, display: "flex", alignItems: "center" }}
           variant={isInsufficient ? "insufficient" : "sufficient"}
         >
-          {exchange.tomestonesCost}
-          &nbsp;
-          <TomeIcon />
+          <TomeIcon />x{exchange.tomestonesCost}
         </Text>
       </Flex>
     </Card>

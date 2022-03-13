@@ -13,6 +13,7 @@ export const NavHeader = () => {
           textDecoration: "none",
           fontWeight: 700,
           fontSize: "1.5rem",
+          transition: "color .2s ease-in",
         }}
         to="/objectives"
       >
@@ -24,6 +25,7 @@ export const NavHeader = () => {
           textDecoration: "none",
           fontWeight: 700,
           fontSize: "1.5rem",
+          transition: "color .2s ease-in",
         }}
         to="/exchanges"
       >
