@@ -1,24 +1,11 @@
-import { faSlash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  Box,
-  Container,
-  Divider,
-  Flex,
-  Heading,
-  Input,
-  Link,
-  Progress,
-  Text,
-} from "@theme-ui/components";
+import { Box, Container, Text } from "@theme-ui/components";
 import { sumBy } from "lodash";
 import { useCallback } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import pJson from "../../package.json";
-import { Countdown } from "../components/Countdown";
 import { EventItem } from "../components/EventItem";
 import { ExchangeItem } from "../components/ExchangeItem";
-import { TomeIcon } from "../components/TomeIcon";
+import { Header } from "../components/Header";
 import {
   EventExchange,
   InstanceObjective,
@@ -97,123 +84,41 @@ export const Info = () => {
     <Container p={2}>
       <Switch>
         <Route path="/exchanges">
-          <>
-            <Flex sx={{ alignItems: "center" }}>
-              <Box p={2}>
-                <Heading>
-                  <Link
-                    sx={{
-                      textDecoration: "none",
-                    }}
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202203/dceh8sj926"
-                  >
-                    Scripture
-                  </Link>{" "}
-                  Exchanges
-                </Heading>
-              </Box>
-              {eventData.endDate && <Countdown endDate={eventData.endDate} />}
-              <Box p={2} sx={{ flex: "1 1 auto" }}>
-                <Progress
-                  max={totalRequiredTomes}
-                  value={state.currentTomestones}
-                >
-                  {`${(
-                    (state.currentTomestones / totalRequiredTomes) *
-                    100
-                  ).toFixed(1)}%`}
-                </Progress>
-              </Box>
-              <Box p={2}>
-                <Input
-                  type="number"
-                  value={state.currentTomestones}
-                  onChange={onTomesChange}
-                />
-              </Box>
-              <Flex py={2} pr={2} sx={{ alignItems: "center" }}>
-                <FontAwesomeIcon icon={faSlash} rotation={90} />
-                &nbsp;
-                <Text sx={{ fontSize: 4, display: "inline-flex" }}>
-                  <TomeIcon />x{totalRequiredTomes}
-                </Text>
-              </Flex>
-            </Flex>
-            <Divider />
-            <Box p={2} sx={{ height: "calc(100vh - 182px)", overflow: "auto" }}>
-              {eventData.exchange.map((e, i) => (
-                <ExchangeItem
-                  key={`${i}-${e.type}`}
-                  exchange={e}
-                  tomesCount={state.currentTomestones}
-                  selectionCount={state.exchangeSelections[e.name]}
-                  addSelection={addSelection}
-                  removeSelection={removeSelection}
-                />
-              ))}
-            </Box>
-          </>
+          <Header
+            endDate={eventData.endDate}
+            currentTomestones={state.currentTomestones}
+            totalRequiredTomes={totalRequiredTomes}
+            onTomesChange={onTomesChange}
+          >
+            {eventData.exchange.map((e, i) => (
+              <ExchangeItem
+                key={`${i}-${e.type}`}
+                exchange={e}
+                tomesCount={state.currentTomestones}
+                selectionCount={state.exchangeSelections[e.name]}
+                addSelection={addSelection}
+                removeSelection={removeSelection}
+              />
+            ))}
+          </Header>
         </Route>
         <Route path="/objectives">
-          <>
-            <Flex sx={{ alignItems: "center" }}>
-              <Box p={2}>
-                <Heading>
-                  <Link
-                    sx={{
-                      textDecoration: "none",
-                    }}
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202203/dceh8sj926"
-                  >
-                    Scripture
-                  </Link>{" "}
-                  Objectives
-                </Heading>
-              </Box>
-              {eventData.endDate && <Countdown endDate={eventData.endDate} />}
-              <Box p={2} sx={{ flex: "1 1 auto" }}>
-                <Progress
-                  max={totalRequiredTomes}
-                  value={state.currentTomestones}
-                >
-                  {`${(
-                    (state.currentTomestones / totalRequiredTomes) *
-                    100
-                  ).toFixed(1)}%`}
-                </Progress>
-              </Box>
-              <Box p={2}>
-                <Input
-                  type="number"
-                  value={state.currentTomestones}
-                  onChange={onTomesChange}
-                />
-              </Box>
-              <Flex py={2} pr={2} sx={{ alignItems: "center" }}>
-                <FontAwesomeIcon icon={faSlash} rotation={90} />
-                &nbsp;
-                <Text sx={{ fontSize: 4, display: "inline-flex" }}>
-                  <TomeIcon />x{totalRequiredTomes}
-                </Text>
-              </Flex>
-            </Flex>
-            <Divider />
-            <Box p={2} sx={{ height: "calc(100vh - 182px)", overflow: "auto" }}>
-              {eventData.objectives.map((o, i) => (
-                <EventItem
-                  key={`${i}-${o.type}`}
-                  objective={o}
-                  tomesCost={totalRequiredTomes - state.currentTomestones}
-                  addRun={addRun}
-                  removeRun={removeRun}
-                />
-              ))}
-            </Box>
-          </>
+          <Header
+            endDate={eventData.endDate}
+            currentTomestones={state.currentTomestones}
+            totalRequiredTomes={totalRequiredTomes}
+            onTomesChange={onTomesChange}
+          >
+            {eventData.objectives.map((o, i) => (
+              <EventItem
+                key={`${i}-${o.type}`}
+                objective={o}
+                tomesCost={totalRequiredTomes - state.currentTomestones}
+                addRun={addRun}
+                removeRun={removeRun}
+              />
+            ))}
+          </Header>
         </Route>
         <Route path="/">
           <Redirect to="/objectives" />

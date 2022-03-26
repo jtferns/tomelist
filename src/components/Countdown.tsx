@@ -16,7 +16,7 @@ const timerProps = {
   trailColor: "#4d4d4d",
 };
 
-const renderTime = (dimension: string, time: number) => {
+const renderTime = (dimension: "d" | "h" | "m" | "s", time: number) => {
   return (
     <Box
       className="time-wrapper"

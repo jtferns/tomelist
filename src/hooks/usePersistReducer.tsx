@@ -3,7 +3,7 @@ import { useLocalStorage } from "react-use";
 
 const LOCAL_STORAGE_KEY = "tomelist";
 
-type ExchangeSelections = Record<string, number>;
+export type ExchangeSelections = Record<string, number>;
 type State = {
   exchangeSelections: ExchangeSelections;
   currentTomestones: number;
