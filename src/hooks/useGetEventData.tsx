@@ -45,7 +45,7 @@ export const useGetEventData = () => {
             setData({
               ...jsonData["2022_scripture"],
               startDate: new Date("2022-03-14T08:00:00.000Z"),
-              endDate: new Date("2022-04-15T14:59:00.000Z"),
+              endDate: new Date("2022-04-12T03:00:00.000Z"),
             })
         );
     }
