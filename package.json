@@ -52,5 +52,24 @@
   "devDependencies": {
     "@types/lodash": "^4.14.169",
     "@types/react-router-dom": "^5.1.7"
-  }
+  },
+  "description": "Just a simple list for your tomes, Kupo!",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jtferns/tomelist.git"
+  },
+  "keywords": [
+    "FFXIV",
+    "tomestone",
+    "moogle",
+    "treasure",
+    "trove"
+  ],
+  "author": "Janoo Fernandes",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jtferns/tomelist/issues"
+  },
+  "homepage": "https://github.com/jtferns/tomelist#readme"
 }
