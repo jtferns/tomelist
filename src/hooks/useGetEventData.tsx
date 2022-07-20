@@ -21,12 +21,16 @@ export type EventExchange = {
 export type EventData = {
   objectives: EventObjective[];
   exchange: EventExchange[];
-  startDate?: Date;
-  endDate?: Date;
+  startDate: Date;
+  endDate: Date;
+  link: string;
 };
 const DEFAULT_EVENT_DATA = {
   objectives: [],
   exchange: [],
+  startDate: new Date("2020-03-14T08:00:00.000Z"),
+  endDate: new Date("2020-03-14T09:00:00.000Z"),
+  link: "",
 };
 
 export const useGetEventData = () => {
@@ -36,16 +40,16 @@ export const useGetEventData = () => {
     let mounted = true;
     async function fetchData() {
       await fetch(
-        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/d800a6fba10b99d3ef697c2f6d027d45b7fef88f/itop_ffxiv_ff2021.json"
+        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/cbeed9f9763b3dde23fa9c9585c57b9e58241cc0/itop_ffxiv_ff2021.json"
       )
         .then((fetchedData) => fetchedData.json())
         .then(
           (jsonData) =>
             mounted &&
             setData({
-              ...jsonData["2022_scripture"],
-              startDate: new Date("2022-03-14T08:00:00.000Z"),
-              endDate: new Date("2022-04-12T03:00:00.000Z"),
+              ...jsonData["2022_verity"],
+              startDate: new Date(jsonData["2022_verity"].startDate),
+              endDate: new Date(jsonData["2022_verity"].endDate),
             })
         );
     }
@@ -54,6 +58,8 @@ export const useGetEventData = () => {
       mounted = false;
     };
   }, []);
+
+  console.log({ data });
 
   return data;
 };

@@ -14,7 +14,7 @@ import { TomeIcon } from "../components/TomeIcon";
 import { EventData } from "../hooks/useGetEventData";
 
 type HeaderProps = PropsWithChildren<
-  Pick<EventData, "endDate"> & {
+  Pick<EventData, "startDate" | "endDate"> & {
     currentTomestones: number;
     totalRequiredTomes: number;
     onTomesChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -22,6 +22,7 @@ type HeaderProps = PropsWithChildren<
 >;
 
 export const Header = ({
+  startDate,
   endDate,
   children,
   currentTomestones,
@@ -32,7 +33,7 @@ export const Header = ({
   return (
     <>
       <Flex sx={{ alignItems: "center" }}>
-        {endDate && <Countdown endDate={endDate} />}
+        {endDate && <Countdown startDate={startDate} endDate={endDate} />}
         <Box p={2} sx={{ flex: "1 1 auto" }}>
           <Progress
             max={totalRequiredTomes}

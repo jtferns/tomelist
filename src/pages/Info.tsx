@@ -85,6 +85,7 @@ export const Info = () => {
       <Switch>
         <Route path="/exchanges">
           <Header
+            startDate={eventData.startDate}
             endDate={eventData.endDate}
             currentTomestones={state.currentTomestones}
             totalRequiredTomes={totalRequiredTomes}
@@ -104,6 +105,7 @@ export const Info = () => {
         </Route>
         <Route path="/objectives">
           <Header
+            startDate={eventData.startDate}
             endDate={eventData.endDate}
             currentTomestones={state.currentTomestones}
             totalRequiredTomes={totalRequiredTomes}

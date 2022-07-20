@@ -2,12 +2,14 @@ import { Box, Flex } from "@theme-ui/components";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
 type CountdownProps = {
+  startDate: Date;
   endDate: Date;
 };
 
-const minuteSeconds = 60;
-const hourSeconds = 3600;
-const daySeconds = 86400;
+const MINUTE_SECONDS = 60;
+const HOUR_SECONDS = MINUTE_SECONDS * 60;
+const DAY_SECONDS = HOUR_SECONDS * 24;
+const LOOP_DELAY_MS = 100;
 
 const timerProps = {
   isPlaying: true,
@@ -30,19 +32,36 @@ const renderTime = (dimension: "d" | "h" | "m" | "s", time: number) => {
   );
 };
 
-const getTimeSeconds = (time: number) => (minuteSeconds - time) | 0;
+const getTimeSeconds = (time: number) => (MINUTE_SECONDS - time) | 0;
 const getTimeMinutes = (time: number) =>
-  ((time % hourSeconds) / minuteSeconds) | 0;
-const getTimeHours = (time: number) => ((time % daySeconds) / hourSeconds) | 0;
-const getTimeDays = (time: number) => (time / daySeconds) | 0;
+  ((time % HOUR_SECONDS) / MINUTE_SECONDS) | 0;
+const getTimeHours = (time: number) =>
+  ((time % DAY_SECONDS) / HOUR_SECONDS) | 0;
+const getTimeDays = (time: number) => (time / DAY_SECONDS) | 0;
 
-export const Countdown = ({ endDate }: CountdownProps) => {
-  const startTime = Date.now() / 1000; // use UNIX timestamp in seconds
+export const Countdown = ({ startDate, endDate }: CountdownProps) => {
+  const startTime = startDate.getTime() / 1000; // use UNIX timestamp in seconds
+  const currentStartTime = Date.now() / 1000; // use UNIX timestamp in seconds
   const endTime = endDate.getTime() / 1000; // use UNIX timestamp in seconds
+  const hasStarted = currentStartTime - startTime > 0;
+  const currentEndTime = hasStarted ? endTime : startTime;
 
-  const remainingTime = endTime - startTime;
-  const days = Math.ceil(remainingTime / daySeconds);
-  const daysDuration = days * daySeconds;
+  const remainingTime = currentEndTime - currentStartTime;
+  const days = Math.ceil(remainingTime / DAY_SECONDS);
+  const daysDuration = days * DAY_SECONDS;
+  const title = hasStarted
+    ? `This event ends on ${endDate.toString()}!`
+    : `This event starts on ${startDate.toString()}!`;
+
+  console.log({
+    endDate,
+    currentStartTime,
+    currentEndTime,
+    remainingTime,
+    days,
+    daysDuration,
+  });
+
   return (
     <Flex
       sx={{
@@ -50,11 +69,11 @@ export const Countdown = ({ endDate }: CountdownProps) => {
         fontFamily: "monospace",
         textAlign: "center",
       }}
-      title={`This event ends on ${endDate.toString()}!`}
+      title={title}
     >
       <CountdownCircleTimer
         {...timerProps}
-        key={`d-${endDate.getTime}`}
+        key={`d-${currentEndTime}`}
         colors="#b3e2cd"
         duration={daysDuration}
         initialRemainingTime={remainingTime}
@@ -65,43 +84,43 @@ export const Countdown = ({ endDate }: CountdownProps) => {
       </CountdownCircleTimer>
       <CountdownCircleTimer
         {...timerProps}
-        key={`h-${endDate.getTime}`}
+        key={`h-${currentEndTime}`}
         colors="#fdcdac"
-        duration={daySeconds}
-        initialRemainingTime={remainingTime % daySeconds}
+        duration={DAY_SECONDS}
+        initialRemainingTime={remainingTime % DAY_SECONDS}
         onComplete={(totalElapsedTime) => [
-          remainingTime - totalElapsedTime > hourSeconds,
-          0,
+          remainingTime - totalElapsedTime > HOUR_SECONDS,
+          LOOP_DELAY_MS,
         ]}
       >
         {({ elapsedTime = 0 }) =>
-          renderTime("h", getTimeHours(daySeconds - elapsedTime))
+          renderTime("h", getTimeHours(DAY_SECONDS - elapsedTime))
         }
       </CountdownCircleTimer>
       <CountdownCircleTimer
         {...timerProps}
-        key={`m-${endDate.getTime}`}
+        key={`m-${currentEndTime}`}
         colors="#cbd5e8"
-        duration={hourSeconds}
-        initialRemainingTime={remainingTime % hourSeconds}
+        duration={HOUR_SECONDS}
+        initialRemainingTime={remainingTime % HOUR_SECONDS}
         onComplete={(totalElapsedTime) => [
-          remainingTime - totalElapsedTime > minuteSeconds,
-          0,
+          remainingTime - totalElapsedTime > MINUTE_SECONDS,
+          LOOP_DELAY_MS,
         ]}
       >
         {({ elapsedTime = 0 }) =>
-          renderTime("m", getTimeMinutes(hourSeconds - elapsedTime))
+          renderTime("m", getTimeMinutes(HOUR_SECONDS - elapsedTime))
         }
       </CountdownCircleTimer>
       <CountdownCircleTimer
         {...timerProps}
-        key={`s-${endDate.getTime}`}
+        key={`s-${currentEndTime}`}
         colors="#f4cae4"
-        duration={minuteSeconds}
-        initialRemainingTime={remainingTime % minuteSeconds}
+        duration={MINUTE_SECONDS}
+        initialRemainingTime={remainingTime % MINUTE_SECONDS}
         onComplete={(totalElapsedTime) => [
           remainingTime - totalElapsedTime > 0,
-          0,
+          LOOP_DELAY_MS,
         ]}
       >
         {({ elapsedTime = 0 }) => renderTime("s", getTimeSeconds(elapsedTime))}

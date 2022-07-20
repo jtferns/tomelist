@@ -14,9 +14,9 @@ export const NavHeader = () => {
             }}
             target="_blank"
             rel="noreferrer"
-            href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202203/dceh8sj926"
+            href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202207/ujz24q0uim"
           >
-            Scripture
+            Verity
           </Link>
         </Flex>
         <Flex
