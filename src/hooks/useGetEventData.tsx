@@ -59,7 +59,5 @@ export const useGetEventData = () => {
     };
   }, []);
 
-  console.log({ data });
-
   return data;
 };

@@ -53,15 +53,6 @@ export const Countdown = ({ startDate, endDate }: CountdownProps) => {
     ? `This event ends on ${endDate.toString()}!`
     : `This event starts on ${startDate.toString()}!`;
 
-  console.log({
-    endDate,
-    currentStartTime,
-    currentEndTime,
-    remainingTime,
-    days,
-    daysDuration,
-  });
-
   return (
     <Flex
       sx={{
