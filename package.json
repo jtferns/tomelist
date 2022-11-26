@@ -71,5 +71,6 @@
   "bugs": {
     "url": "https://github.com/jtferns/tomelist/issues"
   },
-  "homepage": "https://tomelist.surge.sh"
+  "homepage": "https://tomelist.surge.sh",
+  "packageManager": "yarn@3.3.0"
 }
