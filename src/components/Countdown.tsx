@@ -9,7 +9,7 @@ type CountdownProps = {
 const MINUTE_SECONDS = 60;
 const HOUR_SECONDS = MINUTE_SECONDS * 60;
 const DAY_SECONDS = HOUR_SECONDS * 24;
-const LOOP_DELAY_MS = 100;
+const LOOP_DELAY_S = 100 / 1000;
 
 const timerProps: Pick<
   Props,
@@ -84,7 +84,7 @@ export const Countdown = ({ startDate, endDate }: CountdownProps) => {
         initialRemainingTime={remainingTime % DAY_SECONDS}
         onComplete={(totalElapsedTime) => ({
           shouldRepeat: remainingTime - totalElapsedTime > HOUR_SECONDS,
-          delay: LOOP_DELAY_MS,
+          delay: LOOP_DELAY_S,
         })}
       >
         {({ elapsedTime = 0 }) =>
@@ -99,7 +99,7 @@ export const Countdown = ({ startDate, endDate }: CountdownProps) => {
         initialRemainingTime={remainingTime % HOUR_SECONDS}
         onComplete={(totalElapsedTime) => ({
           shouldRepeat: remainingTime - totalElapsedTime > MINUTE_SECONDS,
-          delay: LOOP_DELAY_MS,
+          delay: LOOP_DELAY_S,
         })}
       >
         {({ elapsedTime = 0 }) =>
@@ -114,7 +114,7 @@ export const Countdown = ({ startDate, endDate }: CountdownProps) => {
         initialRemainingTime={remainingTime % MINUTE_SECONDS}
         onComplete={(totalElapsedTime) => ({
           shouldRepeat: remainingTime - totalElapsedTime > 0,
-          delay: LOOP_DELAY_MS,
+          delay: LOOP_DELAY_S,
         })}
       >
         {({ elapsedTime = 0 }) => renderTime("s", getTimeSeconds(elapsedTime))}

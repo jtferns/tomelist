@@ -1,5 +1,5 @@
 import { Flex, Link } from "@theme-ui/components";
-import { NavLink, useRouteMatch } from "react-router-dom";
+import { NavLink, useMatch } from "react-router-dom";
 import { EventData } from "../hooks/useGetEventData";
 
 type NavHeaderProps = {
@@ -20,7 +20,7 @@ export const NavHeader = ({ eventData }: NavHeaderProps) => {
             rel="noreferrer"
             href={eventData.link}
           >
-            {eventData.label || "MISSING_EVENT_NAME"}
+            {eventData.label || "Loading..."}
           </Link>
         </Flex>
         <Flex
@@ -33,7 +33,7 @@ export const NavHeader = ({ eventData }: NavHeaderProps) => {
         >
           <NavLink
             style={{
-              color: useRouteMatch("/objectives") != null ? "#f0c" : "#4d4d4d",
+              color: useMatch("/objectives") != null ? "#f0c" : "#4d4d4d",
               textDecoration: "none",
               fontWeight: 700,
               fontSize: "1.5rem",
@@ -45,7 +45,7 @@ export const NavHeader = ({ eventData }: NavHeaderProps) => {
           </NavLink>
           <NavLink
             style={{
-              color: useRouteMatch("/exchanges") != null ? "#f0c" : "#4d4d4d",
+              color: useMatch("/exchanges") != null ? "#f0c" : "#4d4d4d",
               textDecoration: "none",
               fontWeight: 700,
               fontSize: "1.5rem",

@@ -1,7 +1,7 @@
 import { Box, Container, Text } from "@theme-ui/components";
 import { sumBy } from "lodash";
 import { useCallback } from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import pJson from "../../package.json";
 import { EventItem } from "../components/EventItem";
 import { ExchangeItem } from "../components/ExchangeItem";
@@ -84,50 +84,54 @@ export const Info = ({ eventData }: InfoProps) => {
 
   return (
     <Container p={2}>
-      <Switch>
-        <Route path="/exchanges">
-          <Header
-            startDate={eventData.startDate}
-            endDate={eventData.endDate}
-            currentTomestones={state.currentTomestones}
-            totalRequiredTomes={totalRequiredTomes}
-            onTomesChange={onTomesChange}
-          >
-            {eventData.exchange.map((e, i) => (
-              <ExchangeItem
-                key={`${i}-${e.type}`}
-                exchange={e}
-                tomesCount={state.currentTomestones}
-                selectionCount={state.exchangeSelections[e.name]}
-                addSelection={addSelection}
-                removeSelection={removeSelection}
-              />
-            ))}
-          </Header>
-        </Route>
-        <Route path="/objectives">
-          <Header
-            startDate={eventData.startDate}
-            endDate={eventData.endDate}
-            currentTomestones={state.currentTomestones}
-            totalRequiredTomes={totalRequiredTomes}
-            onTomesChange={onTomesChange}
-          >
-            {eventData.objectives.map((o, i) => (
-              <EventItem
-                key={`${i}-${o.type}`}
-                objective={o}
-                tomesCost={totalRequiredTomes - state.currentTomestones}
-                addRun={addRun}
-                removeRun={removeRun}
-              />
-            ))}
-          </Header>
-        </Route>
-        <Route path="/">
-          <Redirect to="/objectives" />
-        </Route>
-      </Switch>
+      <Routes>
+        <Route
+          path="exchanges"
+          element={
+            <Header
+              startDate={eventData.startDate}
+              endDate={eventData.endDate}
+              currentTomestones={state.currentTomestones}
+              totalRequiredTomes={totalRequiredTomes}
+              onTomesChange={onTomesChange}
+            >
+              {eventData.exchange.map((e, i) => (
+                <ExchangeItem
+                  key={`${i}-${e.type}`}
+                  exchange={e}
+                  tomesCount={state.currentTomestones}
+                  selectionCount={state.exchangeSelections[e.name]}
+                  addSelection={addSelection}
+                  removeSelection={removeSelection}
+                />
+              ))}
+            </Header>
+          }
+        />
+        <Route
+          path="objectives"
+          element={
+            <Header
+              startDate={eventData.startDate}
+              endDate={eventData.endDate}
+              currentTomestones={state.currentTomestones}
+              totalRequiredTomes={totalRequiredTomes}
+              onTomesChange={onTomesChange}
+            >
+              {eventData.objectives.map((o, i) => (
+                <EventItem
+                  key={`${i}-${o.type}`}
+                  objective={o}
+                  tomesCost={totalRequiredTomes - state.currentTomestones}
+                  addRun={addRun}
+                  removeRun={removeRun}
+                />
+              ))}
+            </Header>
+          }
+        />
+        <Route path="/" element={<Navigate to="objectives" replace />} />
+      </Routes>
       <Box
         sx={{
           textAlign: "center",

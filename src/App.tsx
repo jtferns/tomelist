@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Container, ThemeProvider } from "theme-ui";
 import { NavHeader } from "./components/NavHeader";
 import { useGetEventData } from "./hooks/useGetEventData";
@@ -15,11 +15,13 @@ export const App = () => {
       <ThemeProvider theme={theme}>
         <Container p={2}>
           <NavHeader eventData={eventData} />
-          <Switch>
-            <Route path="/">
-              <Info eventData={eventData} />
-            </Route>
-          </Switch>
+          <Routes>
+            <Route path="/*" element={<Info eventData={eventData} />} />
+            <Route
+              path="*"
+              element={<p>Could not find the page you're looking for 😥</p>}
+            />
+          </Routes>
         </Container>
       </ThemeProvider>
     </BrowserRouter>
