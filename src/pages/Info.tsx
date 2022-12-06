@@ -7,14 +7,16 @@ import { EventItem } from "../components/EventItem";
 import { ExchangeItem } from "../components/ExchangeItem";
 import { Header } from "../components/Header";
 import {
+  EventData,
   EventExchange,
   InstanceObjective,
-  useGetEventData,
 } from "../hooks/useGetEventData";
 import { usePersistReducer } from "../hooks/usePersistReducer";
 
-export const Info = () => {
-  const eventData = useGetEventData();
+type InfoProps = {
+  eventData: EventData;
+};
+export const Info = ({ eventData }: InfoProps) => {
   const [state, dispatch] = usePersistReducer();
 
   const totalRequiredTomes = Math.max(

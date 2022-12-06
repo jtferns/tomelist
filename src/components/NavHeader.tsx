@@ -1,7 +1,11 @@
 import { Flex, Link } from "@theme-ui/components";
 import { NavLink, useRouteMatch } from "react-router-dom";
+import { EventData } from "../hooks/useGetEventData";
 
-export const NavHeader = () => {
+type NavHeaderProps = {
+  eventData: EventData;
+};
+export const NavHeader = ({ eventData }: NavHeaderProps) => {
   return (
     <>
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
@@ -14,9 +18,9 @@ export const NavHeader = () => {
             }}
             target="_blank"
             rel="noreferrer"
-            href="https://na.finalfantasyxiv.com/lodestone/special/mogmog-collection/202207/ujz24q0uim"
+            href={eventData.link}
           >
-            Verity
+            {eventData.label}
           </Link>
         </Flex>
         <Flex
