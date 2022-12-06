@@ -1,5 +1,5 @@
 import { Box, Flex } from "@theme-ui/components";
-import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import { CountdownCircleTimer, Props } from "react-countdown-circle-timer";
 
 type CountdownProps = {
   startDate: Date;
@@ -11,7 +11,10 @@ const HOUR_SECONDS = MINUTE_SECONDS * 60;
 const DAY_SECONDS = HOUR_SECONDS * 24;
 const LOOP_DELAY_MS = 100;
 
-const timerProps = {
+const timerProps: Pick<
+  Props,
+  "isPlaying" | "size" | "strokeWidth" | "trailColor"
+> = {
   isPlaying: true,
   size: 60,
   strokeWidth: 4,
@@ -79,10 +82,10 @@ export const Countdown = ({ startDate, endDate }: CountdownProps) => {
         colors="#fdcdac"
         duration={DAY_SECONDS}
         initialRemainingTime={remainingTime % DAY_SECONDS}
-        onComplete={(totalElapsedTime) => [
-          remainingTime - totalElapsedTime > HOUR_SECONDS,
-          LOOP_DELAY_MS,
-        ]}
+        onComplete={(totalElapsedTime) => ({
+          shouldRepeat: remainingTime - totalElapsedTime > HOUR_SECONDS,
+          delay: LOOP_DELAY_MS,
+        })}
       >
         {({ elapsedTime = 0 }) =>
           renderTime("h", getTimeHours(DAY_SECONDS - elapsedTime))
@@ -94,10 +97,10 @@ export const Countdown = ({ startDate, endDate }: CountdownProps) => {
         colors="#cbd5e8"
         duration={HOUR_SECONDS}
         initialRemainingTime={remainingTime % HOUR_SECONDS}
-        onComplete={(totalElapsedTime) => [
-          remainingTime - totalElapsedTime > MINUTE_SECONDS,
-          LOOP_DELAY_MS,
-        ]}
+        onComplete={(totalElapsedTime) => ({
+          shouldRepeat: remainingTime - totalElapsedTime > MINUTE_SECONDS,
+          delay: LOOP_DELAY_MS,
+        })}
       >
         {({ elapsedTime = 0 }) =>
           renderTime("m", getTimeMinutes(HOUR_SECONDS - elapsedTime))
@@ -109,10 +112,10 @@ export const Countdown = ({ startDate, endDate }: CountdownProps) => {
         colors="#f4cae4"
         duration={MINUTE_SECONDS}
         initialRemainingTime={remainingTime % MINUTE_SECONDS}
-        onComplete={(totalElapsedTime) => [
-          remainingTime - totalElapsedTime > 0,
-          LOOP_DELAY_MS,
-        ]}
+        onComplete={(totalElapsedTime) => ({
+          shouldRepeat: remainingTime - totalElapsedTime > 0,
+          delay: LOOP_DELAY_MS,
+        })}
       >
         {({ elapsedTime = 0 }) => renderTime("s", getTimeSeconds(elapsedTime))}
       </CountdownCircleTimer>
