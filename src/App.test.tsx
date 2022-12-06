@@ -4,7 +4,7 @@ import { App } from "./App";
 
 test("renders event link", () => {
   render(<App />);
-  const linkElement = screen.getByText(/verity/i);
+  const linkElement = screen.getByText(/MISSING_EVENT_NAME/i);
   expect(linkElement).toBeInTheDocument();
 });
 

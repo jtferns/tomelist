@@ -20,7 +20,7 @@ export const NavHeader = ({ eventData }: NavHeaderProps) => {
             rel="noreferrer"
             href={eventData.link}
           >
-            {eventData.label}
+            {eventData.label || "MISSING_EVENT_NAME"}
           </Link>
         </Flex>
         <Flex
