@@ -140,7 +140,7 @@ export const Info = ({ eventData }: InfoProps) => {
         }}
       >
         <Text sx={{ fontSize: "8px" }}>
-          All referenced content are subject to © 2010 - 2022 SQUARE ENIX CO.,
+          All referenced content are subject to © 2010 - 2023 SQUARE ENIX CO.,
           LTD. All Rights Reserved. | Tomelist v{pJson.version}
         </Text>
       </Box>

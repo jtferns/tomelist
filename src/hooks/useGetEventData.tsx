@@ -34,7 +34,7 @@ const DEFAULT_EVENT_DATA = {
   link: "",
   label: "",
 };
-const DATA_KEY = "2022_creation";
+const DATA_KEY = "2023_mendacity";
 
 export const useGetEventData = () => {
   const [data, setData] = useState<EventData>(DEFAULT_EVENT_DATA);
@@ -43,7 +43,7 @@ export const useGetEventData = () => {
     let mounted = true;
     async function fetchData() {
       await fetch(
-        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/6c10b006c0b0636cc7c9562ce4c3de8ad98798d9/itop_ffxiv_ff2021.json"
+        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/65bedec8947ccb0ca4ba49fed77b8bb671df1f81/itop_ffxiv_ff2021.json"
       )
         .then((fetchedData) => fetchedData.json())
         .then(
