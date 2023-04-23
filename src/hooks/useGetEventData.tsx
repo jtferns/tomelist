@@ -43,7 +43,7 @@ export const useGetEventData = () => {
     let mounted = true;
     async function fetchData() {
       await fetch(
-        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/2c2da7404333a89a6a6e235b3f557003b6e794ab/itop_ffxiv_ff2021.json"
+        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/6c10b006c0b0636cc7c9562ce4c3de8ad98798d9/itop_ffxiv_ff2021.json"
       )
         .then((fetchedData) => fetchedData.json())
         .then(
