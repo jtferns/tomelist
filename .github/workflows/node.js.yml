@@ -57,6 +57,7 @@ jobs:
         path: |
           **/build
         key: build-${{ hashFiles('**/package.json') }}
+    - run: yarn add surge -D
     - run: yarn deploy
       env:
         SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
