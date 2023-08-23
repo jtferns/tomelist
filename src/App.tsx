@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Container, ThemeProvider } from "theme-ui";
+import { Container, ThemeUIProvider } from "theme-ui";
 import { NavHeader } from "./components/NavHeader";
 import { useGetEventData } from "./hooks/useGetEventData";
 import { useUpdateTitle } from "./hooks/useUpdateTitle";
@@ -12,7 +12,7 @@ export const App = () => {
   const eventData = useGetEventData();
   return (
     <BrowserRouter>
-      <ThemeProvider theme={theme}>
+      <ThemeUIProvider theme={theme}>
         <Container p={2}>
           <NavHeader eventData={eventData} />
           <Routes>
@@ -23,7 +23,7 @@ export const App = () => {
             />
           </Routes>
         </Container>
-      </ThemeProvider>
+      </ThemeUIProvider>
     </BrowserRouter>
   );
 };
