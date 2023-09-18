@@ -29,7 +29,9 @@ export const Header = ({
   onTomesChange,
 }: HeaderProps) => {
   const progressValue = (currentTomestones / totalRequiredTomes) * 100;
-  const progressLabel = `${progressValue.toFixed(1)}%`;
+  const progressLabel = `${
+    isFinite(progressValue) ? progressValue.toFixed(1) : "–"
+  }%`;
   return (
     <>
       <Flex sx={{ alignItems: "center" }}>
@@ -48,7 +50,16 @@ export const Header = ({
         </Box>
         {progressValue >= 0 && (
           <Box>
-            <Badge variant="outline">{progressLabel}</Badge>
+            <Badge
+              sx={{
+                fontSize: "26.25px",
+                borderRadius: "6px",
+                color: "primary",
+              }}
+              variant="outline"
+            >
+              {progressLabel}
+            </Badge>
           </Box>
         )}
         <Box p={2} sx={{ width: "6rem" }}>
