@@ -34,7 +34,7 @@ const DEFAULT_EVENT_DATA = {
   link: "",
   label: "",
 };
-const DATA_KEY = "2023_tenfold_pageantry";
+const DATA_KEY = "2024_first_genesis";
 
 export const useGetEventData = () => {
   const [data, setData] = useState<EventData>(DEFAULT_EVENT_DATA);
@@ -43,7 +43,7 @@ export const useGetEventData = () => {
     let mounted = true;
     async function fetchData() {
       await fetch(
-        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/04d439cdbfe38ade59b380fc2c54d475bb81b9d1/itop_ffxiv_2023.json"
+        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/ed67f3f63c9e4dc0dc8245a6ba7e2819d1dcbc4f/ffxiv_treasure_trove_2024.json"
       )
         .then((fetchedData) => fetchedData.json())
         .then(
