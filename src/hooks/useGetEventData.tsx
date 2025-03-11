@@ -34,7 +34,7 @@ const DEFAULT_EVENT_DATA = {
   link: "",
   label: "",
 };
-const DATA_KEY = "2024_first_genesis";
+const DATA_KEY = "2025_phantasmagoria";
 
 export const useGetEventData = () => {
   const [data, setData] = useState<EventData>(DEFAULT_EVENT_DATA);
@@ -43,7 +43,7 @@ export const useGetEventData = () => {
     let mounted = true;
     async function fetchData() {
       await fetch(
-        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/ed67f3f63c9e4dc0dc8245a6ba7e2819d1dcbc4f/ffxiv_treasure_trove_2024.json"
+        "https://gist.githubusercontent.com/jtferns/1ac2cc922b6fb31a801c5245dd3a0158/raw/4f515c6ad8cd478c39391ab79f7f7d1baaa90e49/ffxiv_treasure_trove_2025.json"
       )
         .then((fetchedData) => fetchedData.json())
         .then(
