@@ -1,6 +1,6 @@
 /**
  * Draft-generates the `exchanges` array for an event from FFXIV Collect.
- * Usage: yarn dlx tsx scripts/fetch-rewards.ts "Aphorism" > draft-exchanges.json
+ * Usage: yarn dlx --quiet tsx scripts/fetch-rewards.ts "Aphorism" > draft-exchanges.json
  * Output requires manual audit against the in-game shop / Lodestone table.
  */
 type CollectRow = {
