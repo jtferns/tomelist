@@ -1,46 +1,58 @@
-# Getting Started with Create React App
+# Tomelist
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Tomelist is a web app that helps FFXIV (Final Fantasy XIV) players track tomestone farming
+progress during seasonal "Moogle Treasure Trove" events. Pick the event, log the duties you've
+cleared and the items you want to exchange for, and Tomelist tracks your running tomestone totals
+against event goals. Progress is saved to `localStorage`, and the app supports multiple events
+(past and current) side by side — each event's progress is tracked independently.
 
-## Available Scripts
+## Workspace layout
 
-In the project directory, you can run:
+This is a Yarn workspaces monorepo:
 
-### `yarn start`
+- `app/` — the Vite + React PWA (TanStack Router, Zustand, Tailwind). This is what gets deployed.
+- `packages/schema/` (`@tomelist/schema`) — Zod schemas shared between the app and the data
+  authoring tooling, plus the tests that validate `data/`.
+- `data/` — event content: `manifest.json` (list of known events) and `data/events/*.json` (one
+  file per event: objectives, exchange items, start/end dates). This is bundled into the app at
+  build time — see `app/src/lib/events.ts`.
+- `scripts/` — authoring aids for producing event JSON (not part of the built app or CI). See
+  [`scripts/README.md`](scripts/README.md) for the event authoring flow.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Commands
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Run these from the repo root.
 
-### `yarn test`
+- `yarn workspace @tomelist/app run dev` — run the app's Vite dev server
+- `yarn tsc` — typecheck all workspaces
+- `yarn test` — run all workspace test suites (Vitest)
+- `yarn build` — production build (outputs `app/dist`)
+- `yarn validate:data` — validate every file under `data/` against the `@tomelist/schema` schemas
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Package manager is Yarn 4 (Berry, `nodeLinker: node-modules`, see `.yarnrc.yml`). Node version is
+pinned in `.nvmrc`.
 
-### `yarn build`
+## Adding or updating an event
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+See [`scripts/README.md`](scripts/README.md) for the full authoring flow: drafting exchange data
+with `scripts/fetch-rewards.ts`, transcribing objectives, adding a new `data/events/<id>.json`, and
+registering it in `data/manifest.json`. Run `yarn validate:data` before opening a PR.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Deployment
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The app is a Cloudflare Worker serving static assets (see `wrangler.jsonc`). CI
+(`.github/workflows/node.js.yml`) runs typecheck, tests, and build on every push and PR; on pushes
+to `main`, after those checks pass, it builds again and deploys to Cloudflare via
+`cloudflare/wrangler-action`. Deploying requires the `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` repository secrets to be configured.
 
-### `yarn eject`
+### Retiring the old Surge deployment
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Tomelist previously deployed to `tomelist.surge.sh`. That deployment isn't torn down automatically
+— once the Cloudflare Worker URL is live, manually point the old Surge site at a redirect page.
+`surge-redirect/index.html` is a small HTML page that redirects visitors to the new deployed URL;
+replace the `REPLACE_WITH_DEPLOYED_URL` placeholders in it with the real URL, then run:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+cp surge-redirect/index.html surge-redirect/200.html && npx surge ./surge-redirect https://tomelist.surge.sh
+```
