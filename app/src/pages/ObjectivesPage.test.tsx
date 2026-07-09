@@ -9,8 +9,13 @@ const E = "2026-03-mogmog-collection";
 
 async function renderObjectives() {
   const router = createAppRouter();
-  render(<RouterProvider router={router} />);
+  // Navigate before mounting: mounting with the router still at its default
+  // "/" location triggers the index route's beforeLoad redirect (to
+  // /$eventId/overview), which races the explicit navigate() below and can
+  // clobber it back to the overview route. Resolving navigation first avoids
+  // the race entirely (mirrors the passing pattern in router.test.tsx).
   await router.navigate({ to: "/$eventId/objectives", params: { eventId: E } });
+  render(<RouterProvider router={router} />);
   await screen.findByTestId("objectives-page");
 }
 

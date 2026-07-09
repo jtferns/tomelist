@@ -9,8 +9,13 @@ const E = "2026-03-mogmog-collection";
 
 async function renderOverview() {
   const router = createAppRouter();
-  render(<RouterProvider router={router} />);
+  // Navigate before mounting to avoid racing the index route's beforeLoad
+  // redirect (see ObjectivesPage.test.tsx for the full explanation). This
+  // route happens to share its destination with that redirect so the race
+  // wasn't observable here, but resolving navigation first is the safe,
+  // order-independent pattern.
   await router.navigate({ to: "/$eventId/overview", params: { eventId: E } });
+  render(<RouterProvider router={router} />);
   await screen.findByTestId("overview-page");
 }
 
