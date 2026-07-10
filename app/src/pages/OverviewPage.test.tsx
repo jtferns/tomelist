@@ -27,7 +27,7 @@ beforeEach(() => {
 describe("OverviewPage", () => {
   it("shows the wallet and event name", async () => {
     await renderOverview();
-    expect(screen.getByText(/Mogmog Collection/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Mogmog Collection/).length).toBeGreaterThan(0);
     expect(screen.getByTestId("wallet-count")).toHaveTextContent("0");
   });
   it("steppers adjust the wallet", async () => {

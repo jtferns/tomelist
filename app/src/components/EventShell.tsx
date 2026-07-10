@@ -1,5 +1,6 @@
 import { Link, Outlet, useParams } from "@tanstack/react-router";
 import { ListChecks, Home, Settings, ShoppingBag } from "lucide-react";
+import { ProgressHud } from "@/components/ProgressHud";
 
 const tabs = [
   { to: "overview", label: "Overview", Icon: Home },
@@ -12,10 +13,13 @@ export function EventShell() {
   const { eventId } = useParams({ from: "/$eventId" });
   return (
     <div className="mx-auto flex min-h-dvh max-w-3xl flex-col">
-      <main className="flex-1 p-4 pb-20 sm:pb-4 sm:pt-16">
+      <div className="sm:pt-14">
+        <ProgressHud />
+      </div>
+      <main className="flex-1 p-4 pb-20 sm:pb-4">
         <Outlet />
       </main>
-      <nav className="fixed inset-x-0 bottom-0 border-t border-border bg-card sm:bottom-auto sm:top-0 sm:border-b sm:border-t-0">
+      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card sm:bottom-auto sm:top-0 sm:border-b sm:border-t-0">
         <div className="mx-auto flex max-w-3xl justify-around">
           {tabs.map(({ to, label, Icon }) => (
             <Link
