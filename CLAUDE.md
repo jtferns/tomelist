@@ -74,3 +74,10 @@ tests (`packages/schema/src/data.test.ts`, run via `yarn validate:data`).
 data for a new event; it is not wired into any build/test/CI step. See `scripts/README.md` for the
 full per-event authoring flow (draft exchanges → transcribe objectives → add
 `data/events/<id>.json` → register in `data/manifest.json` → `yarn validate:data`).
+
+## Task tracking
+
+Backlog items are tracked as **draft items in the "Tomelist Backlog" GitHub Project** (project #1,
+owner `jtferns`), not as repo issues. When asked to capture or track a task, add it directly with
+`gh project item-create 1 --owner jtferns --title "..." --body "..."` rather than
+`gh issue create`. Only file an actual repo issue if explicitly asked to.
