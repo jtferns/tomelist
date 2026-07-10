@@ -1,37 +1,106 @@
 import { useParams } from "@tanstack/react-router";
+import { CheckCircle2, Circle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getEvent } from "@/lib/events";
+import { cn } from "@/lib/utils";
+import { getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 import type { Exchange } from "@tomelist/schema";
 
-function ExchangeRow({ eventId, item }: { eventId: string; item: Exchange }) {
-  const status = useAppStore((s) => s.events[eventId]?.wishlist[item.id]?.status);
+function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchange; wallet: number }) {
+  const entry = useAppStore((s) => s.events[eventId]?.wishlist[item.id]);
   const toggleWishlist = useAppStore((s) => s.toggleWishlist);
+  const adjustWishlistQuantity = useAppStore((s) => s.adjustWishlistQuantity);
   const markExchanged = useAppStore((s) => s.markExchanged);
-  return (
-    <Card data-testid={`exchange-${item.id}`}>
-      <CardContent className="flex items-center gap-3 p-3">
-        <button
-          type="button"
-          aria-label={`Want ${item.name}`}
-          onClick={() => toggleWishlist(eventId, item.id)}
-          className="min-w-0 flex-1 text-left"
-        >
-          <p className="truncate font-medium">{item.name}</p>
-          <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Badge variant="secondary">{item.cost} tomes</Badge>
-            <span>{item.type}</span>
-            {item.tradeable ? <Badge variant="outline">tradeable</Badge> : null}
+  const wanted = entry?.status === "wanted";
+  const exchanged = entry?.status === "exchanged";
+  const quantity = entry?.quantity ?? 1;
+  const insufficient = wanted && item.cost * quantity > wallet;
+
+  const meta = (
+    <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+      <Badge variant="secondary">{item.cost} tomes</Badge>
+      <span>{item.type}</span>
+      {item.tradeable ? <Badge variant="outline">tradeable</Badge> : null}
+    </div>
+  );
+
+  if (exchanged) {
+    return (
+      <Card data-testid={`exchange-${item.id}`} className="opacity-70">
+        <CardContent className="flex items-center gap-3 p-3">
+          <CheckCircle2 className="size-5 shrink-0 text-primary" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-medium">{item.name}</p>
+            {meta}
           </div>
-        </button>
-        {status === "exchanged" ? (
           <Badge>Exchanged</Badge>
-        ) : status === "wanted" ? (
-          <Button size="sm" onClick={() => markExchanged(eventId, item.id, item.cost)}>
-            Mark exchanged
-          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card
+      data-testid={`exchange-${item.id}`}
+      data-insufficient={insufficient ? "true" : undefined}
+      role="button"
+      tabIndex={0}
+      aria-pressed={wanted}
+      aria-label={`Want ${item.name}`}
+      onClick={() => toggleWishlist(eventId, item.id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleWishlist(eventId, item.id);
+        }
+      }}
+      className={cn(
+        "cursor-pointer transition-colors hover:bg-accent",
+        wanted && "border-primary"
+      )}
+    >
+      <CardContent className="flex items-center gap-3 p-3">
+        {wanted ? (
+          <CheckCircle2 className="size-5 shrink-0 text-primary" />
+        ) : (
+          <Circle className="size-5 shrink-0 text-muted-foreground" />
+        )}
+        <div className={cn("min-w-0 flex-1", insufficient && "italic opacity-60")}>
+          <p className="truncate font-medium">{item.name}</p>
+          {meta}
+        </div>
+        {wanted ? (
+          <div
+            className="flex shrink-0 items-center gap-1"
+            onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label={`Fewer ${item.name}`}
+              onClick={() => adjustWishlistQuantity(eventId, item.id, -1)}
+            >
+              −
+            </Button>
+            <span data-testid={`qty-${item.id}`} className="w-6 text-center text-sm tabular-nums">
+              {quantity}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label={`More ${item.name}`}
+              onClick={() => adjustWishlistQuantity(eventId, item.id, 1)}
+            >
+              +
+            </Button>
+            <Button size="sm" onClick={() => markExchanged(eventId, item.id, item.cost)}>
+              Mark exchanged
+            </Button>
+          </div>
         ) : null}
       </CardContent>
     </Card>
@@ -41,20 +110,19 @@ function ExchangeRow({ eventId, item }: { eventId: string; item: Exchange }) {
 export function ExchangesPage() {
   const { eventId } = useParams({ from: "/$eventId" });
   const event = getEvent(eventId);
-  const wantedTotal = useAppStore((s) => {
-    const wishlist = s.events[eventId]?.wishlist ?? {};
-    return event?.exchanges
-      .filter((e) => wishlist[e.id]?.status === "wanted")
-      .reduce((sum, e) => sum + e.cost, 0) ?? 0;
-  });
+  const wallet = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
+  const wishlist = useAppStore((s) => s.events[eventId]?.wishlist);
   if (!event) return <div data-testid="exchanges-page">Unknown event.</div>;
+  const wantedTotal = getWishlistTotal(event, wishlist);
   return (
     <div data-testid="exchanges-page" className="flex flex-col gap-3">
       <p className="text-sm text-muted-foreground">
-        Wishlist total: <span data-testid="wanted-total" className="font-bold text-foreground">{wantedTotal}</span> tomes
+        Wishlist total:{" "}
+        <span data-testid="wanted-total" className="font-bold text-foreground">{wantedTotal}</span>{" "}
+        tomes
       </p>
       {event.exchanges.map((item) => (
-        <ExchangeRow key={item.id} eventId={eventId} item={item} />
+        <ExchangeRow key={item.id} eventId={eventId} item={item} wallet={wallet} />
       ))}
     </div>
   );

@@ -25,18 +25,55 @@ describe("ExchangesPage", () => {
     expect(screen.getByText("Fat Cat Parasol")).toBeInTheDocument();
     expect(screen.getByTestId("exchange-fat-cat-parasol")).toHaveTextContent("50");
   });
-  it("tapping an item wants it and updates the summary", async () => {
+
+  it("tapping the card wants it and updates the summary", async () => {
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
     expect(screen.getByTestId("wanted-total")).toHaveTextContent("50");
+    expect(screen.getByTestId("qty-fat-cat-parasol")).toHaveTextContent("1");
   });
-  it("mark exchanged deducts wallet", async () => {
+
+  it("tapping a wanted card untoggles it", async () => {
+    await renderExchanges();
+    const card = () => screen.getByRole("button", { name: /want fat cat parasol/i });
+    await userEvent.click(card());
+    await userEvent.click(card());
+    expect(screen.getByTestId("wanted-total")).toHaveTextContent("0");
+  });
+
+  it("quantity stepper multiplies the total and clamps at 1", async () => {
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    await userEvent.click(screen.getByRole("button", { name: /more fat cat parasol/i }));
+    expect(screen.getByTestId("qty-fat-cat-parasol")).toHaveTextContent("2");
+    expect(screen.getByTestId("wanted-total")).toHaveTextContent("100");
+    await userEvent.click(screen.getByRole("button", { name: /fewer fat cat parasol/i }));
+    await userEvent.click(screen.getByRole("button", { name: /fewer fat cat parasol/i }));
+    expect(screen.getByTestId("qty-fat-cat-parasol")).toHaveTextContent("1");
+    // stepper clicks must not toggle the card off
+    expect(screen.getByTestId("wanted-total")).toHaveTextContent("50");
+  });
+
+  it("marks unaffordable wanted items", async () => {
     useAppStore.getState().addTomestones(E, 60);
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    expect(screen.getByTestId("exchange-fat-cat-parasol")).not.toHaveAttribute("data-insufficient");
+    await userEvent.click(screen.getByRole("button", { name: /more fat cat parasol/i })); // 100 > 60
+    expect(screen.getByTestId("exchange-fat-cat-parasol")).toHaveAttribute("data-insufficient", "true");
+  });
+
+  it("mark exchanged deducts one unit and decrements quantity", async () => {
+    useAppStore.getState().addTomestones(E, 120);
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    await userEvent.click(screen.getByRole("button", { name: /more fat cat parasol/i })); // qty 2
     const row = screen.getByTestId("exchange-fat-cat-parasol");
     await userEvent.click(within(row).getByRole("button", { name: /mark exchanged/i }));
-    expect(useAppStore.getState().getProgress(E).tomestones).toBe(10);
+    expect(useAppStore.getState().getProgress(E).tomestones).toBe(70);
+    expect(screen.getByTestId("qty-fat-cat-parasol")).toHaveTextContent("1");
+    await userEvent.click(within(row).getByRole("button", { name: /mark exchanged/i }));
+    expect(useAppStore.getState().getProgress(E).tomestones).toBe(20);
     expect(within(row).getByText(/exchanged/i)).toBeInTheDocument();
   });
 });
