@@ -12,5 +12,5 @@
     "build": "yarn workspaces foreach -A --topological run build",
     "validate:data": "yarn workspace @tomelist/schema run validate:data"
   },
-  "packageManager": "yarn@4.7.0"
+  "packageManager": "yarn@4.17.1"
 }
