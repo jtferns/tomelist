@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["icon.svg"],
+      includeAssets: ["tomes/*.png"],
       manifest: {
         name: "Tomelist",
         short_name: "Tomelist",
@@ -20,9 +20,9 @@ export default defineConfig({
         background_color: "#2a2438",
         display: "standalone",
         icons: [
-          { src: "icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
           { src: "pwa-192x192.png", sizes: "192x192", type: "image/png" },
           { src: "pwa-512x512.png", sizes: "512x512", type: "image/png" },
+          { src: "maskable-icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
       },
     }),

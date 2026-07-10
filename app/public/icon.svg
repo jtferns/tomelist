@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#2a2438"/>
-  <circle cx="256" cy="230" r="120" fill="#e37fbe"/>
-  <circle cx="256" cy="110" r="34" fill="#f2c14e"/>
-  <rect x="252" y="130" width="8" height="60" fill="#f2c14e"/>
-  <text x="256" y="430" font-family="sans-serif" font-size="72" font-weight="bold" fill="#f5f2fa" text-anchor="middle">TOMELIST</text>
-</svg>

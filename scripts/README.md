@@ -8,3 +8,9 @@ Per new event:
    (kinds: standard | weekly | minimog | ultimog; assign effort: quick | medium | long).
 5. Create `data/events/<id>.json`, add the event to `data/manifest.json`.
 6. `yarn validate:data` must pass. Open a PR; merging deploys.
+7. Add the event's tomestone art as `app/public/tomes/<eventId>.png` and set
+   `tomestone.icon` to `/tomes/<eventId>.png` in the event JSON. For the newest
+   event, also update the static favicon link in `app/index.html` and regenerate
+   the PWA icons from it (`sips -z <size> <size> app/public/tomes/<eventId>.png
+   --out app/public/pwa-<size>x<size>.png`, plus the 180px apple-touch and 512px
+   maskable icons).

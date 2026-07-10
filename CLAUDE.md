@@ -56,7 +56,12 @@ pinned in `.nvmrc`. CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn 
    settings — keyed per event (`events: Record<eventId, EventProgress>`), and syncs to
    `localStorage` under the key `"tomelist:v2"`. Event content itself is never mutated; this store
    is the only place user progress is written. `EventProgress`/`WishlistEntry` types come from
-   `packages/schema/src/state.ts`.
+   `packages/schema/src/state.ts`. Settings also hold a palette×mode theme (`{ palette:
+   maelstrom|adder|flames, mode: dark|light }`), which `Layout` applies to the document as
+   `data-palette`/`data-theme` attributes; the persisted state uses zustand-persist `version: 2`,
+   with a `migrate` step that upgrades the legacy single-string theme/quantity-less format.
+   `EventShell` additionally swaps the page favicon to the currently viewed event's
+   `tomestone.icon`.
 5. The pages under `app/src/pages/` (`OverviewPage`, `ObjectivesPage`, `ExchangesPage`,
    `SettingsPage`) read event content via `getEvent(eventId)` and cross-reference it against
    `useAppStore`'s per-event progress to render and update progress.
