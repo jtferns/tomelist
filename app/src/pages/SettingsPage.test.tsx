@@ -7,7 +7,7 @@ import { createAppRouter } from "@/router";
 
 beforeEach(() => {
   localStorage.clear();
-  useAppStore.setState({ settings: { theme: "dark" } });
+  useAppStore.setState({ settings: { theme: { palette: "maelstrom", mode: "dark" } } });
 });
 
 describe("SettingsPage", () => {
@@ -17,7 +17,7 @@ describe("SettingsPage", () => {
     render(<RouterProvider router={router} />);
     await screen.findByTestId("settings-page");
     await userEvent.click(screen.getByRole("button", { name: /light/i }));
-    expect(useAppStore.getState().settings.theme).toBe("light");
+    expect(useAppStore.getState().settings.theme.mode).toBe("light");
     expect(document.documentElement.dataset.theme).toBe("light");
   });
   it("lists events", async () => {

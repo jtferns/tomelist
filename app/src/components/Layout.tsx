@@ -5,7 +5,7 @@ import { useAppStore } from "@/store/useAppStore";
 export function Layout() {
   const theme = useAppStore((s) => s.settings.theme);
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.theme = theme.mode;
   }, [theme]);
   return <Outlet />;
 }

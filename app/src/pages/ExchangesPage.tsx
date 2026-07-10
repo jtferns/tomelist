@@ -8,7 +8,7 @@ import type { Exchange } from "@tomelist/schema";
 
 function ExchangeRow({ eventId, item }: { eventId: string; item: Exchange }) {
   const status = useAppStore((s) => s.events[eventId]?.wishlist[item.id]?.status);
-  const cycleWishlist = useAppStore((s) => s.cycleWishlist);
+  const toggleWishlist = useAppStore((s) => s.toggleWishlist);
   const markExchanged = useAppStore((s) => s.markExchanged);
   return (
     <Card data-testid={`exchange-${item.id}`}>
@@ -16,7 +16,7 @@ function ExchangeRow({ eventId, item }: { eventId: string; item: Exchange }) {
         <button
           type="button"
           aria-label={`Want ${item.name}`}
-          onClick={() => cycleWishlist(eventId, item.id)}
+          onClick={() => toggleWishlist(eventId, item.id)}
           className="min-w-0 flex-1 text-left"
         >
           <p className="truncate font-medium">{item.name}</p>
