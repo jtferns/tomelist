@@ -31,7 +31,7 @@ Additional regressions:
 | --- | --- |
 | Progress display | Compact sticky HUD bar on every event tab; Overview keeps the big WalletStepper |
 | Event switching | Event name in the HUD opens a switcher dropdown; Settings list stays as secondary path |
-| Exchange rows | Whole card toggles wanted; clear hover/selected affordances; restore sufficient/insufficient tint; Mark exchanged stays a distinct button |
+| Exchange rows | Whole card toggles wanted; quantity stepper on wanted cards; clear hover/selected affordances; restore sufficient/insufficient tint; Mark exchanged stays a distinct button |
 | Themes | Grand Company palettes (Maelstrom, Twin Adder, Immortal Flames), modeled as palette × mode (dark/light); default Maelstrom dark |
 | Favicon | Dynamic: swaps to the viewed event's tome art at runtime; static fallback + PWA icons use the latest event's art |
 
@@ -59,13 +59,21 @@ Tapping the event name opens a dropdown (shadcn `DropdownMenu`) listing
 
 ### 3. Exchange rows
 
-- Whole card is the toggle target: tap toggles `none ↔ wanted`.
+- Whole card is the toggle target: tap toggles `none ↔ wanted` (wanted starts at
+  quantity 1).
+- **Quantities:** wanted cards show a small −/+ stepper to adjust quantity
+  (min 1; − at 1 does nothing, untoggle by tapping the card). `WishlistEntry`
+  (`packages/schema/src/state.ts`) gains a `quantity` field (default 1; persisted
+  entries migrate in the same persist-version bump as themes, §5). Wishlist total
+  = Σ cost × quantity. Stepper clicks do not bubble into the card toggle.
 - Affordances: `cursor: pointer`, `hover:bg-accent`, visible selection indicator
   (empty circle → filled check), primary-tinted border when selected.
-- Sufficient/insufficient: wanted items costing more than the current wallet render
-  muted/italic ("not yet affordable"); affordable ones render solid.
+- Sufficient/insufficient: wanted items whose cost × quantity exceeds the current
+  wallet render muted/italic ("not yet affordable"); affordable ones render solid.
 - "Mark exchanged" remains a distinct button (no event bubbling into the toggle);
-  exchanged items keep the badge and leave the toggle cycle.
+  it deducts one unit's cost and decrements quantity, flipping the entry to
+  `exchanged` (with badge, out of the toggle cycle) when the last unit is
+  exchanged.
 
 ### 4. Global click affordances
 
@@ -100,11 +108,12 @@ Add hover/active transitions to the nav tabs (currently only `.active` changes).
 ## Testing
 
 Extend existing Vitest suites: HUD wallet/total rendering and reactivity to wishlist
-changes; event-switcher navigation; whole-card toggle + affordable/unaffordable
-rendering; theme persistence migration from the old string shape; favicon link swap.
+changes; event-switcher navigation; whole-card toggle, quantity stepper math
+(total = Σ cost × qty, mark-exchanged decrement), and affordable/unaffordable
+rendering; persistence migration (theme string shape + wishlist quantity default);
+favicon link swap.
 Gate: `yarn tsc && yarn test`.
 
 ## Out of scope
 
-- Per-item quantities on exchanges (v1 had them; deferred).
 - Any push/deploy — publishing remains the user's call.
