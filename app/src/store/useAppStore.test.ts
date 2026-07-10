@@ -51,6 +51,23 @@ describe("theme actions", () => {
   });
 });
 
+describe("objective actions", () => {
+  it("records an objective: increments count and wallet", () => {
+    useAppStore.getState().recordObjective(E, "obj-x", 10);
+    useAppStore.getState().recordObjective(E, "obj-x", 10);
+    const p = useAppStore.getState().getProgress(E);
+    expect(p.completedObjectives["obj-x"].count).toBe(2);
+    expect(p.tomestones).toBe(20);
+  });
+
+  it("undo floors at zero", () => {
+    useAppStore.getState().undoObjective(E, "obj-x", 10);
+    const p = useAppStore.getState().getProgress(E);
+    expect(p.completedObjectives["obj-x"]?.count ?? 0).toBe(0);
+    expect(p.tomestones).toBe(0);
+  });
+});
+
 describe("migratePersistedState", () => {
   it("migrates legacy string theme and quantity-less wishlist entries", () => {
     const migrated = migratePersistedState({
