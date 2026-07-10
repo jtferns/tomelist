@@ -46,19 +46,8 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
     <Card
       data-testid={`exchange-${item.id}`}
       data-insufficient={insufficient ? "true" : undefined}
-      role="button"
-      tabIndex={0}
-      aria-pressed={wanted}
-      aria-label={`Want ${item.name}`}
-      onClick={() => toggleWishlist(eventId, item.id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggleWishlist(eventId, item.id);
-        }
-      }}
       className={cn(
-        "cursor-pointer transition-colors hover:bg-accent",
+        "relative transition-colors hover:bg-accent",
         wanted && "border-primary"
       )}
     >
@@ -68,13 +57,22 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
         ) : (
           <Circle className="size-5 shrink-0 text-muted-foreground" />
         )}
-        <div className={cn("min-w-0 flex-1", insufficient && "italic opacity-60")}>
+        <button
+          type="button"
+          aria-pressed={wanted}
+          aria-label={`Want ${item.name}`}
+          onClick={() => toggleWishlist(eventId, item.id)}
+          className={cn(
+            "min-w-0 flex-1 cursor-pointer text-left after:absolute after:inset-0 after:content-['']",
+            insufficient && "italic opacity-60"
+          )}
+        >
           <p className="truncate font-medium">{item.name}</p>
           {meta}
-        </div>
+        </button>
         {wanted ? (
           <div
-            className="flex shrink-0 items-center gap-1"
+            className="relative z-10 flex shrink-0 items-center gap-1"
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
           >
@@ -97,7 +95,11 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
             >
               +
             </Button>
-            <Button size="sm" onClick={() => markExchanged(eventId, item.id, item.cost)}>
+            <Button
+              size="sm"
+              disabled={wallet < item.cost}
+              onClick={() => markExchanged(eventId, item.id, item.cost)}
+            >
               Mark exchanged
             </Button>
           </div>

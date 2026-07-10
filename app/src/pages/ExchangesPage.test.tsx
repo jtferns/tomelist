@@ -76,4 +76,20 @@ describe("ExchangesPage", () => {
     expect(useAppStore.getState().getProgress(E).tomestones).toBe(20);
     expect(within(row).getByText(/exchanged/i)).toBeInTheDocument();
   });
+
+  it("disables mark exchanged when wallet can't cover one unit", async () => {
+    useAppStore.getState().addTomestones(E, 20);
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    const row = screen.getByTestId("exchange-fat-cat-parasol");
+    expect(within(row).getByRole("button", { name: /mark exchanged/i })).toBeDisabled();
+  });
+
+  it("enables mark exchanged once wallet covers one unit", async () => {
+    useAppStore.getState().addTomestones(E, 60);
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    const row = screen.getByTestId("exchange-fat-cat-parasol");
+    expect(within(row).getByRole("button", { name: /mark exchanged/i })).toBeEnabled();
+  });
 });
