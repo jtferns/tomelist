@@ -22,7 +22,7 @@ export function EventShell() {
               key={to}
               to={`/$eventId/${to}`}
               params={{ eventId }}
-              className="flex min-h-14 min-w-14 flex-col items-center justify-center gap-0.5 px-3 text-xs text-muted-foreground [&.active]:text-primary"
+              className="flex min-h-14 min-w-14 flex-col items-center justify-center gap-0.5 px-3 text-xs text-muted-foreground transition-colors hover:text-foreground [&.active]:text-primary"
             >
               <Icon className="size-5" />
               {label}

@@ -5,18 +5,18 @@
   --foreground: oklch(0.95 0.01 280);
   --card: oklch(0.23 0.02 280);
   --card-foreground: oklch(0.95 0.01 280);
-  --primary: oklch(0.75 0.15 330);
-  --primary-foreground: oklch(0.15 0.02 280);
+  --primary: oklch(0.63 0.19 25);
+  --primary-foreground: oklch(0.98 0.01 25);
   --secondary: oklch(0.28 0.02 280);
   --secondary-foreground: oklch(0.95 0.01 280);
   --muted: oklch(0.3 0.02 280);
   --muted-foreground: oklch(0.7 0.02 280);
-  --accent: oklch(0.35 0.05 330);
-  --accent-foreground: oklch(0.95 0.01 280);
+  --accent: oklch(0.32 0.06 25);
+  --accent-foreground: oklch(0.95 0.01 25);
   --destructive: oklch(0.65 0.2 25);
   --border: oklch(0.32 0.02 280);
   --input: oklch(0.35 0.02 280);
-  --ring: oklch(0.75 0.15 330);
+  --ring: oklch(0.63 0.19 25);
 }
 
 :root[data-theme="light"] {
@@ -24,18 +24,62 @@
   --foreground: oklch(0.2 0.02 280);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.2 0.02 280);
-  --primary: oklch(0.55 0.18 330);
+  --primary: oklch(0.5 0.19 25);
   --primary-foreground: oklch(0.98 0 0);
   --secondary: oklch(0.95 0.01 280);
   --secondary-foreground: oklch(0.2 0.02 280);
   --muted: oklch(0.93 0.01 280);
   --muted-foreground: oklch(0.45 0.02 280);
-  --accent: oklch(0.9 0.04 330);
-  --accent-foreground: oklch(0.2 0.02 280);
+  --accent: oklch(0.92 0.03 25);
+  --accent-foreground: oklch(0.25 0.05 25);
   --destructive: oklch(0.58 0.22 25);
   --border: oklch(0.88 0.01 280);
   --input: oklch(0.88 0.01 280);
-  --ring: oklch(0.55 0.18 330);
+  --ring: oklch(0.5 0.19 25);
+}
+
+/* Grand Company palettes — brand-token overrides over the neutral mode blocks. */
+:root[data-palette="maelstrom"][data-theme="dark"] {
+  --primary: oklch(0.63 0.19 25);
+  --primary-foreground: oklch(0.98 0.01 25);
+  --accent: oklch(0.32 0.06 25);
+  --accent-foreground: oklch(0.95 0.01 25);
+  --ring: oklch(0.63 0.19 25);
+}
+:root[data-palette="maelstrom"][data-theme="light"] {
+  --primary: oklch(0.5 0.19 25);
+  --primary-foreground: oklch(0.98 0 0);
+  --accent: oklch(0.92 0.03 25);
+  --accent-foreground: oklch(0.25 0.05 25);
+  --ring: oklch(0.5 0.19 25);
+}
+:root[data-palette="adder"][data-theme="dark"] {
+  --primary: oklch(0.8 0.16 125);
+  --primary-foreground: oklch(0.2 0.05 125);
+  --accent: oklch(0.32 0.05 135);
+  --accent-foreground: oklch(0.95 0.01 135);
+  --ring: oklch(0.8 0.16 125);
+}
+:root[data-palette="adder"][data-theme="light"] {
+  --primary: oklch(0.5 0.13 135);
+  --primary-foreground: oklch(0.98 0 0);
+  --accent: oklch(0.92 0.05 130);
+  --accent-foreground: oklch(0.25 0.05 135);
+  --ring: oklch(0.5 0.13 135);
+}
+:root[data-palette="flames"][data-theme="dark"] {
+  --primary: oklch(0.8 0.13 85);
+  --primary-foreground: oklch(0.22 0.05 85);
+  --accent: oklch(0.33 0.05 85);
+  --accent-foreground: oklch(0.95 0.01 85);
+  --ring: oklch(0.8 0.13 85);
+}
+:root[data-palette="flames"][data-theme="light"] {
+  --primary: oklch(0.55 0.12 80);
+  --primary-foreground: oklch(0.98 0 0);
+  --accent: oklch(0.92 0.04 85);
+  --accent-foreground: oklch(0.25 0.05 85);
+  --ring: oklch(0.55 0.12 80);
 }
 
 @theme inline {
@@ -60,6 +104,13 @@
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
 }
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
