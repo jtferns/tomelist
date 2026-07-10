@@ -1,6 +1,9 @@
 import { Link, Outlet, useParams } from "@tanstack/react-router";
 import { ListChecks, Home, Settings, ShoppingBag } from "lucide-react";
+import { useEffect } from "react";
 import { ProgressHud } from "@/components/ProgressHud";
+import { getEvent } from "@/lib/events";
+import { setFavicon } from "@/lib/favicon";
 
 const tabs = [
   { to: "overview", label: "Overview", Icon: Home },
@@ -11,6 +14,10 @@ const tabs = [
 
 export function EventShell() {
   const { eventId } = useParams({ from: "/$eventId" });
+  const event = getEvent(eventId);
+  useEffect(() => {
+    if (event?.tomestone.icon) setFavicon(event.tomestone.icon);
+  }, [event]);
   return (
     <div className="mx-auto flex min-h-dvh max-w-3xl flex-col">
       <div className="sm:pt-14">
