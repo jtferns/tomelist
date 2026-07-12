@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Tomelist</title>
     <link rel="icon" type="image/png" href="/tomes/2026-03-mogmog-collection.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" sizes="180x180" />
+    <script>
+      (function () {
+        try {
+          var palettes = ["maelstrom", "adder", "flames"];
+          var modes = ["dark", "light"];
+          var raw = localStorage.getItem("tomelist:v2");
+          var theme = (raw && JSON.parse(raw).state.settings.theme) || {};
+          var palette = palettes.indexOf(theme.palette) !== -1 ? theme.palette : "maelstrom";
+          var mode = modes.indexOf(theme.mode) !== -1 ? theme.mode : "dark";
+          document.documentElement.dataset.theme = mode;
+          document.documentElement.dataset.palette = palette;
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
