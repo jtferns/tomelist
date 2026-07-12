@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { EventData, Exchange, Objective } from "@tomelist/schema";
 import { emptyEventProgress, type EventProgress } from "@tomelist/schema";
-import { budgetReport, EFFORT_WEIGHTS } from "./optimizer";
+import {
+  budgetReport,
+  EFFORT_WEIGHTS,
+  lastWeeklyReset,
+  rankRunNext,
+  runsToMustGoal,
+} from "./optimizer";
 
 function objective(overrides: Partial<Objective> & Pick<Objective, "id">): Objective {
   return {
@@ -216,6 +222,138 @@ describe("budgetReport - weeksNeeded exact arithmetic", () => {
     });
     const report = budgetReport(ev, p, NOW);
     expect(report.tiers[0].weeksNeeded).toBeNull();
+  });
+});
+
+describe("lastWeeklyReset", () => {
+  it("maps a mid-week date to the previous Tuesday 08:00 UTC", () => {
+    // Thursday
+    const now = new Date("2026-01-15T12:00:00Z");
+    expect(lastWeeklyReset(now).toISOString()).toBe("2026-01-13T08:00:00.000Z");
+  });
+
+  it("maps a Tuesday just before reset to a full week back", () => {
+    const now = new Date("2026-01-13T07:59:59.999Z");
+    expect(lastWeeklyReset(now).toISOString()).toBe("2026-01-06T08:00:00.000Z");
+  });
+
+  it("maps exactly 08:00 Tuesday to itself", () => {
+    const now = new Date("2026-01-13T08:00:00.000Z");
+    expect(lastWeeklyReset(now).toISOString()).toBe("2026-01-13T08:00:00.000Z");
+  });
+});
+
+describe("rankRunNext", () => {
+  it("orders by score (points / effort weight) desc, then points desc, then id asc", () => {
+    const ev = event({
+      objectives: [
+        objective({ id: "a", points: 20, effort: "medium" }), // score 10
+        objective({ id: "b", points: 10, effort: "quick" }), // score 10
+        objective({ id: "c", points: 40, effort: "long" }), // score 10
+        objective({ id: "d", points: 5, effort: "quick" }), // score 5
+      ],
+    });
+    const ranked = rankRunNext(ev, progress(), NOW);
+    // a, b, c tie at score 10; sorted by points desc (c=40, a=20, b=10), then d last.
+    expect(ranked.map((r) => r.objective.id)).toEqual(["c", "a", "b", "d"]);
+  });
+
+  it("excludes a completed one-time objective", () => {
+    const ev = event({
+      objectives: [objective({ id: "one-time", repeatable: false, points: 10 })],
+    });
+    const p = progress({
+      completedObjectives: { "one-time": { count: 1, lastDoneAt: NOW.toISOString() } },
+    });
+    expect(rankRunNext(ev, p, NOW)).toEqual([]);
+  });
+
+  it("excludes a weekly objective done since the current reset, includes one done before it", () => {
+    const ev = event({
+      objectives: [
+        objective({ id: "weekly-done", kind: "standard", repeatable: "weekly", points: 10 }),
+        objective({ id: "weekly-stale", kind: "standard", repeatable: "weekly", points: 10 }),
+      ],
+    });
+    const reset = lastWeeklyReset(NOW);
+    const p = progress({
+      completedObjectives: {
+        "weekly-done": { count: 1, lastDoneAt: new Date(reset.getTime() + 1000).toISOString() },
+        "weekly-stale": { count: 3, lastDoneAt: new Date(reset.getTime() - 1000).toISOString() },
+      },
+    });
+    const ids = rankRunNext(ev, p, NOW).map((r) => r.objective.id);
+    expect(ids).toEqual(["weekly-stale"]);
+  });
+
+  it("always includes repeatable === true objectives regardless of completion history", () => {
+    const ev = event({
+      objectives: [objective({ id: "grind", kind: "standard", repeatable: true, points: 10 })],
+    });
+    const p = progress({
+      completedObjectives: { grind: { count: 50, lastDoneAt: NOW.toISOString() } },
+    });
+    expect(rankRunNext(ev, p, NOW).map((r) => r.objective.id)).toEqual(["grind"]);
+  });
+});
+
+describe("runsToMustGoal", () => {
+  it("returns 0 when the must tier is already affordable", () => {
+    const ev = event({ exchanges: [exchange({ id: "ex-1", cost: 100 })] });
+    const p = progress({
+      tomestones: 100,
+      wishlist: { "ex-1": { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    expect(runsToMustGoal(ev, p, NOW)).toBe(0);
+  });
+
+  it("greedily counts objectives needed to cover the shortfall", () => {
+    const ev = event({
+      exchanges: [exchange({ id: "ex-1", cost: 100 })],
+      objectives: [
+        objective({ id: "a", points: 40, effort: "quick", repeatable: false }), // score 40
+        objective({ id: "b", points: 30, effort: "quick", repeatable: false }), // score 30
+        objective({ id: "c", points: 10, effort: "quick", repeatable: false }), // score 10
+        objective({ id: "d", points: 25, effort: "quick", repeatable: false }), // score 25
+      ],
+    });
+    const p = progress({
+      tomestones: 0,
+      wishlist: { "ex-1": { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    // shortfall = 100. Ranked by score desc: a(40), b(30), d(25), c(10).
+    // a=40 (1), b=70 (2), d=95 (3), c=105 (4) -> covered at count 4.
+    expect(runsToMustGoal(ev, p, NOW)).toBe(4);
+  });
+
+  it("returns null when short with no unbounded grind available", () => {
+    const ev = event({
+      exchanges: [exchange({ id: "ex-1", cost: 1000 })],
+      objectives: [objective({ id: "a", points: 10, repeatable: false })],
+    });
+    const p = progress({
+      tomestones: 0,
+      wishlist: { "ex-1": { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    expect(runsToMustGoal(ev, p, NOW)).toBeNull();
+  });
+
+  it("covers the shortfall via a repeating unbounded grind when the finite list runs out", () => {
+    const ev = event({
+      exchanges: [exchange({ id: "ex-1", cost: 100 })],
+      objectives: [
+        objective({ id: "one-time", points: 10, repeatable: false }),
+        objective({ id: "grind", points: 20, repeatable: true }),
+      ],
+    });
+    const p = progress({
+      tomestones: 0,
+      wishlist: { "ex-1": { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    // shortfall = 100. Ranked by score desc: grind (score 20) then one-time (score 10).
+    // sum after grind(20)=20 (count1), one-time(10)=30 (count2), still short -> repeat best
+    // unbounded (grind, 20 pts): 50(3), 70(4), 90(5), 110(6) -> covered at count 6.
+    expect(runsToMustGoal(ev, p, NOW)).toBe(6);
   });
 });
 

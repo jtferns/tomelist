@@ -29,6 +29,25 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  *   oneTimeRemaining; if shortfall <= 0 -> 0 (one-time income isn't instant, but we treat it
  *   as available); else if weeklyRate > 0 -> ceil(shortfall / weeklyRate); else null.
  * - affordableByEnd = projectedIncome !== null ? projectedIncome >= cumulativeCost : null.
+ *
+ * Run-next ranking
+ * ----------------
+ * - lastWeeklyReset(now): the most recent FFXIV weekly reset (Tuesday 08:00:00.000 UTC) at or
+ *   before `now`, computed in UTC.
+ * - Availability (an objective must be available to be ranked):
+ *   - repeatable === false -> available iff never completed (count 0).
+ *   - repeatable === "weekly" OR kind === "minimog" -> available iff never completed, or
+ *     lastDoneAt is strictly before lastWeeklyReset(now) (i.e. not yet done since the current
+ *     reset). Minimogs count as weekly picks here regardless of their own repeatable flag,
+ *     matching the game mechanic (see Income model above).
+ *   - repeatable === true -> always available (unbounded grind).
+ * - score = points / EFFORT_WEIGHTS[effort]. Ranked list sorted by score desc, then points desc,
+ *   then id asc, for a stable/deterministic order.
+ * - runsToMustGoal walks the ranked list, summing points until the must-tier shortfall
+ *   (cumulativeCost - wallet) is covered, returning the count of objectives consumed; 0 if
+ *   already affordable. If the ranked list is exhausted while still short, it keeps repeating
+ *   the highest-scoring available unbounded-grind objective (repeatable === true) until covered;
+ *   if none exists, the goal is unreachable and it returns null.
  */
 
 export const EFFORT_WEIGHTS = { quick: 1, medium: 2, long: 4 } as const;
@@ -145,4 +164,74 @@ export function budgetReport(event: EventData, progress: EventProgress, now: Dat
   });
 
   return { wallet, weeklyRate, oneTimeRemaining, weeksLeft, projectedIncome, tiers };
+}
+
+const WEEKLY_RESET_DAY = 2; // Tuesday, per Date#getUTCDay (0 = Sunday)
+const WEEKLY_RESET_HOUR = 8;
+
+export function lastWeeklyReset(now: Date): Date {
+  const reset = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), WEEKLY_RESET_HOUR, 0, 0, 0)
+  );
+  const dayDiff = (reset.getUTCDay() - WEEKLY_RESET_DAY + 7) % 7;
+  reset.setUTCDate(reset.getUTCDate() - dayDiff);
+  if (reset.getTime() > now.getTime()) {
+    reset.setUTCDate(reset.getUTCDate() - 7);
+  }
+  return reset;
+}
+
+export type RankedObjective = { objective: Objective; score: number };
+
+function isAvailableForRunNext(objective: Objective, progress: EventProgress, now: Date): boolean {
+  const record = progress.completedObjectives[objective.id];
+  if (objective.repeatable === true) return true;
+  if (objective.repeatable === "weekly" || objective.kind === "minimog") {
+    if (!record) return true;
+    const lastDoneAt = new Date(record.lastDoneAt).getTime();
+    if (Number.isNaN(lastDoneAt)) return true;
+    return lastDoneAt < lastWeeklyReset(now).getTime();
+  }
+  // repeatable === false
+  return (record?.count ?? 0) === 0;
+}
+
+export function rankRunNext(event: EventData, progress: EventProgress, now: Date): RankedObjective[] {
+  const ranked: RankedObjective[] = event.objectives
+    .filter((objective) => isAvailableForRunNext(objective, progress, now))
+    .map((objective) => ({ objective, score: objective.points / EFFORT_WEIGHTS[objective.effort] }));
+
+  ranked.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    if (b.objective.points !== a.objective.points) return b.objective.points - a.objective.points;
+    return a.objective.id.localeCompare(b.objective.id);
+  });
+
+  return ranked;
+}
+
+export function runsToMustGoal(event: EventData, progress: EventProgress, now: Date): number | null {
+  const report = budgetReport(event, progress, now);
+  const mustTier = report.tiers.find((tier) => tier.tier === "must");
+  const mustCost = mustTier?.cumulativeCost ?? 0;
+  const shortfall = mustCost - report.wallet;
+  if (shortfall <= 0) return 0;
+
+  const ranked = rankRunNext(event, progress, now);
+  let sum = 0;
+  let count = 0;
+  for (const { objective } of ranked) {
+    sum += objective.points;
+    count += 1;
+    if (sum >= shortfall) return count;
+  }
+
+  const bestUnbounded = ranked.find(({ objective }) => objective.repeatable === true);
+  if (!bestUnbounded) return null;
+
+  while (sum < shortfall) {
+    sum += bestUnbounded.objective.points;
+    count += 1;
+  }
+  return count;
 }

@@ -1,6 +1,7 @@
 import { useParams } from "@tanstack/react-router";
 import { formatDistanceToNowStrict } from "date-fns";
 import { BudgetSummary } from "@/components/BudgetSummary";
+import { RunNext } from "@/components/RunNext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WalletStepper } from "@/components/WalletStepper";
 import { getEvent, isEventEnded } from "@/lib/events";
@@ -34,6 +35,7 @@ export function OverviewPage() {
         </CardContent>
       </Card>
       <BudgetSummary eventId={eventId} />
+      <RunNext eventId={eventId} />
     </div>
   );
 }
