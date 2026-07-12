@@ -60,9 +60,16 @@ all depend on live TanStack Router params and/or real event JSON data loaded via
 - **Tabs was dropped 2026-07-12**: `app/src/components/ui/tabs.tsx` was scaffolded but never
   imported and had no planned use, so the source, its authored preview, and its 4 synced
   components (Tabs/TabsList/TabsTrigger/TabsContent) were deleted to keep the designed set tight.
-- Only `Badge`, `Button`, and `Card` (as a family) have rich authored previews, per explicit
-  user scoping — `Layout` and `WalletStepper` are floor cards by choice, not by blocker (they
-  have no router/data dependency and could be authored on a future sync).
+- `Badge`, `Button`, `Card` (as a family), and `WalletStepper` have rich authored previews.
+- **Layout stays on the floor card permanently**: it renders only a router `<Outlet />` — its
+  entire visible job is applying theme attributes as a side effect — so an authored preview
+  would have to invent content the component doesn't render. Don't author one.
+- **`useAppStore` is in `cfg.extraEntries`** (`./src/store/useAppStore.ts`) so previews can
+  import it from `@tomelist/app` — the synth-entry barrel only includes `.tsx`/`.jsx` files, so
+  without this the store hook isn't a bundle export and imports come back undefined.
+- **WalletStepper's preview seeds the store delta-style** (targets an absolute 240): the zustand
+  store persists to localStorage across capture page loads, so a plain `addTomestones(+240)`
+  accumulates run over run and the screenshot drifts (first symptom: 720 in the sheet).
 
 ## Known render warns
 

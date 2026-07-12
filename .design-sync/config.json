@@ -9,7 +9,7 @@
     "component": "ThemeRoot",
     "props": { "theme": "dark", "palette": "maelstrom" }
   },
-  "extraEntries": ["./src/design-sync/theme-root.tsx"],
+  "extraEntries": ["./src/design-sync/theme-root.tsx", "./src/store/useAppStore.ts"],
   "readmeHeader": ".design-sync/conventions.md",
   "componentSrcMap": {
     "ThemeRoot": null,
