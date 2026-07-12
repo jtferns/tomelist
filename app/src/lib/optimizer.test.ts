@@ -7,6 +7,7 @@ import {
   lastWeeklyReset,
   rankRunNext,
   runsToMustGoal,
+  weeklyPlan,
 } from "./optimizer";
 
 function objective(overrides: Partial<Objective> & Pick<Objective, "id">): Objective {
@@ -354,6 +355,110 @@ describe("runsToMustGoal", () => {
     // sum after grind(20)=20 (count1), one-time(10)=30 (count2), still short -> repeat best
     // unbounded (grind, 20 pts): 50(3), 70(4), 90(5), 110(6) -> covered at count 6.
     expect(runsToMustGoal(ev, p, NOW)).toBe(6);
+  });
+});
+
+describe("weeklyPlan", () => {
+  const reset = lastWeeklyReset(NOW);
+
+  it("excludes minimogs done this week from suggestions and orders top-2 by score", () => {
+    const ev = event({
+      objectives: [
+        objective({ id: "mini-a", kind: "minimog", points: 40, effort: "quick" }), // score 40
+        objective({ id: "mini-b", kind: "minimog", points: 20, effort: "quick" }), // score 20
+        objective({ id: "mini-c", kind: "minimog", points: 10, effort: "quick" }), // score 10, done this week
+      ],
+    });
+    const p = progress({
+      completedObjectives: {
+        "mini-c": { count: 1, lastDoneAt: new Date(reset.getTime() + 1000).toISOString() },
+      },
+    });
+    const plan = weeklyPlan(ev, p, NOW);
+    expect(plan.suggestedMinimogs.map((r) => r.objective.id)).toEqual(["mini-a", "mini-b"]);
+  });
+
+  it("weeklies flag flips based on lastDoneAt before/after reset", () => {
+    const ev = event({
+      objectives: [
+        objective({ id: "weekly-done", kind: "standard", repeatable: "weekly", points: 10 }),
+        objective({ id: "weekly-stale", kind: "standard", repeatable: "weekly", points: 10 }),
+      ],
+    });
+    const p = progress({
+      completedObjectives: {
+        "weekly-done": { count: 1, lastDoneAt: new Date(reset.getTime() + 1000).toISOString() },
+        "weekly-stale": { count: 3, lastDoneAt: new Date(reset.getTime() - 1000).toISOString() },
+      },
+    });
+    const plan = weeklyPlan(ev, p, NOW);
+    const byId = Object.fromEntries(plan.weeklies.map((w) => [w.objective.id, w.doneThisWeek]));
+    expect(byId).toEqual({ "weekly-done": true, "weekly-stale": false });
+  });
+
+  it("excludes minimogs from the weeklies list even if flagged repeatable: weekly", () => {
+    const ev = event({
+      objectives: [objective({ id: "mini-weekly", kind: "minimog", repeatable: "weekly", points: 10 })],
+    });
+    const plan = weeklyPlan(ev, progress(), NOW);
+    expect(plan.weeklies).toEqual([]);
+  });
+
+  it("sums earnedThisWeek across all doneThisWeek objectives", () => {
+    const ev = event({
+      objectives: [
+        objective({ id: "a", points: 10 }),
+        objective({ id: "b", kind: "minimog", points: 20 }),
+        objective({ id: "c", points: 5 }), // not done
+      ],
+    });
+    const p = progress({
+      completedObjectives: {
+        a: { count: 1, lastDoneAt: new Date(reset.getTime() + 100).toISOString() },
+        b: { count: 1, lastDoneAt: new Date(reset.getTime() + 100).toISOString() },
+      },
+    });
+    const plan = weeklyPlan(ev, p, NOW);
+    expect(plan.earnedThisWeek).toBe(30);
+  });
+
+  it("neededPerWeek is 0 when the must tier is already covered by wallet/one-time income", () => {
+    const ev = event({ exchanges: [exchange({ id: "ex-1", cost: 50 })] });
+    const p = progress({
+      tomestones: 100,
+      wishlist: { "ex-1": { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    const plan = weeklyPlan(ev, p, NOW);
+    expect(plan.neededPerWeek).toBe(0);
+    expect(plan.onPace).toBe(true);
+  });
+
+  it("neededPerWeek is positive when there's a shortfall and weeksLeft > 0; onPace false when under-earned", () => {
+    const ev = event({
+      ends: "2026-01-29T00:00:00Z", // 2 weeks after NOW
+      exchanges: [exchange({ id: "ex-1", cost: 100 })],
+      objectives: [],
+    });
+    const p = progress({
+      tomestones: 0,
+      wishlist: { "ex-1": { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    // shortfall = 100 - 0 - 0 = 100; weeksLeft = 2 -> ceil(100/2) = 50
+    const plan = weeklyPlan(ev, p, NOW);
+    expect(plan.neededPerWeek).toBe(50);
+    expect(plan.earnedThisWeek).toBe(0);
+    expect(plan.onPace).toBe(false);
+  });
+
+  it("neededPerWeek is null when weeksLeft is null (open-ended event)", () => {
+    const ev = event({ ends: null, exchanges: [exchange({ id: "ex-1", cost: 100 })] });
+    const p = progress({
+      tomestones: 0,
+      wishlist: { "ex-1": { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    const plan = weeklyPlan(ev, p, NOW);
+    expect(plan.neededPerWeek).toBeNull();
+    expect(plan.onPace).toBeNull();
   });
 });
 

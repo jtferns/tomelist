@@ -10,6 +10,7 @@ import { getActiveEvent } from "@/lib/events";
 import { ExchangesPage } from "@/pages/ExchangesPage";
 import { ObjectivesPage } from "@/pages/ObjectivesPage";
 import { OverviewPage } from "@/pages/OverviewPage";
+import { PlannerPage } from "@/pages/PlannerPage";
 import { SettingsPage } from "@/pages/SettingsPage";
 
 const rootRoute = createRootRoute({ component: Layout });
@@ -33,12 +34,13 @@ const eventRoute = createRoute({
 
 const overviewRoute = createRoute({ getParentRoute: () => eventRoute, path: "/overview", component: OverviewPage });
 const objectivesRoute = createRoute({ getParentRoute: () => eventRoute, path: "/objectives", component: ObjectivesPage });
+const plannerRoute = createRoute({ getParentRoute: () => eventRoute, path: "/planner", component: PlannerPage });
 const exchangesRoute = createRoute({ getParentRoute: () => eventRoute, path: "/exchanges", component: ExchangesPage });
 const settingsRoute = createRoute({ getParentRoute: () => eventRoute, path: "/settings", component: SettingsPage });
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  eventRoute.addChildren([overviewRoute, objectivesRoute, exchangesRoute, settingsRoute]),
+  eventRoute.addChildren([overviewRoute, objectivesRoute, plannerRoute, exchangesRoute, settingsRoute]),
 ]);
 
 export function createAppRouter() {

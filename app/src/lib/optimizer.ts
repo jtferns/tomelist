@@ -48,6 +48,25 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  *   already affordable. If the ranked list is exhausted while still short, it keeps repeating
  *   the highest-scoring available unbounded-grind objective (repeatable === true) until covered;
  *   if none exists, the goal is unreachable and it returns null.
+ *
+ * Weekly plan
+ * -----------
+ * - doneThisWeek(id): completedObjectives[id] exists AND its lastDoneAt parses to a time >=
+ *   lastWeeklyReset(now).
+ * - suggestedMinimogs: kind === "minimog" objectives NOT doneThisWeek, scored and ordered
+ *   exactly like rankRunNext (points / EFFORT_WEIGHTS[effort] desc, then points desc, then id
+ *   asc), truncated to the top 2 — the game allows 2 Minimog picks per week.
+ * - weeklies: objectives with repeatable === "weekly" (any kind other than minimog — minimogs
+ *   are surfaced via suggestedMinimogs instead), in event order, each paired with its
+ *   doneThisWeek flag.
+ * - earnedThisWeek: sum of objective.points over ALL event objectives that are doneThisWeek.
+ *   This is an approximation: completedObjectives only stores the latest lastDoneAt (and a
+ *   cumulative count), so a repeatable objective completed more than once within the same
+ *   week is only counted once here, not per-completion.
+ * - neededPerWeek: derived from budgetReport's must tier. Let shortfall = mustCost - wallet -
+ *   oneTimeRemaining. When weeksLeft is a number > 0: max(0, ceil(shortfall / weeksLeft)).
+ *   When weeksLeft is null or 0: null (no meaningful weekly target).
+ * - onPace: null when neededPerWeek is null; otherwise earnedThisWeek >= neededPerWeek.
  */
 
 export const EFFORT_WEIGHTS = { quick: 1, medium: 2, long: 4 } as const;
@@ -234,4 +253,57 @@ export function runsToMustGoal(event: EventData, progress: EventProgress, now: D
     count += 1;
   }
   return count;
+}
+
+export type WeeklyPlan = {
+  suggestedMinimogs: RankedObjective[];
+  weeklies: { objective: Objective; doneThisWeek: boolean }[];
+  earnedThisWeek: number;
+  neededPerWeek: number | null;
+  onPace: boolean | null;
+};
+
+function doneThisWeek(progress: EventProgress, objectiveId: string, now: Date): boolean {
+  const record = progress.completedObjectives[objectiveId];
+  if (!record) return false;
+  const lastDoneAt = new Date(record.lastDoneAt).getTime();
+  if (Number.isNaN(lastDoneAt)) return false;
+  return lastDoneAt >= lastWeeklyReset(now).getTime();
+}
+
+export function weeklyPlan(event: EventData, progress: EventProgress, now: Date): WeeklyPlan {
+  const suggestedMinimogs = event.objectives
+    .filter((objective) => objective.kind === "minimog" && !doneThisWeek(progress, objective.id, now))
+    .map((objective) => ({ objective, score: objective.points / EFFORT_WEIGHTS[objective.effort] }))
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (b.objective.points !== a.objective.points) return b.objective.points - a.objective.points;
+      return a.objective.id.localeCompare(b.objective.id);
+    })
+    .slice(0, 2);
+
+  const weeklies = event.objectives
+    .filter((objective) => objective.repeatable === "weekly" && objective.kind !== "minimog")
+    .map((objective) => ({ objective, doneThisWeek: doneThisWeek(progress, objective.id, now) }));
+
+  let earnedThisWeek = 0;
+  for (const objective of event.objectives) {
+    if (doneThisWeek(progress, objective.id, now)) earnedThisWeek += objective.points;
+  }
+
+  const report = budgetReport(event, progress, now);
+  const mustTier = report.tiers.find((tier) => tier.tier === "must");
+  const mustCost = mustTier?.cumulativeCost ?? 0;
+  const shortfall = mustCost - report.wallet - report.oneTimeRemaining;
+
+  let neededPerWeek: number | null;
+  if (report.weeksLeft === null || report.weeksLeft === 0) {
+    neededPerWeek = null;
+  } else {
+    neededPerWeek = shortfall <= 0 ? 0 : Math.ceil(shortfall / report.weeksLeft);
+  }
+
+  const onPace = neededPerWeek === null ? null : earnedThisWeek >= neededPerWeek;
+
+  return { suggestedMinimogs, weeklies, earnedThisWeek, neededPerWeek, onPace };
 }

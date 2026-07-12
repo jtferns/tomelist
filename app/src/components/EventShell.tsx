@@ -1,5 +1,5 @@
 import { Link, Outlet, useParams } from "@tanstack/react-router";
-import { ListChecks, Home, Settings, ShoppingBag } from "lucide-react";
+import { CalendarCheck, ListChecks, Home, Settings, ShoppingBag } from "lucide-react";
 import { useEffect } from "react";
 import { ProgressHud } from "@/components/ProgressHud";
 import { getEvent } from "@/lib/events";
@@ -8,6 +8,7 @@ import { setFavicon } from "@/lib/favicon";
 const tabs = [
   { to: "overview", label: "Overview", Icon: Home },
   { to: "objectives", label: "Objectives", Icon: ListChecks },
+  { to: "planner", label: "Planner", Icon: CalendarCheck },
   { to: "exchanges", label: "Exchanges", Icon: ShoppingBag },
   { to: "settings", label: "Settings", Icon: Settings },
 ] as const;
