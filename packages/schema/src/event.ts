@@ -23,6 +23,7 @@ export const exchangeSchema = z.object({
   limited: z.boolean().optional(),
   icon: z.string().optional(),
   notes: z.string().optional(),
+  eorzeadbUrl: z.string().url().optional(),
 });
 
 export const eventSchema = z.object({

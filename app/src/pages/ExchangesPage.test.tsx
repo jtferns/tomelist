@@ -115,4 +115,12 @@ describe("ExchangesPage", () => {
     expect(screen.queryByTestId("alt-miners-earring")).not.toBeInTheDocument();
     expect(screen.queryByTestId("alt-magicked-prism-bundle")).not.toBeInTheDocument();
   });
+
+  it("does not render eorzeadb links or load the tooltip script (no exchange in this event's data has eorzeadbUrl)", async () => {
+    await renderExchanges();
+    expect(screen.queryByTestId("eorzeadb-fat-cat-parasol")).not.toBeInTheDocument();
+    expect(
+      document.querySelector('script[src="https://lds-img.finalfantasyxiv.com/pc/global/js/eorzeadb/loader.js?v3"]')
+    ).not.toBeInTheDocument();
+  });
 });

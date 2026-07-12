@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getEvent } from "@/lib/events";
+import { useEorzeaTooltips } from "@/lib/useEorzeaTooltips";
 import { cn } from "@/lib/utils";
 import { getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
@@ -39,6 +40,18 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
         >
           also elsewhere
         </Badge>
+      ) : null}
+      {item.eorzeadbUrl ? (
+        <a
+          href={item.eorzeadbUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid={`eorzeadb-${item.id}`}
+          className={cn("eorzeadb_link", "relative z-10 underline underline-offset-2")}
+          onClick={(e) => e.stopPropagation()}
+        >
+          db
+        </a>
       ) : null}
     </div>
   );
@@ -139,6 +152,7 @@ export function ExchangesPage() {
   const event = getEvent(eventId);
   const wallet = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
   const wishlist = useAppStore((s) => s.events[eventId]?.wishlist);
+  useEorzeaTooltips(Boolean(event?.exchanges.some((e) => e.eorzeadbUrl)));
   if (!event) return <div data-testid="exchanges-page">Unknown event.</div>;
   const wantedTotal = getWishlistTotal(event, wishlist);
   return (
