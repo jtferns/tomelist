@@ -73,7 +73,7 @@ export const useAppStore = create<AppState>()(
         });
       const setTheme = (patch: Partial<ThemeSettings>) =>
         set((s) => ({
-          settings: { theme: { ...s.settings.theme, ...patch } },
+          settings: { ...s.settings, theme: { ...s.settings.theme, ...patch } },
           updatedAt: new Date().toISOString(),
         }));
 
