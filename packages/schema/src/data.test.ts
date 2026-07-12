@@ -20,4 +20,15 @@ describe("bundled event data", () => {
       expect(manifest.events.map((e) => e.id)).toContain(event.id);
     }
   });
+  it("manifest entries match their event file metadata", () => {
+    const manifest = manifestSchema.parse(JSON.parse(readFileSync(join(dataDir, "manifest.json"), "utf8")));
+    for (const entry of manifest.events) {
+      const event = eventSchema.parse(
+        JSON.parse(readFileSync(join(dataDir, "events", `${entry.id}.json`), "utf8"))
+      );
+      expect(entry.name).toBe(event.name);
+      expect(entry.starts).toBe(event.starts);
+      expect(entry.ends).toBe(event.ends);
+    }
+  });
 });
