@@ -53,17 +53,16 @@ all depend on live TanStack Router params and/or real event JSON data loaded via
   unresolved CSS custom properties (browser-default colors) since Tomelist's whole token system
   is scoped to `:root[data-theme][data-palette]`. If this file is ever deleted, the render check
   will show near-black/blank previews with no obvious tag — this note is the only trace.
-- **11 of 15 synced components are unauthored floor cards** (Card sub-parts, Tabs sub-parts,
-  Layout, WalletStepper). `CardAction`/`CardContent`/`CardDescription`/`CardFooter`/`CardHeader`/
+- **8 of 11 synced components are unauthored floor cards** (Card sub-parts, Layout,
+  WalletStepper). `CardAction`/`CardContent`/`CardDescription`/`CardFooter`/`CardHeader`/
   `CardTitle` render legitimately blank on the floor card (no children by default) —
   `[RENDER_BLANK]` warnings for these are expected, not a regression to chase.
-- **`Tabs` has no real usage anywhere in the app** (`app/src/components/ui/tabs.tsx` is scaffolded
-  but never imported elsewhere) — its authored preview (`Default`/`LineVariant`) is invented
-  Tomelist-flavored content, not ported from a real call site. If Tabs later gets wired into the
-  app for real, re-check the preview still matches actual usage.
-- Only `Badge`, `Button`, `Card` (as a family), and `Tabs` (as a family) got rich authored
-  previews, per explicit user scoping — `Layout` and `WalletStepper` are floor cards by choice,
-  not by blocker (they have no router/data dependency and could be authored on a future sync).
+- **Tabs was dropped 2026-07-12**: `app/src/components/ui/tabs.tsx` was scaffolded but never
+  imported and had no planned use, so the source, its authored preview, and its 4 synced
+  components (Tabs/TabsList/TabsTrigger/TabsContent) were deleted to keep the designed set tight.
+- Only `Badge`, `Button`, and `Card` (as a family) have rich authored previews, per explicit
+  user scoping — `Layout` and `WalletStepper` are floor cards by choice, not by blocker (they
+  have no router/data dependency and could be authored on a future sync).
 
 ## Known render warns
 
