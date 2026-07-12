@@ -107,6 +107,18 @@ describe("budgetReport - oneTimeRemaining", () => {
     const report = budgetReport(ev, p, NOW);
     expect(report.oneTimeRemaining).toBe(60); // 10 + 50
   });
+
+  it("excludes minimogs even when flagged repeatable: false — they earn via weeklyRate only", () => {
+    const ev = event({
+      objectives: [
+        objective({ id: "std-1", repeatable: false, points: 10 }),
+        objective({ id: "mini-1", kind: "minimog", repeatable: false, points: 40 }),
+      ],
+    });
+    const report = budgetReport(ev, progress({}), NOW);
+    expect(report.oneTimeRemaining).toBe(10); // mini-1 not double-counted here
+    expect(report.weeklyRate).toBe(40); // it still earns weekly via top-2
+  });
 });
 
 describe("budgetReport - weeklyRate", () => {

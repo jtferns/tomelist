@@ -12,7 +12,8 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  * - Cumulative tiers: must = sum(must); want = must + sum(want); maybe = want + sum(maybe).
  * - oneTimeRemaining = sum of points of objectives with repeatable === false that are NOT
  *   completed (progress.completedObjectives[id]?.count >= 1 means done). This includes
- *   kind "ultimog" (unclaimed Ultimogs are one-time).
+ *   kind "ultimog" (unclaimed Ultimogs are one-time) but EXCLUDES kind "minimog" — minimogs
+ *   are weekly picks by game mechanics and earn only through weeklyRate's top-2 rule.
  * - weeklyRate = sum of points of objectives with repeatable === "weekly" (regardless of
  *   kind), PLUS the top-2 minimog-kind objectives by points (the game allows 2 Minimog picks
  *   per week). If fewer than 2 minimog objectives exist, take what's there. A minimog
@@ -64,6 +65,10 @@ function computeOneTimeRemaining(event: EventData, progress: EventProgress): num
   let total = 0;
   for (const objective of event.objectives) {
     if (objective.repeatable !== false) continue;
+    // Minimogs are weekly picks by game mechanics whatever their repeatable
+    // flag says — they earn through weeklyRate's top-2 rule, and counting a
+    // repeatable:false minimog here too would double its points.
+    if (objective.kind === "minimog") continue;
     if (isCompleted(progress, objective.id)) continue;
     total += objective.points;
   }
