@@ -130,6 +130,9 @@ export const useAppStore = create<AppState>()(
                   : { ...entry, status: "exchanged" };
             }
           }),
+        // Returns a live reference into the store's state (or a fresh empty progress when the
+        // event has no entry yet). Callers must treat the result as read-only — do not mutate
+        // it in place. Pure consumers (e.g. the optimizer in lib/optimizer.ts) rely on this.
         getProgress: (eventId) => get().events[eventId] ?? emptyEventProgress(),
       };
     },
