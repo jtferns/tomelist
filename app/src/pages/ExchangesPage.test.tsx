@@ -92,4 +92,27 @@ describe("ExchangesPage", () => {
     const row = screen.getByTestId("exchange-fat-cat-parasol");
     expect(within(row).getByRole("button", { name: /mark exchanged/i })).toBeEnabled();
   });
+
+  it("shows a tier chip defaulting to Want that cycles want -> maybe -> must", async () => {
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    const chip = screen.getByTestId("tier-fat-cat-parasol");
+    expect(chip).toHaveTextContent("Want");
+    expect(useAppStore.getState().events[E]?.wishlist["fat-cat-parasol"]?.tier).toBe("want");
+
+    await userEvent.click(chip);
+    expect(chip).toHaveTextContent("Maybe");
+    expect(useAppStore.getState().events[E]?.wishlist["fat-cat-parasol"]?.tier).toBe("maybe");
+
+    await userEvent.click(chip);
+    expect(chip).toHaveTextContent("Must");
+    expect(useAppStore.getState().events[E]?.wishlist["fat-cat-parasol"]?.tier).toBe("must");
+  });
+
+  it("does not show an alt-source badge (no exchange in this event's data has altSources)", async () => {
+    await renderExchanges();
+    expect(screen.queryByTestId("alt-fat-cat-parasol")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("alt-miners-earring")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("alt-magicked-prism-bundle")).not.toBeInTheDocument();
+  });
 });

@@ -9,21 +9,37 @@ import { getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 import type { Exchange } from "@tomelist/schema";
 
+const TIER_CYCLE = { must: "want", want: "maybe", maybe: "must" } as const;
+const TIER_LABEL = { must: "Must", want: "Want", maybe: "Maybe" } as const;
+const TIER_VARIANT = { must: "default", want: "secondary", maybe: "outline" } as const;
+
 function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchange; wallet: number }) {
   const entry = useAppStore((s) => s.events[eventId]?.wishlist[item.id]);
   const toggleWishlist = useAppStore((s) => s.toggleWishlist);
   const adjustWishlistQuantity = useAppStore((s) => s.adjustWishlistQuantity);
+  const setWishlistTier = useAppStore((s) => s.setWishlistTier);
   const markExchanged = useAppStore((s) => s.markExchanged);
   const wanted = entry?.status === "wanted";
   const exchanged = entry?.status === "exchanged";
   const quantity = entry?.quantity ?? 1;
   const insufficient = wanted && item.cost * quantity > wallet;
+  const tier = entry?.tier ?? "want";
+  const tierLabel = TIER_LABEL[tier];
 
   const meta = (
     <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
       <Badge variant="secondary">{item.cost} tomes</Badge>
       <span>{item.type}</span>
       {item.tradeable ? <Badge variant="outline">tradeable</Badge> : null}
+      {item.altSources?.length ? (
+        <Badge
+          variant="outline"
+          data-testid={`alt-${item.id}`}
+          title={item.altSources.map((s) => `${s.type}: ${s.text}`).join("\n")}
+        >
+          also elsewhere
+        </Badge>
+      ) : null}
     </div>
   );
 
@@ -76,6 +92,15 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
           >
+            <Button
+              variant={TIER_VARIANT[tier]}
+              size="sm"
+              aria-label={`Priority for ${item.name}: ${tierLabel}. Tap to change`}
+              data-testid={`tier-${item.id}`}
+              onClick={() => setWishlistTier(eventId, item.id, TIER_CYCLE[tier])}
+            >
+              {tierLabel}
+            </Button>
             <Button
               variant="outline"
               size="sm"
