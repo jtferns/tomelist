@@ -1,0 +1,27 @@
+{
+  "pkg": "@tomelist/app",
+  "globalName": "TomelistApp",
+  "projectId": "e191cb8f-f296-4c28-bbdc-a0afa4adb68c",
+  "shape": "package",
+  "buildCmd": "yarn workspace @tomelist/app run build && cp app/dist/assets/index-*.css app/dist/tomelist-compiled.css",
+  "cssEntry": "dist/tomelist-compiled.css",
+  "provider": {
+    "component": "ThemeRoot",
+    "props": { "theme": "dark", "palette": "maelstrom" }
+  },
+  "extraEntries": ["./src/design-sync/theme-root.tsx"],
+  "readmeHeader": ".design-sync/conventions.md",
+  "componentSrcMap": {
+    "ThemeRoot": null,
+    "EventShell": null,
+    "EventSwitcher": null,
+    "ProgressHud": null,
+    "ObjectivesPage": null,
+    "ExchangesPage": null,
+    "OverviewPage": null,
+    "SettingsPage": null
+  },
+  "libOverrides": {
+    "source-kit.mjs": "exclude app/src/main.tsx (Vite bootstrap side effects) and the 6 components that import @/lib/events (import.meta.glob crashes the whole IIFE bundle at module-eval time) from the synth-entry re-export barrel"
+  }
+}
