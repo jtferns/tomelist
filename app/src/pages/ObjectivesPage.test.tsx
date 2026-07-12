@@ -43,4 +43,26 @@ describe("ObjectivesPage", () => {
     await userEvent.click(within(row).getByRole("button", { name: /did it/i }));
     expect(within(row).getByRole("button", { name: /done/i })).toBeDisabled();
   });
+
+  it("renders category filter chips for All + each category", async () => {
+    await renderObjectives();
+    const chips = screen.getByTestId("category-filters");
+    expect(within(chips).getByTestId("filter-all")).toBeInTheDocument();
+    for (const category of ["Dungeons", "GATEs", "Weekly", "Ocean Fishing", "Quests"]) {
+      expect(within(chips).getByTestId(`filter-${category}`)).toBeInTheDocument();
+    }
+  });
+
+  it("filtering by category shows only matching objectives, and All restores everything", async () => {
+    await renderObjectives();
+    await userEvent.click(screen.getByTestId("filter-Dungeons"));
+    expect(screen.getByTestId("objective-obj-moogle-dungeons")).toBeInTheDocument();
+    expect(screen.queryByTestId("objective-obj-gates")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("objective-obj-ultimog-msq")).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByTestId("filter-all"));
+    expect(screen.getByTestId("objective-obj-moogle-dungeons")).toBeInTheDocument();
+    expect(screen.getByTestId("objective-obj-gates")).toBeInTheDocument();
+    expect(screen.getByTestId("objective-obj-ultimog-msq")).toBeInTheDocument();
+  });
 });

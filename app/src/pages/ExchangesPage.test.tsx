@@ -123,4 +123,45 @@ describe("ExchangesPage", () => {
       document.querySelector('script[src="https://lds-img.finalfantasyxiv.com/pc/global/js/eorzeadb/loader.js?v3"]')
     ).not.toBeInTheDocument();
   });
+
+  it("sort-cost orders exchanges ascending by cost", async () => {
+    await renderExchanges();
+    await userEvent.click(screen.getByTestId("sort-cost"));
+    const ids = screen.getAllByTestId(/^exchange-/).map((el) => el.getAttribute("data-testid"));
+    expect(ids).toEqual([
+      "exchange-magicked-prism-bundle",
+      "exchange-fat-cat-parasol",
+      "exchange-miners-earring",
+    ]);
+  });
+
+  it("sort-tier puts a must-tier wanted item first and an exchanged item last", async () => {
+    useAppStore.getState().addTomestones(E, 200);
+    await renderExchanges();
+    // Want fat-cat-parasol and bump its tier to Must.
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    await userEvent.click(screen.getByTestId("tier-fat-cat-parasol")); // want -> maybe
+    await userEvent.click(screen.getByTestId("tier-fat-cat-parasol")); // maybe -> must
+    // Want and exchange miners-earring so it lands in the "exchanged" bucket.
+    await userEvent.click(screen.getByRole("button", { name: /want miner's earring/i }));
+    const earringRow = screen.getByTestId("exchange-miners-earring");
+    await userEvent.click(within(earringRow).getByRole("button", { name: /mark exchanged/i }));
+
+    await userEvent.click(screen.getByTestId("sort-tier"));
+    const ids = screen.getAllByTestId(/^exchange-/).map((el) => el.getAttribute("data-testid"));
+    expect(ids[0]).toBe("exchange-fat-cat-parasol");
+    expect(ids[ids.length - 1]).toBe("exchange-miners-earring");
+  });
+
+  it("sort-default restores event order", async () => {
+    await renderExchanges();
+    await userEvent.click(screen.getByTestId("sort-cost"));
+    await userEvent.click(screen.getByTestId("sort-default"));
+    const ids = screen.getAllByTestId(/^exchange-/).map((el) => el.getAttribute("data-testid"));
+    expect(ids).toEqual([
+      "exchange-miners-earring",
+      "exchange-fat-cat-parasol",
+      "exchange-magicked-prism-bundle",
+    ]);
+  });
 });

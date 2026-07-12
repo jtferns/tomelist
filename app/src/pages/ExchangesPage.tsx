@@ -1,5 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { CheckCircle2, Circle } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +14,21 @@ import type { Exchange } from "@tomelist/schema";
 const TIER_CYCLE = { must: "want", want: "maybe", maybe: "must" } as const;
 const TIER_LABEL = { must: "Must", want: "Want", maybe: "Maybe" } as const;
 const TIER_VARIANT = { must: "default", want: "secondary", maybe: "outline" } as const;
+
+type SortKey = "default" | "tier" | "cost" | "type";
+const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "default", label: "Default" },
+  { key: "tier", label: "Tier" },
+  { key: "cost", label: "Cost" },
+  { key: "type", label: "Type" },
+];
+const TIER_RANK = { must: 0, want: 1, maybe: 2 } as const;
+
+function tierGroupRank(entry: { status: "wanted" | "exchanged"; tier: "must" | "want" | "maybe" } | undefined) {
+  if (!entry) return 3;
+  if (entry.status === "exchanged") return 4;
+  return TIER_RANK[entry.tier];
+}
 
 function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchange; wallet: number }) {
   const entry = useAppStore((s) => s.events[eventId]?.wishlist[item.id]);
@@ -152,9 +168,33 @@ export function ExchangesPage() {
   const event = getEvent(eventId);
   const wallet = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
   const wishlist = useAppStore((s) => s.events[eventId]?.wishlist);
+  const [sortKey, setSortKey] = useState<SortKey>("default");
   useEorzeaTooltips(Boolean(event?.exchanges.some((e) => e.eorzeadbUrl)));
   if (!event) return <div data-testid="exchanges-page">Unknown event.</div>;
   const wantedTotal = getWishlistTotal(event, wishlist);
+  const sortedExchanges = event.exchanges
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => {
+      switch (sortKey) {
+        case "tier": {
+          const diff = tierGroupRank(wishlist?.[a.item.id]) - tierGroupRank(wishlist?.[b.item.id]);
+          return diff !== 0 ? diff : a.index - b.index;
+        }
+        case "cost": {
+          const diff = a.item.cost - b.item.cost;
+          return diff !== 0 ? diff : a.index - b.index;
+        }
+        case "type": {
+          const diff = a.item.type.localeCompare(b.item.type);
+          if (diff !== 0) return diff;
+          const costDiff = a.item.cost - b.item.cost;
+          return costDiff !== 0 ? costDiff : a.index - b.index;
+        }
+        default:
+          return a.index - b.index;
+      }
+    })
+    .map(({ item }) => item);
   return (
     <div data-testid="exchanges-page" className="flex flex-col gap-3">
       <p className="text-sm text-muted-foreground">
@@ -162,7 +202,21 @@ export function ExchangesPage() {
         <span data-testid="wanted-total" className="font-bold text-foreground">{wantedTotal}</span>{" "}
         tomes
       </p>
-      {event.exchanges.map((item) => (
+      <div data-testid="sort-options" className="flex flex-wrap items-center gap-1.5">
+        {SORT_OPTIONS.map(({ key, label }) => (
+          <Button
+            key={key}
+            size="sm"
+            variant={sortKey === key ? "default" : "outline"}
+            aria-pressed={sortKey === key}
+            data-testid={`sort-${key}`}
+            onClick={() => setSortKey(key)}
+          >
+            {label}
+          </Button>
+        ))}
+      </div>
+      {sortedExchanges.map((item) => (
         <ExchangeRow key={item.id} eventId={eventId} item={item} wallet={wallet} />
       ))}
     </div>

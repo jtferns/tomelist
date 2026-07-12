@@ -1,5 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { RotateCcw } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -61,11 +62,41 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
 export function ObjectivesPage() {
   const { eventId } = useParams({ from: "/$eventId" });
   const event = getEvent(eventId);
+  const [category, setCategory] = useState<string | null>(null);
   if (!event) return <div data-testid="objectives-page">Unknown event.</div>;
+  const categories = Array.from(new Set(event.objectives.map((o) => o.category)));
+  const visibleObjectives = category
+    ? event.objectives.filter((o) => o.category === category)
+    : event.objectives;
   return (
     <div data-testid="objectives-page" className="flex flex-col gap-6">
+      {categories.length >= 2 ? (
+        <div data-testid="category-filters" className="flex flex-wrap items-center gap-1.5">
+          <Button
+            size="sm"
+            variant={category === null ? "default" : "outline"}
+            aria-pressed={category === null}
+            data-testid="filter-all"
+            onClick={() => setCategory(null)}
+          >
+            All
+          </Button>
+          {categories.map((c) => (
+            <Button
+              key={c}
+              size="sm"
+              variant={category === c ? "default" : "outline"}
+              aria-pressed={category === c}
+              data-testid={`filter-${c}`}
+              onClick={() => setCategory(c)}
+            >
+              {c}
+            </Button>
+          ))}
+        </div>
+      ) : null}
       {kindOrder.map((kind) => {
-        const group = event.objectives.filter((o) => o.kind === kind);
+        const group = visibleObjectives.filter((o) => o.kind === kind);
         if (group.length === 0) return null;
         return (
           <section key={kind} className="flex flex-col gap-2">
