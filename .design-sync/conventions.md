@@ -29,13 +29,15 @@ Real token names, all present in `styles.css`:
 | `bg-card` / `text-card-foreground` | `--card` | card surfaces |
 | `bg-primary` / `text-primary-foreground` | `--primary` | primary actions, active states |
 | `bg-secondary` / `text-secondary-foreground` | `--secondary` | secondary badges/buttons |
-| `bg-muted` / `text-muted-foreground` | `--muted` | de-emphasized text, meta rows |
-| `bg-accent` / `text-accent-foreground` | `--accent` | hover states |
+| `text-muted-foreground` | `--muted-foreground` | de-emphasized text, meta rows |
+| `hover:bg-accent` | `--accent` | hover states (plain `bg-accent` is not emitted) |
 | `bg-destructive` | `--destructive` | destructive actions |
 | `border-border` | `--border` | card/input borders |
 
 Layout: `rounded-md`/`rounded-lg`/`rounded-xl` for corners, `gap-*`/`p-*`/`px-*`/`py-*` for
-spacing — nothing custom, standard Tailwind scale. No dark-mode `dark:` variant classes needed on
+spacing — nothing custom, standard Tailwind scale. Caveat: the shipped CSS is compiled on-demand
+from the app's own source, so **only utility classes the app already uses exist** — check
+`_ds_bundle.css` before relying on a class not listed above. No dark-mode `dark:` variant classes needed on
 top of these tokens — the token values themselves already flip with `data-theme`.
 
 ## Where the truth lives

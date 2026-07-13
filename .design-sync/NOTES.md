@@ -74,6 +74,16 @@ newer `PlannerPage`/`BudgetSummary`/`RunNext`) are **now synced with real previe
   store persists to localStorage across capture page loads, so a plain `addTomestones(+240)`
   accumulates run over run and the screenshot drifts (first symptom: 720 in the sheet).
 
+## Conventions drift (found 2026-07-13 re-sync)
+
+- `conventions.md`'s utility table lists `bg-muted` and `bg-accent`, but the compiled Tailwind v4
+  CSS (`_ds_bundle.css`) only emits classes the app actually uses — plain `bg-muted` doesn't exist
+  at all, and `bg-accent` exists only as `hover:` variants. A design agent trusting the table gets
+  silently unstyled backgrounds. General rule for this repo: any utility not already used somewhere
+  in `app/src` is absent from the shipped CSS, even if its token (`--muted`, `--accent`) is defined.
+  Fixed 2026-07-13 (user-approved): table rows reworded to the verified forms
+  (`text-muted-foreground`, `hover:bg-accent`) and an on-demand-CSS caveat added.
+
 ## Known render warns
 
 - `[RENDER_BLANK]` on `CardAction`/`CardContent`/`CardDescription`/`CardFooter`/`CardHeader`/
