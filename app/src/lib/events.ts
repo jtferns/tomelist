@@ -1,20 +1,48 @@
 import { eventSchema, type EventData } from "@tomelist/schema";
 
-const modules = import.meta.glob("../../../data/events/*.json", { eager: true }) as Record<
-  string,
-  { default: unknown }
->;
+type EventModules = Record<string, { default: unknown }>;
 
-const events: EventData[] = Object.values(modules)
-  .map((m) => eventSchema.parse(m.default))
-  .sort((a, b) => (a.starts < b.starts ? 1 : -1));
+// Vite replaces this call with an object literal at build time. Under other
+// bundlers (the design-sync esbuild IIFE), `import.meta.glob` doesn't exist
+// and the call throws — leave `globModules` empty there and fall back to
+// `globalThis.__tomelistEventModules`, which design-sync's preview data shim
+// (app/src/design-sync/preview-data.tsx) populates with statically imported
+// event JSON.
+let globModules: EventModules = {};
+try {
+  globModules = import.meta.glob("../../../data/events/*.json", { eager: true }) as EventModules;
+} catch {
+  // not running under Vite
+}
 
-export function getAllEvents(): EventData[] {
+declare global {
+  // eslint-disable-next-line no-var
+  var __tomelistEventModules: EventModules | undefined;
+}
+
+// Parsed lazily (first accessor call, i.e. render time) rather than at module
+// evaluation, so a fallback registry assigned by a module that evaluates
+// after this one is still picked up.
+let events: EventData[] | undefined;
+
+function allEvents(): EventData[] {
+  if (!events) {
+    const modules = Object.keys(globModules).length
+      ? globModules
+      : (globalThis.__tomelistEventModules ?? {});
+    events = Object.values(modules)
+      .map((m) => eventSchema.parse(m.default))
+      .sort((a, b) => (a.starts < b.starts ? 1 : -1));
+  }
   return events;
 }
 
+export function getAllEvents(): EventData[] {
+  return allEvents();
+}
+
 export function getEvent(id: string): EventData | undefined {
-  return events.find((e) => e.id === id);
+  return allEvents().find((e) => e.id === id);
 }
 
 export function isEventEnded(event: EventData, now: Date): boolean {
@@ -22,8 +50,8 @@ export function isEventEnded(event: EventData, now: Date): boolean {
 }
 
 export function getActiveEvent(now: Date): EventData | undefined {
-  const live = events.find(
+  const live = allEvents().find(
     (e) => new Date(e.starts) <= now && (e.ends === null || new Date(e.ends) >= now)
   );
-  return live ?? events[0];
+  return live ?? allEvents()[0];
 }

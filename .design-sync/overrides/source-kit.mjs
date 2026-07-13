@@ -24,15 +24,13 @@ import { resolveDistEntry } from '../../.ds-sync/lib/bundle.mjs';
 import { exportedNames, isComponentName } from '../../.ds-sync/lib/dts.mjs';
 
 const NON_IMPL_RX = /\.(stories|test|spec)\./;
-// main.tsx: Vite bootstrap (see header). The other six import @/lib/events,
-// which calls import.meta.glob(...) at module top level — that throws under
-// esbuild's IIFE output, and since every synth-entry file lands in ONE
-// bundle, the throw kills window.TomelistApp assignment for all 22
-// components, not just these six. Excluding them here is what lets the
-// import.meta.glob-free 16 build and export at all. Matching componentSrcMap
-// nulls (see .design-sync/config.json) keep them out of the discovered
-// component list too, since deriveComponentsFromSrc scans srcFiles, not comps.
-const BOOTSTRAP_RX = /(^|\/)(main|router|EventShell|EventSwitcher|ProgressHud|ObjectivesPage|ExchangesPage|OverviewPage|SettingsPage)\.(tsx|jsx)$/;
+// main.tsx: Vite bootstrap (see header). router.tsx: not a component (route
+// table + createAppRouter factory). The formerly excluded six event-data
+// components are back in since lib/events.ts guards its import.meta.glob
+// call (try/catch, lazy parse) and design-sync/preview-data.tsx registers
+// static event JSON via globalThis.__tomelistEventModules — see
+// .design-sync/NOTES.md "Router + event-data shim".
+const BOOTSTRAP_RX = /(^|\/)(main|router)\.(tsx|jsx)$/;
 const SRC_IMPL_RX = /\.(tsx|jsx)$/;
 // Dir names that don't usefully group components — skip so the emitted path
 // is `components/<group>/<Name>` not `components/components/<Name>`.

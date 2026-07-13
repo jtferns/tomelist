@@ -15,33 +15,35 @@ barrel, which then compiles into a single IIFE (`_ds_bundle.js`). Two classes of
 1. **`app/src/main.tsx`** — the Vite bootstrap: imports global `index.css` (which the esbuild IIFE
    can't resolve — `tailwindcss` v4's package.json isn't resolvable outside the Vite/PostCSS
    plugin) and calls `createRoot().render()` as a module-level side effect.
-2. **Any file importing `@/lib/events`** (`router.tsx`, `EventShell.tsx`, `EventSwitcher.tsx`,
-   `ProgressHud.tsx`, `ObjectivesPage.tsx`, `ExchangesPage.tsx`, `OverviewPage.tsx`,
-   `SettingsPage.tsx`) — `lib/events.ts` calls `import.meta.glob(...)` at module top level, which
-   throws under esbuild's IIFE output format. Because everything lands in ONE bundle, this throw
-   killed `window.TomelistApp` assignment for **all** components, not just these files — the
-   original symptom was `[BUNDLE_EXPORT] 22/22 not a component on window.TomelistApp`.
+2. **`router.tsx`** — the route table + `createAppRouter` factory, not a component.
 
-The fork excludes both classes of file from the synth-entry barrel via a `BOOTSTRAP_RX` regex
-(see the file's header comment) and `cfg.componentSrcMap` nulls out the same names so
-`deriveComponentsFromSrc` (which scans ALL src files, not just the barrel) doesn't reintroduce
-them as phantom "components" with no corresponding bundle export.
+The fork excludes those via `BOOTSTRAP_RX` (see the file's header comment).
 
-**Consequence: 8 real Tomelist pieces are excluded from this sync entirely** (not even floor
-cards) — `EventShell`, `EventSwitcher`, `ProgressHud`, `ObjectivesPage`, `ExchangesPage`,
-`OverviewPage`, `SettingsPage`, plus `router.tsx`/`main.tsx` which were never "components." They
-all depend on live TanStack Router params and/or real event JSON data loaded via
-`import.meta.glob`, neither of which exists in this static bundle.
+## Router + event-data shim (2026-07-12)
+
+The formerly excluded event-data/router components (`EventShell`, `EventSwitcher`,
+`ProgressHud`, `ObjectivesPage`, `ExchangesPage`, `OverviewPage`, `SettingsPage`, plus the
+newer `PlannerPage`/`BudgetSummary`/`RunNext`) are **now synced with real previews**, via:
+
+- **`app/src/lib/events.ts`** wraps its `import.meta.glob` call in try/catch (throws under the
+  esbuild IIFE, where it's replaced by the literal under Vite) and parses events **lazily at
+  first accessor call**, falling back to `globalThis.__tomelistEventModules` when the glob
+  produced nothing. Lazy matters: module evaluation order inside the IIFE barrel is
+  alphabetical, so the registry module may evaluate after events.ts.
+- **`app/src/design-sync/preview-data.tsx`** (design-sync-only, auto-included in the barrel)
+  statically imports `data/events/2026-03-mogmog-collection.json` and assigns the registry.
+- **`app/src/design-sync/preview-router.tsx`** exports `PreviewRouter` — a memory-history
+  TanStack router whose `/$eventId` route renders the preview children (+ an Outlet feeding a
+  `$` splat that renders null), navigated to `/{eventId}/{tab}`. Every router-dependent preview
+  wraps its component in it. `PreviewRouter` is nulled in `componentSrcMap` (bundle export, not
+  a synced component).
+- **EventShell is `cardMode: "single"`** (cfg.overrides) — its fixed-position nav overflows
+  grid cells.
+- Preview store seeds are guarded/delta-style AND **shared across previews** (one localStorage
+  per capture run): the sample event ends with miners-earring (must) + fat-cat-parasol (want)
+  wanted and wallet 80, so e.g. the HUD shows 80/150.
 
 ## Re-sync risks / future work
-
-- **To bring the excluded 7 components in**: would need (a) a working stand-in for
-  `getEvent`/`getAllEvents`/`isEventEnded` that doesn't rely on `import.meta.glob` under IIFE —
-  e.g. an esbuild `define` swap for `import.meta.glob` itself (returns `{}`), which was
-  considered but not implemented because `lib/bundle.mjs` is off-limits to fork per the skill's
-  own guidance ("don't fork those; use config overrides") and no config surface exists for
-  arbitrary esbuild defines — and (b) a fake `RouterProvider` wrapping `ThemeRoot` with a route
-  matching `/$eventId` for the `useParams` calls in `EventShell`/`ProgressHud`/pages.
 - **`cfg.cssEntry` points at `app/dist/tomelist-compiled.css`**, a copy of the Vite-built,
   content-hashed CSS chunk (`app/dist/assets/index-*.css`) made stable by `cfg.buildCmd`'s `cp`
   step. `app/dist/` is gitignored and rebuilt fresh each time — **always re-run `cfg.buildCmd`
@@ -53,8 +55,9 @@ all depend on live TanStack Router params and/or real event JSON data loaded via
   unresolved CSS custom properties (browser-default colors) since Tomelist's whole token system
   is scoped to `:root[data-theme][data-palette]`. If this file is ever deleted, the render check
   will show near-black/blank previews with no obvious tag — this note is the only trace.
-- **8 of 11 synced components are unauthored floor cards** (Card sub-parts, Layout,
-  WalletStepper). `CardAction`/`CardContent`/`CardDescription`/`CardFooter`/`CardHeader`/
+- **Synced set is now 21 components** (general: Badge/Button/Card family/Layout/WalletStepper/
+  EventShell/EventSwitcher/ProgressHud/BudgetSummary/RunNext; pages: Overview/Objectives/
+  Planner/Exchanges/Settings). Only Layout and the Card sub-parts remain floor cards. `CardAction`/`CardContent`/`CardDescription`/`CardFooter`/`CardHeader`/
   `CardTitle` render legitimately blank on the floor card (no children by default) —
   `[RENDER_BLANK]` warnings for these are expected, not a regression to chase.
 - **Tabs was dropped 2026-07-12**: `app/src/components/ui/tabs.tsx` was scaffolded but never
@@ -75,6 +78,10 @@ all depend on live TanStack Router params and/or real event JSON data loaded via
 
 - `[RENDER_BLANK]` on `CardAction`/`CardContent`/`CardDescription`/`CardFooter`/`CardHeader`/
   `CardTitle` — expected (see above), not new.
+
+- Layout's floor card logs `TypeError: Cannot read properties of null (reading 'stores')` —
+  its `<Outlet/>` mounts outside any RouterProvider. Expected; the floor-card text still
+  renders and Layout is deliberately unauthored.
 
 ## Fonts
 

@@ -10,18 +10,15 @@
     "props": { "theme": "dark", "palette": "maelstrom" }
   },
   "extraEntries": ["./src/design-sync/theme-root.tsx", "./src/store/useAppStore.ts"],
+  "overrides": {
+    "EventShell": { "cardMode": "single", "primaryStory": "AppShell" }
+  },
   "readmeHeader": ".design-sync/conventions.md",
   "componentSrcMap": {
     "ThemeRoot": null,
-    "EventShell": null,
-    "EventSwitcher": null,
-    "ProgressHud": null,
-    "ObjectivesPage": null,
-    "ExchangesPage": null,
-    "OverviewPage": null,
-    "SettingsPage": null
+    "PreviewRouter": null
   },
   "libOverrides": {
-    "source-kit.mjs": "exclude app/src/main.tsx (Vite bootstrap side effects) and the 6 components that import @/lib/events (import.meta.glob crashes the whole IIFE bundle at module-eval time) from the synth-entry re-export barrel"
+    "source-kit.mjs": "exclude app/src/main.tsx (Vite bootstrap side effects) and router.tsx (route table, not a component) from the synth-entry re-export barrel; event-data components are included since lib/events.ts guards import.meta.glob and preview-data.tsx supplies static events"
   }
 }
