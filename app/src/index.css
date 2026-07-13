@@ -17,6 +17,12 @@
   --border: oklch(0.32 0.02 280);
   --input: oklch(0.35 0.02 280);
   --ring: oklch(0.63 0.19 25);
+  --gold: oklch(0.78 0.12 85);
+  --gold-soft: oklch(0.78 0.06 85);
+  --surface-1: oklch(0.21 0.02 280);
+  --surface-2: oklch(0.23 0.02 280);
+  --frame-border: color-mix(in oklch, var(--gold) 40%, var(--border));
+  --frame-inset: inset 0 0 0 1px oklch(0.78 0.12 85 / 0.1);
 }
 
 :root[data-theme="light"] {
@@ -36,6 +42,12 @@
   --border: oklch(0.88 0.01 280);
   --input: oklch(0.88 0.01 280);
   --ring: oklch(0.5 0.19 25);
+  --gold: oklch(0.55 0.1 85);
+  --gold-soft: oklch(0.55 0.05 85);
+  --surface-1: oklch(0.97 0.005 280);
+  --surface-2: oklch(1 0 0);
+  --frame-border: color-mix(in oklch, var(--gold) 40%, var(--border));
+  --frame-inset: inset 0 0 0 1px oklch(0.55 0.1 85 / 0.15);
 }
 
 /* Grand Company palettes — brand-token overrides over the neutral mode blocks. */
@@ -99,17 +111,54 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --font-display: "Cinzel", serif;
+  --font-sans: "Alegreya Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --row-pad-y: 12px;
+  --row-pad-x: 16px;
+  --row-gap: 12px;
+  --hud-pad-y: 16px;
+  --hud-pad-x: 20px;
+}
+:root[data-density="compact"] {
+  --row-pad-y: 8px;
+  --row-pad-x: 12px;
+  --row-gap: 8px;
+  --hud-pad-y: 12px;
+  --hud-pad-x: 16px;
+}
+:root[data-ornament="minimal"] {
+  --frame-border: var(--border);
+  --frame-inset: none;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+:root[data-theme="dark"] body {
+  background: radial-gradient(120% 90% at 50% 0%, oklch(0.19 0.022 280) 0%, oklch(0.145 0.02 280) 100%);
 }
 
 @layer base {
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]) {
     cursor: pointer;
+  }
+}
+
+@layer components {
+  .top-bar-gradient {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), var(--gold), var(--primary), transparent);
   }
 }
 

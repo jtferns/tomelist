@@ -3,6 +3,8 @@ import { z } from "zod";
 export const themeSettingsSchema = z.object({
   palette: z.enum(["maelstrom", "adder", "flames"]),
   mode: z.enum(["dark", "light"]),
+  ornament: z.enum(["full", "reduced", "minimal"]),
+  density: z.enum(["comfy", "compact"]),
 });
 
 export const wishlistEntrySchema = z.object({
@@ -34,7 +36,12 @@ export type WishlistEntry = z.infer<typeof wishlistEntrySchema>;
 export type EventProgress = z.infer<typeof eventProgressSchema>;
 export type UserState = z.infer<typeof userStateSchema>;
 
-export const defaultTheme: ThemeSettings = { palette: "maelstrom", mode: "dark" };
+export const defaultTheme: ThemeSettings = {
+  palette: "maelstrom",
+  mode: "dark",
+  ornament: "full",
+  density: "comfy",
+};
 
 export function emptyEventProgress(): EventProgress {
   return { tomestones: 0, completedObjectives: {}, minimogPicks: [], wishlist: {} };

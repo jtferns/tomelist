@@ -18,6 +18,8 @@ type PersistedState = {
 type AppState = PersistedState & {
   setPalette: (palette: ThemeSettings["palette"]) => void;
   setMode: (mode: ThemeSettings["mode"]) => void;
+  setOrnament: (ornament: ThemeSettings["ornament"]) => void;
+  setDensity: (density: ThemeSettings["density"]) => void;
   addTomestones: (eventId: string, delta: number) => void;
   recordObjective: (eventId: string, objectiveId: string, points: number) => void;
   undoObjective: (eventId: string, objectiveId: string, points: number) => void;
@@ -37,15 +39,15 @@ function touch(events: AppState["events"], eventId: string): EventProgress {
 // plain "dark"/"light" string and wishlist entries without quantity.
 export function migratePersistedState(persisted: unknown): PersistedState {
   const s = persisted as {
-    settings?: { theme?: string | ThemeSettings };
+    settings?: { theme?: string | Partial<ThemeSettings> };
     events?: Record<string, EventProgress>;
     updatedAt?: string;
   } | null;
   const legacy = s?.settings?.theme;
   const theme: ThemeSettings =
     typeof legacy === "string"
-      ? { palette: defaultTheme.palette, mode: legacy === "light" ? "light" : "dark" }
-      : (legacy ?? defaultTheme);
+      ? { ...defaultTheme, mode: legacy === "light" ? "light" : "dark" }
+      : { ...defaultTheme, ...legacy };
   const events: Record<string, EventProgress> = {};
   for (const [id, p] of Object.entries(s?.events ?? {})) {
     const wishlist: EventProgress["wishlist"] = {};
@@ -84,6 +86,8 @@ export const useAppStore = create<AppState>()(
         updatedAt: new Date().toISOString(),
         setPalette: (palette) => setTheme({ palette }),
         setMode: (mode) => setTheme({ mode }),
+        setOrnament: (ornament) => setTheme({ ornament }),
+        setDensity: (density) => setTheme({ density }),
         addTomestones: (eventId, delta) =>
           update(eventId, (p) => {
             p.tomestones = Math.max(0, p.tomestones + delta);
@@ -138,7 +142,7 @@ export const useAppStore = create<AppState>()(
     },
     {
       name: "tomelist:v2",
-      version: 2,
+      version: 3,
       migrate: (persisted) => migratePersistedState(persisted),
       partialize: (s) => ({
         schemaVersion: s.schemaVersion,

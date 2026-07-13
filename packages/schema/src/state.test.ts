@@ -2,17 +2,46 @@ import { describe, expect, it } from "vitest";
 import { defaultTheme, themeSettingsSchema, wishlistEntrySchema, userStateSchema } from "./state";
 
 describe("themeSettingsSchema", () => {
-  it("accepts a palette + mode object", () => {
-    expect(themeSettingsSchema.parse({ palette: "adder", mode: "light" })).toEqual({
+  it("accepts a full theme object", () => {
+    expect(
+      themeSettingsSchema.parse({
+        palette: "adder",
+        mode: "light",
+        ornament: "reduced",
+        density: "compact",
+      })
+    ).toEqual({
       palette: "adder",
       mode: "light",
+      ornament: "reduced",
+      density: "compact",
     });
   });
   it("rejects unknown palettes", () => {
-    expect(() => themeSettingsSchema.parse({ palette: "garlean", mode: "dark" })).toThrow();
+    expect(() =>
+      themeSettingsSchema.parse({ palette: "garlean", mode: "dark", ornament: "full", density: "comfy" })
+    ).toThrow();
   });
-  it("exports a maelstrom-dark default", () => {
-    expect(defaultTheme).toEqual({ palette: "maelstrom", mode: "dark" });
+  it("rejects unknown ornament values", () => {
+    expect(() =>
+      themeSettingsSchema.parse({ palette: "maelstrom", mode: "dark", ornament: "extra", density: "comfy" })
+    ).toThrow();
+  });
+  it("rejects unknown density values", () => {
+    expect(() =>
+      themeSettingsSchema.parse({ palette: "maelstrom", mode: "dark", ornament: "full", density: "roomy" })
+    ).toThrow();
+  });
+  it("rejects a theme missing ornament/density", () => {
+    expect(() => themeSettingsSchema.parse({ palette: "maelstrom", mode: "dark" })).toThrow();
+  });
+  it("exports a maelstrom-dark-full-comfy default", () => {
+    expect(defaultTheme).toEqual({
+      palette: "maelstrom",
+      mode: "dark",
+      ornament: "full",
+      density: "comfy",
+    });
   });
 });
 
@@ -27,7 +56,7 @@ describe("userStateSchema", () => {
   it("is schemaVersion 2 with structured theme", () => {
     const parsed = userStateSchema.parse({
       schemaVersion: 2,
-      settings: { theme: { palette: "maelstrom", mode: "dark" } },
+      settings: { theme: { palette: "maelstrom", mode: "dark", ornament: "full", density: "comfy" } },
       events: {},
       updatedAt: new Date().toISOString(),
     });

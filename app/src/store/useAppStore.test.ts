@@ -5,7 +5,10 @@ const E = "2026-03-mogmog-collection";
 
 beforeEach(() => {
   localStorage.clear();
-  useAppStore.setState({ events: {}, settings: { theme: { palette: "maelstrom", mode: "dark" } } });
+  useAppStore.setState({
+    events: {},
+    settings: { theme: { palette: "maelstrom", mode: "dark", ornament: "full", density: "comfy" } },
+  });
 });
 
 describe("wishlist actions", () => {
@@ -47,7 +50,23 @@ describe("theme actions", () => {
   it("setPalette and setMode update independently", () => {
     useAppStore.getState().setPalette("flames");
     useAppStore.getState().setMode("light");
-    expect(useAppStore.getState().settings.theme).toEqual({ palette: "flames", mode: "light" });
+    expect(useAppStore.getState().settings.theme).toEqual({
+      palette: "flames",
+      mode: "light",
+      ornament: "full",
+      density: "comfy",
+    });
+  });
+
+  it("setOrnament and setDensity update independently", () => {
+    useAppStore.getState().setOrnament("minimal");
+    useAppStore.getState().setDensity("compact");
+    expect(useAppStore.getState().settings.theme).toEqual({
+      palette: "maelstrom",
+      mode: "dark",
+      ornament: "minimal",
+      density: "compact",
+    });
   });
 });
 
@@ -83,9 +102,29 @@ describe("migratePersistedState", () => {
       },
       updatedAt: "2026-01-01T00:00:00.000Z",
     });
-    expect(migrated.settings.theme).toEqual({ palette: "maelstrom", mode: "light" });
+    expect(migrated.settings.theme).toEqual({
+      palette: "maelstrom",
+      mode: "light",
+      ornament: "full",
+      density: "comfy",
+    });
     expect(migrated.events[E].wishlist["fat-cat-parasol"].quantity).toBe(1);
     expect(migrated.events[E].tomestones).toBe(40);
     expect(migrated.schemaVersion).toBe(2);
+  });
+
+  it("migrates a v2 snapshot (palette+mode only) to add ornament/density defaults", () => {
+    const migrated = migratePersistedState({
+      schemaVersion: 2,
+      settings: { theme: { palette: "adder", mode: "dark" } },
+      events: {},
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(migrated.settings.theme).toEqual({
+      palette: "adder",
+      mode: "dark",
+      ornament: "full",
+      density: "comfy",
+    });
   });
 });
