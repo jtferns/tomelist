@@ -138,6 +138,13 @@
   --frame-inset: none;
 }
 
+:root[data-ornament="reduced"] [data-slot="diamond"],
+:root[data-ornament="minimal"] [data-slot="diamond"],
+:root[data-ornament="reduced"] [data-slot="frame-corner"],
+:root[data-ornament="minimal"] [data-slot="frame-corner"] {
+  display: none;
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
