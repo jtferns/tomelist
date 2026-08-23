@@ -30,6 +30,12 @@ describe("ObjectivesPage", () => {
     expect(screen.getByText(/Standard Objectives/i)).toBeInTheDocument();
     expect(screen.getByText(/Ultimog Challenges/i)).toBeInTheDocument();
   });
+
+  it("renders kind group headers as h2 landmarks", async () => {
+    await renderObjectives();
+    expect(screen.getByRole("heading", { level: 2, name: /Standard Objectives/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /Ultimog Challenges/i })).toBeInTheDocument();
+  });
   it("did-it increments count and wallet", async () => {
     await renderObjectives();
     const row = screen.getByTestId("objective-obj-moogle-dungeons");

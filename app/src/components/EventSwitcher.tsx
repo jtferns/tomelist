@@ -41,7 +41,7 @@ export function EventSwitcher({ eventId }: { eventId: string }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="group flex min-w-0 flex-col items-start rounded-md px-1 py-0.5 text-left transition-colors hover:bg-accent"
+        className="group flex min-w-0 flex-col items-start rounded-md px-1 py-0.5 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
         data-testid="event-switcher-trigger"
       >
         <span className="flex min-w-0 items-center gap-1 font-display text-sm font-semibold">
@@ -66,7 +66,7 @@ export function EventSwitcher({ eventId }: { eventId: string }) {
                   setOpen(false);
                   navigate({ to: `/$eventId/${tab}`, params: { eventId: e.id } });
                 }}
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-accent"
+                className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
               >
                 <span className="min-w-0 flex-1 truncate">{e.name}</span>
                 {isEventEnded(e, now) ? <Badge variant="outline">Ended</Badge> : null}

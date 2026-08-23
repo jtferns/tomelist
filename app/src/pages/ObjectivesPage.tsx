@@ -102,8 +102,8 @@ export function ObjectivesPage() {
         if (group.length === 0) return null;
         return (
           <section key={kind} className="flex flex-col gap-2">
-            <SectionKicker>{kindLabels[kind]}</SectionKicker>
-            <FramedCard>
+            <SectionKicker as="h2">{kindLabels[kind]}</SectionKicker>
+            <FramedCard corners>
               {group.map((o, index) => (
                 <Fragment key={o.id}>
                   {index > 0 ? <ListRowDivider /> : null}

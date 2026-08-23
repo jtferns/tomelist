@@ -27,17 +27,19 @@ function SectionHeader({
 function SectionKicker({
   children,
   className,
+  as: Tag = "span",
 }: {
   children?: React.ReactNode
   className?: string
+  as?: "h2" | "span"
 }) {
   return (
-    <span
+    <Tag
       data-slot="section-kicker"
       className={cn("text-xs uppercase tracking-[.12em] text-gold-soft font-bold", className)}
     >
       {children}
-    </span>
+    </Tag>
   )
 }
 

@@ -116,7 +116,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
           aria-label={`Want ${item.name}`}
           onClick={() => toggleWishlist(eventId, item.id)}
           className={cn(
-            "min-w-0 flex-1 cursor-pointer text-left after:absolute after:inset-0 after:content-['']",
+            "min-w-0 flex-1 cursor-pointer text-left outline-none after:absolute after:inset-0 after:content-[''] focus-visible:ring-[3px] focus-visible:ring-ring/50",
             insufficient && "italic opacity-60"
           )}
         >

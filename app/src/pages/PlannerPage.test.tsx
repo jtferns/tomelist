@@ -33,6 +33,12 @@ describe("PlannerPage", () => {
     expect(screen.getByTestId("weekly-obj-weekly-random")).toBeInTheDocument();
   });
 
+  it("renders Minimog picks and Weeklies section headers as h2 landmarks", async () => {
+    await renderPlanner();
+    expect(screen.getByRole("heading", { level: 2, name: /Minimog picks/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /Weeklies/i })).toBeInTheDocument();
+  });
+
   it("clicking a pick's Did it button increments wallet and removes it from suggestions", async () => {
     await renderPlanner();
     const pick = screen.getByTestId("pick-obj-minimog-fishing");

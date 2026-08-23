@@ -40,7 +40,7 @@ export function PlannerPage() {
       </FramedCard>
 
       <section className="flex flex-col gap-2">
-        <SectionKicker>Minimog picks</SectionKicker>
+        <SectionKicker as="h2">Minimog picks</SectionKicker>
         <FramedCard corners>
           {plan.suggestedMinimogs.length === 0 ? (
             <p className="p-4 text-center text-sm text-muted-foreground">
@@ -74,7 +74,7 @@ export function PlannerPage() {
 
       {plan.weeklies.length > 0 ? (
         <section className="flex flex-col gap-2">
-          <SectionKicker>Weeklies</SectionKicker>
+          <SectionKicker as="h2">Weeklies</SectionKicker>
           <FramedCard corners>
             {plan.weeklies.map(({ objective, doneThisWeek }, index) => (
               <Fragment key={objective.id}>
