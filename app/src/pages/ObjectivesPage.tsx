@@ -1,9 +1,12 @@
 import { useParams } from "@tanstack/react-router";
 import { RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Chip } from "@/components/ui/chip";
+import { FramedCard } from "@/components/ui/framed-card";
+import { ListRow, ListRowDivider } from "@/components/ui/list-row";
+import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { useAppStore } from "@/store/useAppStore";
 import type { Objective } from "@tomelist/schema";
@@ -24,38 +27,41 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
   const undoObjective = useAppStore((s) => s.undoObjective);
   const exhausted = objective.repeatable === false && count >= 1;
   return (
-    <Card data-testid={`objective-${objective.id}`}>
-      <CardContent className="flex items-center gap-3 p-3">
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-medium">{objective.title}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-            <Badge variant="secondary">{objective.points} tomes</Badge>
-            <Badge variant="outline">{objective.effort}</Badge>
-            <span>{objective.category}</span>
-            {objective.requirement ? <span>· {objective.requirement}</span> : null}
-          </div>
+    <ListRow data-testid={`objective-${objective.id}`}>
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium">{objective.title}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          <Badge variant="tome">{objective.points} tomes</Badge>
+          <Badge variant="gold-outline">{objective.effort}</Badge>
+          <span>{objective.category}</span>
+          {objective.requirement ? <span>· {objective.requirement}</span> : null}
         </div>
-        <span data-testid="objective-count" className="text-lg font-bold tabular-nums">
-          {count}
-        </span>
-        <Button
-          size="sm"
-          disabled={exhausted}
-          onClick={() => recordObjective(eventId, objective.id, objective.points)}
-        >
-          {exhausted ? "Done" : "Did it"}
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          aria-label={`Undo ${objective.title}`}
-          disabled={count === 0}
-          onClick={() => undoObjective(eventId, objective.id, objective.points)}
-        >
-          <RotateCcw className="size-4" />
-        </Button>
-      </CardContent>
-    </Card>
+      </div>
+      <span
+        data-testid="objective-count"
+        className="font-display text-lg font-bold text-gold tabular-nums"
+      >
+        {count}
+      </span>
+      <Button
+        variant="action"
+        size="sm"
+        disabled={exhausted}
+        onClick={() => recordObjective(eventId, objective.id, objective.points)}
+      >
+        {exhausted ? "Done" : "Did it"}
+      </Button>
+      <Button
+        size="icon"
+        variant="ghost"
+        aria-label={`Undo ${objective.title}`}
+        disabled={count === 0}
+        className="hover:text-gold"
+        onClick={() => undoObjective(eventId, objective.id, objective.points)}
+      >
+        <RotateCcw className="size-4" />
+      </Button>
+    </ListRow>
   );
 }
 
@@ -72,26 +78,22 @@ export function ObjectivesPage() {
     <div data-testid="objectives-page" className="flex flex-col gap-6">
       {categories.length >= 2 ? (
         <div data-testid="category-filters" className="flex flex-wrap items-center gap-1.5">
-          <Button
-            size="sm"
-            variant={category === null ? "default" : "outline"}
-            aria-pressed={category === null}
+          <Chip
+            active={category === null}
             data-testid="filter-all"
             onClick={() => setCategory(null)}
           >
             All
-          </Button>
+          </Chip>
           {categories.map((c) => (
-            <Button
+            <Chip
               key={c}
-              size="sm"
-              variant={category === c ? "default" : "outline"}
-              aria-pressed={category === c}
+              active={category === c}
               data-testid={`filter-${c}`}
               onClick={() => setCategory(c)}
             >
               {c}
-            </Button>
+            </Chip>
           ))}
         </div>
       ) : null}
@@ -100,12 +102,15 @@ export function ObjectivesPage() {
         if (group.length === 0) return null;
         return (
           <section key={kind} className="flex flex-col gap-2">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {kindLabels[kind]}
-            </h2>
-            {group.map((o) => (
-              <ObjectiveRow key={o.id} eventId={eventId} objective={o} />
-            ))}
+            <SectionKicker>{kindLabels[kind]}</SectionKicker>
+            <FramedCard>
+              {group.map((o, index) => (
+                <Fragment key={o.id}>
+                  {index > 0 ? <ListRowDivider /> : null}
+                  <ObjectiveRow eventId={eventId} objective={o} />
+                </Fragment>
+              ))}
+            </FramedCard>
           </section>
         );
       })}

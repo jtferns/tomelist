@@ -27,8 +27,8 @@ beforeEach(() => {
 describe("ObjectivesPage", () => {
   it("renders kind group headers", async () => {
     await renderObjectives();
-    expect(screen.getByRole("heading", { name: /Standard/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Ultimog/i })).toBeInTheDocument();
+    expect(screen.getByText(/Standard Objectives/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ultimog Challenges/i)).toBeInTheDocument();
   });
   it("did-it increments count and wallet", async () => {
     await renderObjectives();
@@ -64,5 +64,40 @@ describe("ObjectivesPage", () => {
     expect(screen.getByTestId("objective-obj-moogle-dungeons")).toBeInTheDocument();
     expect(screen.getByTestId("objective-obj-gates")).toBeInTheDocument();
     expect(screen.getByTestId("objective-obj-ultimog-msq")).toBeInTheDocument();
+  });
+
+  it("filter chips reflect aria-pressed state after a click", async () => {
+    await renderObjectives();
+    const allChip = screen.getByTestId("filter-all");
+    const dungeonsChip = screen.getByTestId("filter-Dungeons");
+    expect(allChip).toHaveAttribute("aria-pressed", "true");
+    expect(dungeonsChip).toHaveAttribute("aria-pressed", "false");
+
+    await userEvent.click(dungeonsChip);
+    expect(allChip).toHaveAttribute("aria-pressed", "false");
+    expect(dungeonsChip).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("undo works after a non-repeatable objective is exhausted", async () => {
+    await renderObjectives();
+    const row = screen.getByTestId("objective-obj-ultimog-msq");
+    await userEvent.click(within(row).getByRole("button", { name: /did it/i }));
+    const doneButton = within(row).getByRole("button", { name: /done/i });
+    expect(doneButton).toBeDisabled();
+    const undoButton = within(row).getByRole("button", { name: /undo/i });
+    expect(undoButton).not.toBeDisabled();
+
+    await userEvent.click(undoButton);
+    expect(within(row).getByTestId("objective-count")).toHaveTextContent("0");
+    expect(within(row).getByRole("button", { name: /undo/i })).toBeDisabled();
+    expect(within(row).getByRole("button", { name: /did it/i })).not.toBeDisabled();
+  });
+
+  it("filtering to a category with no objectives in a kind group skips that section", async () => {
+    await renderObjectives();
+    // Ultimog objectives only exist in the "Quests" category; filtering to
+    // "Dungeons" should leave the Ultimog group empty and unrendered.
+    await userEvent.click(screen.getByTestId("filter-Dungeons"));
+    expect(screen.queryByText(/Ultimog Challenges/i)).not.toBeInTheDocument();
   });
 });
