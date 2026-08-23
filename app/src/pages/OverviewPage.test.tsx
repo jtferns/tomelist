@@ -32,10 +32,10 @@ describe("OverviewPage", () => {
   });
   it("steppers adjust the wallet", async () => {
     await renderOverview();
-    await userEvent.click(screen.getByRole("button", { name: "+10" }));
-    await userEvent.click(screen.getByRole("button", { name: "+1" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add 10 tomestones" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add 1 tomestone" }));
     expect(screen.getByTestId("wallet-count")).toHaveTextContent("11");
-    await userEvent.click(screen.getByRole("button", { name: "-1" }));
+    await userEvent.click(screen.getByRole("button", { name: "Subtract 1 tomestone" }));
     expect(screen.getByTestId("wallet-count")).toHaveTextContent("10");
   });
 });

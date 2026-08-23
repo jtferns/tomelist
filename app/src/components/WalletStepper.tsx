@@ -1,22 +1,55 @@
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/useAppStore";
 
+const STEP_BUTTON_CLASS = "hover:border-primary/60 hover:text-primary";
+
 export function WalletStepper({ eventId }: { eventId: string }) {
   const tomestones = useAppStore((s) => (s.events[eventId] ?? { tomestones: 0 }).tomestones);
   const addTomestones = useAppStore((s) => s.addTomestones);
   return (
     <div className="flex items-center justify-center gap-3">
-      <div className="flex flex-col gap-1">
-        <Button variant="outline" size="lg" onClick={() => addTomestones(eventId, -10)}>-10</Button>
-        <Button variant="outline" size="lg" onClick={() => addTomestones(eventId, -1)}>-1</Button>
-      </div>
-      <div data-testid="wallet-count" className="min-w-24 text-center text-5xl font-bold tabular-nums">
+      <Button
+        variant="outline"
+        size="sm"
+        className={STEP_BUTTON_CLASS}
+        aria-label="Subtract 10 tomestones"
+        onClick={() => addTomestones(eventId, -10)}
+      >
+        −10
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        className={STEP_BUTTON_CLASS}
+        aria-label="Subtract 1 tomestone"
+        onClick={() => addTomestones(eventId, -1)}
+      >
+        −1
+      </Button>
+      <div
+        data-testid="wallet-count"
+        className="min-w-24 text-center font-display text-[44px] font-bold tabular-nums text-gold"
+      >
         {tomestones}
       </div>
-      <div className="flex flex-col gap-1">
-        <Button variant="outline" size="lg" onClick={() => addTomestones(eventId, 10)}>+10</Button>
-        <Button variant="outline" size="lg" onClick={() => addTomestones(eventId, 1)}>+1</Button>
-      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className={STEP_BUTTON_CLASS}
+        aria-label="Add 1 tomestone"
+        onClick={() => addTomestones(eventId, 1)}
+      >
+        +1
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        className={STEP_BUTTON_CLASS}
+        aria-label="Add 10 tomestones"
+        onClick={() => addTomestones(eventId, 10)}
+      >
+        +10
+      </Button>
     </div>
   );
 }

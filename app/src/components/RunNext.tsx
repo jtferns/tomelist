@@ -1,6 +1,9 @@
 import { emptyEventProgress } from "@tomelist/schema";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { FramedCard } from "@/components/ui/framed-card";
+import { ListRow, ListRowDivider } from "@/components/ui/list-row";
+import { SectionHeader } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { rankRunNext, runsToMustGoal, budgetReport } from "@/lib/optimizer";
 import { useAppStore } from "@/store/useAppStore";
@@ -8,6 +11,7 @@ import { useAppStore } from "@/store/useAppStore";
 export function RunNext({ eventId }: { eventId: string }) {
   const event = getEvent(eventId);
   const progress = useAppStore((s) => s.events[eventId]);
+  const recordObjective = useAppStore((s) => s.recordObjective);
 
   if (!event) return null;
 
@@ -22,32 +26,44 @@ export function RunNext({ eventId }: { eventId: string }) {
   const runs = showHint ? runsToMustGoal(event, eventProgress, now) : null;
 
   return (
-    <Card data-testid="run-next">
-      <CardHeader>
-        <CardTitle className="text-center text-sm text-muted-foreground">Run next</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        {top3.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground">All caught up for now.</p>
-        ) : (
-          top3.map(({ objective }) => (
-            <div key={objective.id} data-testid={`run-next-${objective.id}`} className="min-w-0">
-              <p className="truncate font-medium">{objective.title}</p>
-              <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                <Badge variant="secondary">{objective.points} tomes</Badge>
-                <Badge variant="outline">{objective.effort}</Badge>
-              </div>
+    <FramedCard corners data-testid="run-next" className="flex flex-col gap-3 p-4">
+      <SectionHeader title="Run next">
+        <span className="text-xs text-muted-foreground">best tomes-per-effort right now</span>
+      </SectionHeader>
+      {top3.length === 0 ? (
+        <p className="text-center text-sm text-muted-foreground">All caught up for now.</p>
+      ) : (
+        <div>
+          {top3.map(({ objective }, index) => (
+            <div key={objective.id}>
+              {index > 0 ? <ListRowDivider /> : null}
+              <ListRow data-testid={`run-next-${objective.id}`} className="justify-between">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium">{objective.title}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <Badge variant="tome">{objective.points} tomes</Badge>
+                    <Badge variant="gold-outline">{objective.effort}</Badge>
+                  </div>
+                </div>
+                <Button
+                  variant="action"
+                  size="sm"
+                  onClick={() => recordObjective(eventId, objective.id, objective.points)}
+                >
+                  Done
+                </Button>
+              </ListRow>
             </div>
-          ))
-        )}
-        {showHint && runs !== 0 ? (
-          <p data-testid="runs-to-goal" className="text-sm text-muted-foreground">
-            {runs === null
-              ? "Weekly income can't reach your Must goal"
-              : `~${runs} runs to reach your Must goal`}
-          </p>
-        ) : null}
-      </CardContent>
-    </Card>
+          ))}
+        </div>
+      )}
+      {showHint && runs !== 0 ? (
+        <p data-testid="runs-to-goal" className="text-xs text-muted-foreground">
+          {runs === null
+            ? "Weekly income can't reach your Must goal"
+            : `~${runs} runs to reach your Must goal`}
+        </p>
+      ) : null}
+    </FramedCard>
   );
 }

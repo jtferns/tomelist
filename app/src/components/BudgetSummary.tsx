@@ -1,6 +1,9 @@
+import { Link } from "@tanstack/react-router";
 import { emptyEventProgress } from "@tomelist/schema";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FramedCard } from "@/components/ui/framed-card";
+import { ListRow, ListRowDivider } from "@/components/ui/list-row";
+import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { budgetReport, type TierVerdict } from "@/lib/optimizer";
 import { useAppStore } from "@/store/useAppStore";
@@ -13,10 +16,10 @@ const TIER_LABELS: Record<TierVerdict["tier"], string> = {
 
 function TierVerdictBadge({ tier }: { tier: TierVerdict }) {
   if (tier.affordableNow) {
-    return <Badge variant="default">Affordable now</Badge>;
+    return <Badge variant="tome">Affordable now</Badge>;
   }
   if (tier.weeksNeeded !== null && tier.affordableByEnd !== false) {
-    return <Badge variant="secondary">~{tier.weeksNeeded} wk</Badge>;
+    return <Badge variant="gold-outline">~{tier.weeksNeeded} wk</Badge>;
   }
   if (tier.affordableByEnd === false) {
     return <Badge variant="destructive">Out of reach</Badge>;
@@ -35,43 +38,42 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
 
   if (visibleTiers.length === 0) {
     return (
-      <Card data-testid="budget-summary">
-        <CardHeader>
-          <CardTitle className="text-center text-sm text-muted-foreground">Budget</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-sm text-muted-foreground">
-            Add items to your wishlist to see affordability.
-          </p>
-        </CardContent>
-      </Card>
+      <FramedCard muted data-testid="budget-summary">
+        <ListRow className="justify-between">
+          <span className="text-sm text-muted-foreground">Nothing wishlisted yet.</span>
+          <Link
+            to="/$eventId/exchanges"
+            params={{ eventId }}
+            className="text-sm text-gold hover:text-gold-soft"
+          >
+            Browse exchanges →
+          </Link>
+        </ListRow>
+      </FramedCard>
     );
   }
 
   return (
-    <Card data-testid="budget-summary">
-      <CardHeader>
-        <CardTitle className="text-center text-sm text-muted-foreground">Budget</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        {visibleTiers.map((tier) => (
-          <div
-            key={tier.tier}
-            data-testid={`budget-tier-${tier.tier}`}
-            className="flex items-center justify-between gap-2"
-          >
-            <span className="text-sm font-medium">{TIER_LABELS[tier.tier]}</span>
-            <span className="text-sm text-muted-foreground">
-              {tier.cumulativeCost.toLocaleString()}
-            </span>
-            <TierVerdictBadge tier={tier} />
+    <FramedCard corners data-testid="budget-summary" className="flex flex-col gap-3 p-4">
+      <SectionKicker>Budget</SectionKicker>
+      <div>
+        {visibleTiers.map((tier, index) => (
+          <div key={tier.tier}>
+            {index > 0 ? <ListRowDivider /> : null}
+            <ListRow data-testid={`budget-tier-${tier.tier}`} className="justify-between">
+              <span className="text-sm font-medium">{TIER_LABELS[tier.tier]}</span>
+              <span className="text-sm text-gold tabular-nums">
+                {tier.cumulativeCost.toLocaleString()}
+              </span>
+              <TierVerdictBadge tier={tier} />
+            </ListRow>
           </div>
         ))}
-        <p className="text-sm text-muted-foreground">
-          +{report.weeklyRate}/wk
-          {report.weeksLeft !== null ? ` · ${report.weeksLeft} wk left` : ""}
-        </p>
-      </CardContent>
-    </Card>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        +{report.weeklyRate}/wk
+        {report.weeksLeft !== null ? ` · ${report.weeksLeft} wk left` : ""}
+      </p>
+    </FramedCard>
   );
 }

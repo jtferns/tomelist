@@ -1,5 +1,6 @@
 import { RouterProvider } from "@tanstack/react-router";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { emptyEventProgress } from "@tomelist/schema";
 import { beforeEach, describe, expect, it } from "vitest";
 import { useAppStore } from "@/store/useAppStore";
@@ -46,5 +47,29 @@ describe("RunNext", () => {
   it("does not show the hint when the wishlist has no must-tier cost", async () => {
     await renderOverview();
     expect(screen.queryByTestId("runs-to-goal")).not.toBeInTheDocument();
+  });
+
+  it("clicking Done on the top row records the objective and drops it from the ranking", async () => {
+    await renderOverview();
+    const topRow = screen.getByTestId("run-next-obj-ultimog-msq");
+    const doneButton = within(topRow).getByRole("button", { name: /done/i });
+    await userEvent.click(doneButton);
+
+    expect(useAppStore.getState().events[E]?.tomestones).toBe(50);
+    expect(screen.queryByTestId("run-next-obj-ultimog-msq")).not.toBeInTheDocument();
+  });
+
+  it("renders without crashing when fewer than 3 objectives are rankable", async () => {
+    const progress = emptyEventProgress();
+    const recent = new Date().toISOString();
+    progress.completedObjectives["obj-weekly-random"] = { count: 1, lastDoneAt: recent };
+    progress.completedObjectives["obj-minimog-fishing"] = { count: 1, lastDoneAt: recent };
+    progress.completedObjectives["obj-ultimog-msq"] = { count: 1, lastDoneAt: recent };
+    useAppStore.setState({ events: { [E]: progress } });
+
+    await renderOverview();
+    const card = screen.getByTestId("run-next");
+    expect(card).toHaveTextContent("Earn 2,000+ points in GATEs");
+    expect(screen.queryByTestId("run-next-obj-weekly-random")).not.toBeInTheDocument();
   });
 });

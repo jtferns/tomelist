@@ -25,7 +25,13 @@ describe("BudgetSummary", () => {
   it("shows a hint when the wishlist is empty", async () => {
     await renderOverview();
     const summary = screen.getByTestId("budget-summary");
-    expect(summary).toHaveTextContent("Add items to your wishlist to see affordability.");
+    expect(summary).toHaveTextContent("Nothing wishlisted yet.");
+  });
+
+  it("renders a Browse exchanges link to this event's exchanges route when empty", async () => {
+    await renderOverview();
+    const link = screen.getByRole("link", { name: /Browse exchanges/ });
+    expect(link).toHaveAttribute("href", expect.stringContaining(`/${E}/exchanges`));
   });
 
   it("shows Affordable now when the wallet covers a wanted item", async () => {
