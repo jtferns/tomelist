@@ -37,7 +37,7 @@ export function EventShell() {
               key={to}
               to={`/$eventId/${to}`}
               params={{ eventId }}
-              className="flex min-h-14 min-w-14 flex-col items-center justify-center gap-0.5 px-3 text-xs text-muted-foreground transition-colors hover:text-foreground [&.active]:text-gold"
+              className="flex min-h-14 min-w-14 flex-col items-center justify-center gap-0.5 px-3 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 [&.active]:text-gold"
             >
               <Icon className="size-5" />
               {label}
@@ -48,8 +48,8 @@ export function EventShell() {
 
       {/* Desktop header (>=sm) */}
       <nav className="fixed inset-x-0 top-0 z-20 hidden border-b border-[var(--frame-border)] bg-card/95 backdrop-blur sm:block">
-        <div className="mx-auto flex max-w-[960px] items-center justify-between">
-          <div className="flex items-center gap-2 px-3 py-2">
+        <div className="mx-auto flex h-14 max-w-[960px] items-center justify-between">
+          <div className="flex items-center gap-2 px-3">
             <Diamond size={18} />
             <span className="font-display text-[17px] font-bold tracking-[.08em]">TOMELIST</span>
           </div>
@@ -59,7 +59,7 @@ export function EventShell() {
                 key={to}
                 to={`/$eventId/${to}`}
                 params={{ eventId }}
-                className="rounded-[4px] px-3 py-2 text-[13.5px] font-medium text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground [&.active]:bg-primary/15 [&.active]:font-bold [&.active]:text-foreground [&.active]:shadow-[inset_0_-2px_0_var(--color-primary)]"
+                className="rounded-[4px] px-3 py-2 text-[13.5px] font-medium text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 [&.active]:bg-primary/15 [&.active]:font-bold [&.active]:text-foreground [&.active]:shadow-[inset_0_-2px_0_var(--color-primary)]"
               >
                 {label}
               </Link>

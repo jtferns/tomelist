@@ -69,7 +69,7 @@ export function EventSwitcher({ eventId }: { eventId: string }) {
                 className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
               >
                 <span className="min-w-0 flex-1 truncate">{e.name}</span>
-                {isEventEnded(e, now) ? <Badge variant="outline">Ended</Badge> : null}
+                {isEventEnded(e, now) ? <Badge variant="gold-outline">Ended</Badge> : null}
               </button>
             </li>
           ))}

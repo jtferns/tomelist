@@ -44,7 +44,7 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
           <Link
             to="/$eventId/exchanges"
             params={{ eventId }}
-            className="text-sm text-gold hover:text-gold-soft"
+            className="rounded-sm text-sm text-gold outline-none hover:text-gold-soft focus-visible:ring-[3px] focus-visible:ring-ring/50"
           >
             Browse exchanges →
           </Link>

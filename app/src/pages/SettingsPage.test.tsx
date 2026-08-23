@@ -1,7 +1,7 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";
 
@@ -17,6 +17,11 @@ beforeEach(() => {
   useAppStore.setState({
     settings: { theme: { palette: "maelstrom", mode: "dark", ornament: "full", density: "comfy" } },
   });
+});
+
+afterEach(() => {
+  vi.doUnmock("@/lib/events");
+  vi.resetModules();
 });
 
 describe("SettingsPage", () => {
@@ -99,8 +104,24 @@ describe("SettingsPage", () => {
   });
 
   it("lists events with a gold-outline Ended badge for ended events", async () => {
-    await renderSettings();
+    vi.doMock("@/lib/events", async () => {
+      const actual = await vi.importActual<typeof import("@/lib/events")>("@/lib/events");
+      return { ...actual, isEventEnded: () => true };
+    });
+    vi.resetModules();
+    const { createAppRouter: freshCreateAppRouter } = await import("@/router");
+    const { RouterProvider: FreshRouterProvider } = await import("@tanstack/react-router");
+    const router = freshCreateAppRouter();
+    await router.navigate({ to: "/$eventId/settings", params: { eventId: "2026-03-mogmog-collection" } });
+    render(<FreshRouterProvider router={router} />);
+    await screen.findByTestId("settings-page");
+
     expect(screen.getByRole("link", { name: /Mogmog Collection/ })).toBeInTheDocument();
+    const endedBadges = screen.getAllByText("Ended");
+    expect(endedBadges.length).toBeGreaterThan(0);
+    const badge = endedBadges.find((el) => el.className.includes("border-gold/30"));
+    expect(badge).toBeDefined();
+    expect(badge).toHaveClass("border-gold/30");
   });
 
   it("shows the version line", async () => {

@@ -38,7 +38,7 @@ function Diamond({
           width: innerSize,
           height: innerSize,
           transform: "rotate(45deg)",
-          background: "linear-gradient(135deg, oklch(0.88 0.1 85), oklch(0.70 0.13 80))",
+          background: "linear-gradient(135deg, var(--gold-soft), var(--gold))",
         }}
       />
     </div>

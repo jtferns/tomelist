@@ -162,11 +162,4 @@ body {
   }
 }
 
-@layer components {
-  .top-bar-gradient {
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary), var(--gold), var(--primary), transparent);
-  }
-}
-
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));

@@ -24,6 +24,8 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.doUnmock("@/lib/optimizer");
+  vi.resetModules();
 });
 
 describe("PlannerPage", () => {
@@ -105,8 +107,5 @@ describe("PlannerPage", () => {
     const openRow = screen.getByTestId("weekly-obj-weekly-second");
     expect(within(openRow).getByRole("button", { name: "Did it" })).toBeInTheDocument();
     expect(within(openRow).queryByText("Claimed")).not.toBeInTheDocument();
-
-    vi.doUnmock("@/lib/optimizer");
-    vi.resetModules();
   });
 });

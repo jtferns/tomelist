@@ -15,7 +15,7 @@ export function ProgressHud() {
   const pct = total > 0 ? Math.min(100, (tomestones / total) * 100) : 0;
   return (
     <div className="sticky top-0 z-10 border-b border-border bg-card/95 px-4 py-2 backdrop-blur sm:top-14">
-      <FramedCard corners className="mx-auto max-w-3xl">
+      <FramedCard corners className="mx-auto max-w-[960px]">
         <div className="flex flex-wrap items-center gap-3 px-[var(--hud-pad-x)] py-[var(--hud-pad-y)]">
           <EventSwitcher eventId={eventId} />
           <div className="h-2 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary">
