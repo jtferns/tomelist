@@ -1,8 +1,11 @@
 import { useParams } from "@tanstack/react-router";
 import { emptyEventProgress } from "@tomelist/schema";
+import { Fragment } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FramedCard } from "@/components/ui/framed-card";
+import { ListRow, ListRowDivider } from "@/components/ui/list-row";
+import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { weeklyPlan } from "@/lib/optimizer";
 import { useAppStore } from "@/store/useAppStore";
@@ -21,96 +24,84 @@ export function PlannerPage() {
 
   return (
     <div data-testid="planner-page" className="flex flex-col gap-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-center text-sm text-muted-foreground">Pace</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {plan.neededPerWeek !== null ? (
-            <div data-testid="pace-line" className="flex items-center justify-between gap-2">
-              <span className="text-sm">
-                Earned {plan.earnedThisWeek} / need ~{plan.neededPerWeek} this week
-              </span>
-              {plan.onPace ? (
-                <Badge variant="default">On pace</Badge>
-              ) : (
-                <Badge variant="destructive">Behind</Badge>
-              )}
-            </div>
-          ) : (
-            <div data-testid="pace-line" className="flex flex-col gap-1">
-              <p className="text-sm text-muted-foreground">No end date — no weekly target.</p>
-              <p className="text-sm">Earned {plan.earnedThisWeek} this week</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <FramedCard muted className="p-4">
+        {plan.neededPerWeek !== null ? (
+          <div data-testid="pace-line" className="flex items-center justify-between gap-2">
+            <span className="text-sm">
+              Earned {plan.earnedThisWeek} / need ~{plan.neededPerWeek} this week
+            </span>
+            {plan.onPace ? <Badge variant="tome">On pace</Badge> : <Badge variant="destructive">Behind</Badge>}
+          </div>
+        ) : (
+          <p data-testid="pace-line" className="text-sm text-muted-foreground">
+            No end date — no weekly target. Earned {plan.earnedThisWeek} this week.
+          </p>
+        )}
+      </FramedCard>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-center text-sm text-muted-foreground">Minimog picks</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+      <section className="flex flex-col gap-2">
+        <SectionKicker>Minimog picks</SectionKicker>
+        <FramedCard corners>
           {plan.suggestedMinimogs.length === 0 ? (
-            <p className="text-center text-sm text-muted-foreground">Both picks used this week.</p>
+            <p className="p-4 text-center text-sm text-muted-foreground">
+              Both picks used this week.
+            </p>
           ) : (
-            plan.suggestedMinimogs.map(({ objective }) => (
-              <div
-                key={objective.id}
-                data-testid={`pick-${objective.id}`}
-                className="flex items-center gap-3"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{objective.title}</p>
-                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                    <Badge variant="secondary">{objective.points} tomes</Badge>
-                    <Badge variant="outline">{objective.effort}</Badge>
+            plan.suggestedMinimogs.map(({ objective }, index) => (
+              <Fragment key={objective.id}>
+                {index > 0 ? <ListRowDivider /> : null}
+                <ListRow data-testid={`pick-${objective.id}`}>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{objective.title}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                      <Badge variant="tome">{objective.points} tomes</Badge>
+                      <Badge variant="gold-outline">{objective.effort}</Badge>
+                    </div>
                   </div>
-                </div>
-                <Button
-                  size="sm"
-                  onClick={() => recordObjective(eventId, objective.id, objective.points)}
-                >
-                  Did it
-                </Button>
-              </div>
-            ))
-          )}
-        </CardContent>
-      </Card>
-
-      {plan.weeklies.length > 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center text-sm text-muted-foreground">Weeklies</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            {plan.weeklies.map(({ objective, doneThisWeek }) => (
-              <div
-                key={objective.id}
-                data-testid={`weekly-${objective.id}`}
-                className="flex items-center gap-3"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{objective.title}</p>
-                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                    <Badge variant="secondary">{objective.points} tomes</Badge>
-                  </div>
-                </div>
-                {doneThisWeek ? (
-                  <Badge variant="default">Claimed</Badge>
-                ) : (
                   <Button
+                    variant="action"
                     size="sm"
                     onClick={() => recordObjective(eventId, objective.id, objective.points)}
                   >
                     Did it
                   </Button>
-                )}
-              </div>
+                </ListRow>
+              </Fragment>
+            ))
+          )}
+        </FramedCard>
+      </section>
+
+      {plan.weeklies.length > 0 ? (
+        <section className="flex flex-col gap-2">
+          <SectionKicker>Weeklies</SectionKicker>
+          <FramedCard corners>
+            {plan.weeklies.map(({ objective, doneThisWeek }, index) => (
+              <Fragment key={objective.id}>
+                {index > 0 ? <ListRowDivider /> : null}
+                <ListRow data-testid={`weekly-${objective.id}`}>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{objective.title}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                      <Badge variant="tome">{objective.points} tomes</Badge>
+                    </div>
+                  </div>
+                  {doneThisWeek ? (
+                    <Badge variant="gold-outline">Claimed</Badge>
+                  ) : (
+                    <Button
+                      variant="action"
+                      size="sm"
+                      onClick={() => recordObjective(eventId, objective.id, objective.points)}
+                    >
+                      Did it
+                    </Button>
+                  )}
+                </ListRow>
+              </Fragment>
             ))}
-          </CardContent>
-        </Card>
+          </FramedCard>
+        </section>
       ) : null}
     </div>
   );
