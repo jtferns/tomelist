@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { getAllEvents, getEvent, isEventEnded } from "@/lib/events";
 
-const TABS = ["overview", "objectives", "exchanges", "settings"] as const;
+const TABS = ["overview", "objectives", "planner", "exchanges", "settings"] as const;
 
 export function EventSwitcher({ eventId }: { eventId: string }) {
   const [open, setOpen] = useState(false);
@@ -41,12 +41,12 @@ export function EventSwitcher({ eventId }: { eventId: string }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex min-w-0 flex-col items-start rounded-md px-1 py-0.5 text-left transition-colors hover:bg-accent"
+        className="group flex min-w-0 flex-col items-start rounded-md px-1 py-0.5 text-left transition-colors hover:bg-accent"
         data-testid="event-switcher-trigger"
       >
-        <span className="flex min-w-0 items-center gap-1 text-sm font-semibold">
+        <span className="flex min-w-0 items-center gap-1 font-display text-sm font-semibold">
           <span className="truncate">{event.name}</span>
-          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground transition-colors group-hover:text-gold" />
         </span>
         <span className="text-[11px] leading-tight text-muted-foreground">{statusLine}</span>
       </button>
@@ -54,7 +54,7 @@ export function EventSwitcher({ eventId }: { eventId: string }) {
         <ul
           role="listbox"
           aria-label="Switch event"
-          className="absolute left-0 top-full z-20 mt-1 w-64 rounded-md border border-border bg-card p-1 shadow-lg"
+          className="absolute left-0 top-full z-20 mt-1 w-64 rounded-md border border-[var(--frame-border)] bg-surface-2 p-1 shadow-[var(--frame-inset)]"
         >
           {getAllEvents().map((e) => (
             <li key={e.id}>
