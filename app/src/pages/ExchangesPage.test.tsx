@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";
+import { ExchangeRow } from "@/pages/ExchangesPage";
+import type { Exchange } from "@tomelist/schema";
 
 const E = "2026-03-mogmog-collection";
 
@@ -163,5 +165,63 @@ describe("ExchangesPage", () => {
       "exchange-fat-cat-parasol",
       "exchange-magicked-prism-bundle",
     ]);
+  });
+
+  it("sort chips expose aria-pressed and flip pressed state on click", async () => {
+    await renderExchanges();
+    const costChip = screen.getByTestId("sort-cost");
+    const defaultChip = screen.getByTestId("sort-default");
+    expect(defaultChip).toHaveAttribute("aria-pressed", "true");
+    expect(costChip).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(costChip);
+    expect(costChip).toHaveAttribute("aria-pressed", "true");
+    expect(defaultChip).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("clicking the qty + button does not toggle the wishlist entry off (stopPropagation guard)", async () => {
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    expect(screen.getByTestId("wanted-total")).toHaveTextContent("50");
+    await userEvent.click(screen.getByRole("button", { name: /more fat cat parasol/i }));
+    // still wanted, not toggled off
+    expect(screen.getByTestId("wanted-total")).toHaveTextContent("100");
+    expect(screen.getByRole("button", { name: /want fat cat parasol/i })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+  });
+
+  describe("item icon", () => {
+    const baseItem: Exchange = {
+      id: "test-item",
+      name: "Test Item",
+      cost: 10,
+      type: "Fashion",
+    };
+
+    it("renders no img when item.icon is absent", () => {
+      render(<ExchangeRow eventId={E} item={baseItem} wallet={0} />);
+      const row = screen.getByTestId("exchange-test-item");
+      expect(within(row).queryByRole("img")).not.toBeInTheDocument();
+    });
+
+    it("renders an img with empty alt when item.icon is present", () => {
+      render(
+        <ExchangeRow eventId={E} item={{ ...baseItem, icon: "/icons/test-item.png" }} wallet={0} />
+      );
+      const row = screen.getByTestId("exchange-test-item");
+      const img = within(row).getByRole("presentation", { hidden: true });
+      expect(img).toHaveAttribute("src", "/icons/test-item.png");
+      expect(img).toHaveAttribute("alt", "");
+    });
+  });
+
+  it("insufficient wanted item keeps data-insufficient and disables mark exchanged", async () => {
+    useAppStore.getState().addTomestones(E, 20);
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    const row = screen.getByTestId("exchange-fat-cat-parasol");
+    expect(row).toHaveAttribute("data-insufficient", "true");
+    expect(within(row).getByRole("button", { name: /mark exchanged/i })).toBeDisabled();
   });
 });

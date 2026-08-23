@@ -1,9 +1,10 @@
 import { useParams } from "@tanstack/react-router";
-import { CheckCircle2, Circle } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Chip } from "@/components/ui/chip";
+import { FramedCard } from "@/components/ui/framed-card";
+import { SectionHeader } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { useEorzeaTooltips } from "@/lib/useEorzeaTooltips";
 import { cn } from "@/lib/utils";
@@ -30,7 +31,7 @@ function tierGroupRank(entry: { status: "wanted" | "exchanged"; tier: "must" | "
   return TIER_RANK[entry.tier];
 }
 
-function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchange; wallet: number }) {
+export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchange; wallet: number }) {
   const entry = useAppStore((s) => s.events[eventId]?.wishlist[item.id]);
   const toggleWishlist = useAppStore((s) => s.toggleWishlist);
   const adjustWishlistQuantity = useAppStore((s) => s.adjustWishlistQuantity);
@@ -43,14 +44,18 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
   const tier = entry?.tier ?? "want";
   const tierLabel = TIER_LABEL[tier];
 
+  const icon = item.icon ? (
+    <img src={item.icon} alt="" className="size-10 shrink-0 rounded-[4px]" />
+  ) : null;
+
   const meta = (
     <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-      <Badge variant="secondary">{item.cost} tomes</Badge>
+      <Badge variant="tome">{item.cost} tomes</Badge>
       <span>{item.type}</span>
-      {item.tradeable ? <Badge variant="outline">tradeable</Badge> : null}
+      {item.tradeable ? <Badge variant="gold-outline">tradeable</Badge> : null}
       {item.altSources?.length ? (
         <Badge
-          variant="outline"
+          variant="gold-outline"
           data-testid={`alt-${item.id}`}
           title={item.altSources.map((s) => `${s.type}: ${s.text}`).join("\n")}
         >
@@ -74,34 +79,37 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
 
   if (exchanged) {
     return (
-      <Card data-testid={`exchange-${item.id}`} className="opacity-70">
-        <CardContent className="flex items-center gap-3 p-3">
-          <CheckCircle2 className="size-5 shrink-0 text-primary" />
+      <FramedCard data-testid={`exchange-${item.id}`} className="opacity-70">
+        <div className="flex items-center gap-3 p-3">
+          {icon}
           <div className="min-w-0 flex-1">
             <p className="truncate font-medium">{item.name}</p>
             {meta}
           </div>
-          <Badge>Exchanged</Badge>
-        </CardContent>
-      </Card>
+          <Badge variant="gold-outline">Exchanged</Badge>
+        </div>
+      </FramedCard>
     );
   }
 
   return (
-    <Card
+    <FramedCard
       data-testid={`exchange-${item.id}`}
       data-insufficient={insufficient ? "true" : undefined}
       className={cn(
-        "relative transition-colors hover:bg-accent",
-        wanted && "border-primary"
+        "group relative transition-colors hover:bg-accent/40",
+        wanted && "border-gold/60"
       )}
     >
-      <CardContent className="flex items-center gap-3 p-3">
-        {wanted ? (
-          <CheckCircle2 className="size-5 shrink-0 text-primary" />
-        ) : (
-          <Circle className="size-5 shrink-0 text-muted-foreground" />
-        )}
+      <div className="flex items-center gap-3 p-3">
+        {icon}
+        <span
+          aria-hidden="true"
+          className={cn(
+            "size-[18px] shrink-0 rotate-45 border border-border transition-colors group-hover:border-gold/70",
+            wanted && "border-gold bg-gold/20"
+          )}
+        />
         <button
           type="button"
           aria-pressed={wanted}
@@ -115,6 +123,12 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
           <p className="truncate font-medium">{item.name}</p>
           {meta}
         </button>
+        <div className="hidden shrink-0 items-center gap-1 text-right sm:flex">
+          <span className="font-display text-lg font-bold text-gold tabular-nums">
+            {item.cost}
+          </span>
+          <span className="text-xs text-muted-foreground">tomes</span>
+        </div>
         {wanted ? (
           <div
             className="relative z-10 flex shrink-0 items-center gap-1"
@@ -150,6 +164,7 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
               +
             </Button>
             <Button
+              variant="action"
               size="sm"
               disabled={wallet < item.cost}
               onClick={() => markExchanged(eventId, item.id, item.cost)}
@@ -158,8 +173,8 @@ function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: Exchang
             </Button>
           </div>
         ) : null}
-      </CardContent>
-    </Card>
+      </div>
+    </FramedCard>
   );
 }
 
@@ -197,28 +212,32 @@ export function ExchangesPage() {
     .map(({ item }) => item);
   return (
     <div data-testid="exchanges-page" className="flex flex-col gap-3">
-      <p className="text-sm text-muted-foreground">
-        Wishlist total:{" "}
-        <span data-testid="wanted-total" className="font-bold text-foreground">{wantedTotal}</span>{" "}
-        tomes
-      </p>
+      <SectionHeader title="Exchanges">
+        <p className="text-sm whitespace-nowrap text-muted-foreground">
+          Wishlist total{" "}
+          <span data-testid="wanted-total" className="font-bold text-gold tabular-nums">
+            {wantedTotal}
+          </span>{" "}
+          tomes
+        </p>
+      </SectionHeader>
       <div data-testid="sort-options" className="flex flex-wrap items-center gap-1.5">
         {SORT_OPTIONS.map(({ key, label }) => (
-          <Button
+          <Chip
             key={key}
-            size="sm"
-            variant={sortKey === key ? "default" : "outline"}
-            aria-pressed={sortKey === key}
+            active={sortKey === key}
             data-testid={`sort-${key}`}
             onClick={() => setSortKey(key)}
           >
             {label}
-          </Button>
+          </Chip>
         ))}
       </div>
-      {sortedExchanges.map((item) => (
-        <ExchangeRow key={item.id} eventId={eventId} item={item} wallet={wallet} />
-      ))}
+      <div className="flex flex-col gap-3">
+        {sortedExchanges.map((item) => (
+          <ExchangeRow key={item.id} eventId={eventId} item={item} wallet={wallet} />
+        ))}
+      </div>
     </div>
   );
 }
