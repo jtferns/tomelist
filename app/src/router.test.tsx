@@ -9,7 +9,9 @@ describe("router", () => {
     await router.navigate({ to: "/" });
     render(<RouterProvider router={router} />);
     expect(await screen.findByTestId("overview-page")).toBeInTheDocument();
-    expect(router.state.location.pathname).toContain("/2026-03-mogmog-collection/overview");
+    // No event is live at the current date, so getActiveEvent falls back to the
+    // newest by start date.
+    expect(router.state.location.pathname).toContain("/2026-09-astronomy-first-hunt/overview");
   });
   it("renders objectives route", async () => {
     const router = createAppRouter();

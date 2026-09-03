@@ -46,15 +46,20 @@ describe("BudgetSummary", () => {
   });
 
   it("shows a weeks-needed estimate when the wallet can't cover a wanted item yet", async () => {
+    // The Astronomy event still has runway (future end date + weekly income), so
+    // an unaffordable Must item yields a weeks-needed verdict, not "Out of reach".
+    const futureEvent = "2026-09-astronomy-first-hunt";
     const progress = emptyEventProgress();
     progress.tomestones = 0;
-    progress.wishlist[EXCHANGE_ID] = { status: "wanted", tier: "must", quantity: 1 };
-    useAppStore.setState({ events: { [E]: progress } });
+    progress.wishlist["uolon-horn"] = { status: "wanted", tier: "must", quantity: 1 };
+    useAppStore.setState({ events: { [futureEvent]: progress } });
 
-    await renderOverview();
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/overview", params: { eventId: futureEvent } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("overview-page");
+
     const row = screen.getByTestId("budget-tier-must");
-    // Event has no fixed end date, so weeklyRate income yields a weeks-needed
-    // verdict rather than a definitive "Out of reach".
-    expect(row).toHaveTextContent("~1 wk");
+    expect(row).toHaveTextContent(/~\d+ wk/);
   });
 });

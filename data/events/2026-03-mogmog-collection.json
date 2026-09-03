@@ -3,7 +3,7 @@
   "name": "Mogmog Collection (Mar 2026)",
   "tomestone": { "name": "Irregular Tomestone", "icon": "/tomes/2026-03-mogmog-collection.png" },
   "starts": "2026-03-31T08:00:00Z",
-  "ends": null,
+  "ends": "2026-05-01T08:00:00Z",
   "endsLabel": "Release of Patch 7.5",
   "objectives": [
     { "id": "obj-moogle-dungeons", "kind": "standard", "title": "Complete a moogle-marked dungeon", "category": "Dungeons", "points": 10, "effort": "medium", "repeatable": true, "notes": "SAMPLE — audit against Mogpendium" },
