@@ -1,4 +1,5 @@
 import { Link, useParams } from "@tanstack/react-router";
+import { AnimatedCount } from "@/components/ui/animated-count";
 import { EventSwitcher } from "@/components/EventSwitcher";
 import { FramedCard } from "@/components/ui/framed-card";
 import { getEvent } from "@/lib/events";
@@ -26,9 +27,12 @@ export function ProgressHud() {
             />
           </div>
           {total > 0 ? (
-            <span data-testid="hud-pct" className="text-xs font-semibold tabular-nums text-muted-foreground">
-              {Math.floor(pct)}%
-            </span>
+            <AnimatedCount
+              data-testid="hud-pct"
+              value={Math.floor(pct)}
+              format={(n) => `${n}%`}
+              className="text-xs font-semibold tabular-nums text-muted-foreground"
+            />
           ) : null}
           <Link
             to="/$eventId/overview"
@@ -41,12 +45,11 @@ export function ProgressHud() {
                 {event.tomestone.name}
               </span>
               <span className="flex items-baseline gap-1">
-                <span
+                <AnimatedCount
                   data-testid="hud-count"
+                  value={tomestones}
                   className="font-display text-[19px] font-bold tabular-nums text-gold"
-                >
-                  {tomestones}
-                </span>
+                />
                 {total > 0 ? (
                   <span data-testid="hud-total" className="text-xs text-muted-foreground">/ {total}</span>
                 ) : null}

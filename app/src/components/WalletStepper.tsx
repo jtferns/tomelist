@@ -1,3 +1,4 @@
+import { AnimatedCount } from "@/components/ui/animated-count";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -26,12 +27,11 @@ export function WalletStepper({ eventId }: { eventId: string }) {
       >
         −1
       </Button>
-      <div
+      <AnimatedCount
         data-testid="wallet-count"
+        value={tomestones}
         className="min-w-24 text-center font-display text-[44px] font-bold tabular-nums text-gold"
-      >
-        {tomestones}
-      </div>
+      />
       <Button
         variant="outline"
         size="sm"

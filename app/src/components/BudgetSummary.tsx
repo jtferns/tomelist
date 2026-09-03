@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { emptyEventProgress } from "@tomelist/schema";
+import { AnimatedCount } from "@/components/ui/animated-count";
 import { Badge } from "@/components/ui/badge";
 import { FramedCard } from "@/components/ui/framed-card";
 import { ListRow, ListRowDivider } from "@/components/ui/list-row";
@@ -62,9 +63,11 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
             {index > 0 ? <ListRowDivider /> : null}
             <ListRow data-testid={`budget-tier-${tier.tier}`} className="justify-between">
               <span className="text-sm font-medium">{TIER_LABELS[tier.tier]}</span>
-              <span className="text-sm text-gold tabular-nums">
-                {tier.cumulativeCost.toLocaleString()}
-              </span>
+              <AnimatedCount
+                value={tier.cumulativeCost}
+                format={(n) => n.toLocaleString()}
+                className="text-sm text-gold tabular-nums"
+              />
               <TierVerdictBadge tier={tier} />
             </ListRow>
           </div>

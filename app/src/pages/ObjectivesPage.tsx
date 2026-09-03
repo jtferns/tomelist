@@ -3,6 +3,7 @@ import { RotateCcw } from "lucide-react";
 import { Fragment, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AnimatedCount } from "@/components/ui/animated-count";
 import { Chip } from "@/components/ui/chip";
 import { FramedCard } from "@/components/ui/framed-card";
 import { ListRow, ListRowDivider } from "@/components/ui/list-row";
@@ -39,12 +40,11 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
           <p className="mt-1 text-xs text-muted-foreground">{objective.requirement}</p>
         ) : null}
       </div>
-      <span
+      <AnimatedCount
         data-testid="objective-count"
+        value={count}
         className="font-display text-lg font-bold text-gold tabular-nums"
-      >
-        {count}
-      </span>
+      />
       <Button
         variant="action"
         size="sm"

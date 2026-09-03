@@ -1,5 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { useState } from "react";
+import { AnimatedCount } from "@/components/ui/animated-count";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
@@ -209,9 +210,12 @@ export function ExchangesPage() {
       <SectionHeader title="Exchanges">
         <p className="text-sm whitespace-nowrap text-muted-foreground">
           Wishlist total{" "}
-          <span data-testid="wanted-total" className="font-bold text-gold tabular-nums">
-            {wantedTotal}
-          </span>{" "}
+          <AnimatedCount
+            data-testid="wanted-total"
+            value={wantedTotal}
+            format={(n) => n.toLocaleString()}
+            className="font-bold text-gold tabular-nums"
+          />{" "}
           tomes
         </p>
       </SectionHeader>
