@@ -29,13 +29,15 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
   return (
     <ListRow data-testid={`objective-${objective.id}`}>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium">{objective.title}</p>
+        <p className="font-medium">{objective.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <Badge variant="tome">{objective.points} tomes</Badge>
           <Badge variant="gold-outline">{objective.effort}</Badge>
           <span>{objective.category}</span>
-          {objective.requirement ? <span>· {objective.requirement}</span> : null}
         </div>
+        {objective.requirement ? (
+          <p className="mt-1 text-xs text-muted-foreground">{objective.requirement}</p>
+        ) : null}
       </div>
       <span
         data-testid="objective-count"
