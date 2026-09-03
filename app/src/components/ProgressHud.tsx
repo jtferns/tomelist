@@ -21,7 +21,7 @@ export function ProgressHud() {
           <div className="h-2 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary">
             <div
               data-testid="hud-bar"
-              className="h-full rounded-full bg-gradient-to-r from-primary to-gold transition-all"
+              className="h-full rounded-full bg-gradient-to-r from-primary to-gold transition-[width] duration-[var(--dur-slow)]"
               style={{ width: `${pct}%` }}
             />
           </div>

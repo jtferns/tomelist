@@ -117,9 +117,20 @@
   --color-surface-2: var(--surface-2);
   --font-display: "Cinzel", serif;
   --font-sans: "Alegreya Sans", ui-sans-serif, system-ui, sans-serif;
+  /* Retune every Tailwind transition utility at once: a gentle decelerating
+     curve instead of the default ease, a touch slower than 150ms. */
+  --default-transition-duration: var(--dur-fast);
+  --default-transition-timing-function: var(--ease-out);
 }
 
 :root {
+  /* Motion scale. Durations feed both CSS transitions and the count-up hook. */
+  --dur-fast: 140ms;
+  --dur: 220ms;
+  --dur-slow: 340ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+
   --row-pad-y: 12px;
   --row-pad-x: 16px;
   --row-gap: 12px;
@@ -159,6 +170,67 @@ body {
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]) {
     cursor: pointer;
+  }
+}
+
+/* Motion --------------------------------------------------------------------- */
+
+/* A value that just changed: a quick gold-tinted scale pop. Retrigger by
+   changing the element's `key` so it remounts. */
+@keyframes value-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.14);
+    color: var(--color-gold);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-value-pop {
+  animation: value-pop var(--dur-slow) var(--ease-pop);
+}
+
+/* Rows entering a filtered/sorted list: fade up from 4px. Needs @starting-style
+   (Chrome 117+, Safari 17.5+, Firefox 129+); older browsers just skip it. */
+@supports (transition-behavior: allow-discrete) {
+  .list-enter {
+    transition:
+      opacity var(--dur) var(--ease-out),
+      transform var(--dur) var(--ease-out);
+  }
+  @starting-style {
+    .list-enter {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+}
+
+/* Route cross-fade via the View Transitions API (opt-in per <Link>). Firefox
+   has no support yet and falls back to an instant swap. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur);
+  animation-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.01ms;
+    --dur: 0.01ms;
+    --dur-slow: 0.01ms;
+  }
+  .animate-value-pop {
+    animation: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 
