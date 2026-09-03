@@ -4,10 +4,10 @@ type EventModules = Record<string, { default: unknown }>;
 
 // Vite replaces this call with an object literal at build time. Under other
 // bundlers (the design-sync esbuild IIFE), `import.meta.glob` doesn't exist
-// and the call throws — leave `globModules` empty there and fall back to
-// `globalThis.__tomelistEventModules`, which design-sync's preview data shim
-// (app/src/design-sync/preview-data.tsx) populates with statically imported
-// event JSON.
+// and the call throws, leaving `globModules` empty. Events from
+// `globalThis.__tomelistEventModules` are merged on top: the design-sync preview
+// shim and the test setup register events there, and no real event id collides
+// with them. In the production app nothing sets it, so this is a no-op.
 let globModules: EventModules = {};
 try {
   globModules = import.meta.glob("../../../data/events/*.json", { eager: true }) as EventModules;
@@ -27,9 +27,7 @@ let events: EventData[] | undefined;
 
 function allEvents(): EventData[] {
   if (!events) {
-    const modules = Object.keys(globModules).length
-      ? globModules
-      : (globalThis.__tomelistEventModules ?? {});
+    const modules = { ...globModules, ...(globalThis.__tomelistEventModules ?? {}) };
     events = Object.values(modules)
       .map((m) => eventSchema.parse(m.default))
       .sort((a, b) => (a.starts < b.starts ? 1 : -1));

@@ -2,11 +2,15 @@ import { describe, expect, it } from "vitest";
 import { getActiveEvent, getAllEvents, getEvent, isEventEnded } from "./events";
 
 describe("event loading", () => {
-  it("loads all bundled events", () => {
+  it("loads events sorted newest-first by start date", () => {
     const events = getAllEvents();
     expect(events.length).toBeGreaterThan(0);
-    // sorted newest-first by `starts`
     expect(events[0].id).toBe("2026-09-astronomy-first-hunt");
+  });
+  it("merges the registered fixture with the bundled events", () => {
+    const ids = getAllEvents().map((e) => e.id);
+    expect(ids).toContain("2026-09-astronomy-first-hunt"); // bundled via import.meta.glob
+    expect(ids).toContain("2026-03-mogmog-collection"); // registered in vitest.setup.ts, not bundled
   });
   it("getEvent finds by id", () => {
     expect(getEvent("2026-03-mogmog-collection")?.name).toContain("Mogmog");
