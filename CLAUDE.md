@@ -24,7 +24,7 @@ This is a Yarn workspaces monorepo:
 
 Run from the repo root unless noted:
 
-- `yarn workspace @tomelist/app run dev` — Vite dev server for the app
+- `yarn dev` — Vite dev server for the app (delegates to `yarn workspace @tomelist/app run dev`)
 - `yarn tsc` — typecheck all workspaces (`yarn workspaces foreach -A --topological run tsc`)
 - `yarn test` — run all workspace test suites (`yarn workspaces foreach -A run test`, Vitest);
   this includes the `@tomelist/schema` tests, which validate everything under `data/`
