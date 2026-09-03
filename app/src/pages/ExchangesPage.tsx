@@ -80,7 +80,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
 
   if (exchanged) {
     return (
-      <FramedCard data-testid={`exchange-${item.id}`} className="opacity-70">
+      <FramedCard data-testid={`exchange-${item.id}`} className="list-enter opacity-70">
         <div className="flex items-center gap-3 p-3">
           {icon}
           <div className="min-w-0 flex-1">
@@ -98,7 +98,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
       data-testid={`exchange-${item.id}`}
       data-insufficient={insufficient ? "true" : undefined}
       className={cn(
-        "group relative transition-colors hover:bg-accent/40",
+        "list-enter group relative transition-colors hover:bg-accent/40",
         wanted && "border-gold/60"
       )}
     >
@@ -231,7 +231,8 @@ export function ExchangesPage() {
           </Chip>
         ))}
       </div>
-      <div className="flex flex-col gap-3">
+      {/* Re-key on sort so every row remounts and replays the list-enter fade. */}
+      <div key={sortKey} className="flex flex-col gap-3">
         {sortedExchanges.map((item) => (
           <ExchangeRow key={item.id} eventId={eventId} item={item} wallet={wallet} />
         ))}

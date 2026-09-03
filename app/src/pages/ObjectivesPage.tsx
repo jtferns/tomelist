@@ -28,7 +28,7 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
   const undoObjective = useAppStore((s) => s.undoObjective);
   const exhausted = objective.repeatable === false && count >= 1;
   return (
-    <ListRow data-testid={`objective-${objective.id}`}>
+    <ListRow data-testid={`objective-${objective.id}`} className="list-enter">
       <div className="min-w-0 flex-1">
         <p className="font-medium">{objective.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">

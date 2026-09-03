@@ -194,20 +194,17 @@ body {
   animation: value-pop var(--dur-slow) var(--ease-pop);
 }
 
-/* Rows entering a filtered/sorted list: fade up from 4px. Needs @starting-style
-   (Chrome 117+, Safari 17.5+, Firefox 129+); older browsers just skip it. */
-@supports (transition-behavior: allow-discrete) {
-  .list-enter {
-    transition:
-      opacity var(--dur) var(--ease-out),
-      transform var(--dur) var(--ease-out);
+/* Rows (re)mounting into a filtered or re-sorted list: a one-shot fade up from
+   4px. Runs on mount, so re-keying the list replays it. */
+@keyframes list-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
   }
-  @starting-style {
-    .list-enter {
-      opacity: 0;
-      transform: translateY(4px);
-    }
-  }
+}
+
+.list-enter {
+  animation: list-enter var(--dur) var(--ease-out) both;
 }
 
 /* Route cross-fade via the View Transitions API (opt-in per <Link>). Firefox
@@ -224,7 +221,8 @@ body {
     --dur: 0.01ms;
     --dur-slow: 0.01ms;
   }
-  .animate-value-pop {
+  .animate-value-pop,
+  .list-enter {
     animation: none;
   }
   ::view-transition-group(*),
