@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { FramedCard } from "@/components/ui/framed-card";
 import { SectionKicker } from "@/components/ui/section-header";
@@ -46,15 +45,14 @@ export function SettingsPage() {
             {palettes.map((p) => {
               const active = theme.palette === p.id;
               return (
-                <Button
+                <Chip
                   key={p.id}
-                  variant={active ? "action" : "outline"}
-                  aria-pressed={active}
+                  active={active}
                   className={active ? undefined : p.hoverClass}
                   onClick={() => setPalette(p.id)}
                 >
                   {p.label}
-                </Button>
+                </Chip>
               );
             })}
           </div>
@@ -66,14 +64,9 @@ export function SettingsPage() {
             {modes.map((m) => {
               const active = theme.mode === m.id;
               return (
-                <Button
-                  key={m.id}
-                  variant={active ? "action" : "outline"}
-                  aria-pressed={active}
-                  onClick={() => setMode(m.id)}
-                >
+                <Chip key={m.id} active={active} onClick={() => setMode(m.id)}>
                   {m.label}
-                </Button>
+                </Chip>
               );
             })}
           </div>

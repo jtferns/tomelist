@@ -34,6 +34,13 @@ describe("SettingsPage", () => {
     expect(screen.getByRole("heading", { name: /events/i })).toBeInTheDocument();
   });
 
+  it("renders Grand Company and Mode as chips, like Ornament and Density", async () => {
+    await renderSettings();
+    for (const name of [/^maelstrom$/i, /twin adder/i, /immortal flames/i, /^dark$/i, /^light$/i]) {
+      expect(screen.getByRole("button", { name }).getAttribute("data-slot")).toBe("chip");
+    }
+  });
+
   it("switches mode independently of palette", async () => {
     await renderSettings();
     await userEvent.click(screen.getByRole("button", { name: /^light$/i }));
