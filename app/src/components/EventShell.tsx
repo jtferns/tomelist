@@ -48,8 +48,8 @@ export function EventShell() {
 
       {/* Desktop header (>=sm) */}
       <nav className="fixed inset-x-0 top-0 z-20 hidden border-b border-[var(--frame-border)] bg-card/95 backdrop-blur sm:block">
-        <div className="mx-auto flex h-14 max-w-[960px] items-center justify-between">
-          <div className="flex items-center gap-2 px-3">
+        <div className="mx-auto flex h-14 max-w-[960px] items-center justify-between px-4">
+          <div className="flex items-center gap-2">
             <Diamond size={18} />
             <span className="font-display text-[17px] font-bold tracking-[.08em]">TOMELIST</span>
           </div>

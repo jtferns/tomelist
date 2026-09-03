@@ -48,6 +48,16 @@ describe("EventShell", () => {
     expect(active.length).toBeGreaterThan(0);
   });
 
+  it("aligns the desktop header gutter to the content column (px-4)", async () => {
+    await renderAt(E, "overview");
+    await screen.findByTestId("overview-page");
+    const desktopNav = screen
+      .getAllByRole("navigation")
+      .find((nav) => nav.className.includes("top-0"));
+    const inner = desktopNav?.firstElementChild;
+    expect(inner?.className).toMatch(/(^|\s)px-4(\s|$)/);
+  });
+
   it("hides the brand Diamond from accessibility tree", async () => {
     await renderAt(E, "overview");
     await screen.findByTestId("overview-page");
