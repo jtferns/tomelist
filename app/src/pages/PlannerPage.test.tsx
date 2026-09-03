@@ -50,15 +50,15 @@ describe("PlannerPage", () => {
     expect(screen.getByText("Both picks used this week.")).toBeInTheDocument();
   });
 
-  it("shows the no-end-date pace message for this event", async () => {
+  it("shows the no-target pace message for this event", async () => {
     await renderPlanner();
-    expect(screen.getByTestId("pace-line")).toHaveTextContent("No end date — no weekly target.");
+    expect(screen.getByTestId("pace-line")).toHaveTextContent("No weekly target yet.");
   });
 
-  it("renders the exact merged no-target pace copy", async () => {
+  it("renders the exact no-target pace copy", async () => {
     await renderPlanner();
     expect(screen.getByTestId("pace-line")).toHaveTextContent(
-      "No end date — no weekly target. Earned 0 this week."
+      "No weekly target yet. Earned 0 this week."
     );
   });
 

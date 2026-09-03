@@ -450,6 +450,13 @@ describe("weeklyPlan", () => {
     expect(plan.onPace).toBe(false);
   });
 
+  it("neededPerWeek is null when nothing is wishlisted at the must tier", () => {
+    const ev = event({ ends: "2026-02-01T00:00:00Z" }); // fixed end, weeksLeft > 0
+    const plan = weeklyPlan(ev, progress(), NOW); // empty wishlist -> mustCost 0
+    expect(plan.neededPerWeek).toBeNull();
+    expect(plan.onPace).toBeNull();
+  });
+
   it("neededPerWeek is null when weeksLeft is null (open-ended event)", () => {
     const ev = event({ ends: null, exchanges: [exchange({ id: "ex-1", cost: 100 })] });
     const p = progress({

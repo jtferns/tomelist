@@ -65,7 +65,8 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  *   week is only counted once here, not per-completion.
  * - neededPerWeek: derived from budgetReport's must tier. Let shortfall = mustCost - wallet -
  *   oneTimeRemaining. When weeksLeft is a number > 0: max(0, ceil(shortfall / weeksLeft)).
- *   When weeksLeft is null or 0: null (no meaningful weekly target).
+ *   When weeksLeft is null or 0, or nothing is wishlisted at the must tier (mustCost 0):
+ *   null (no meaningful weekly target).
  * - onPace: null when neededPerWeek is null; otherwise earnedThisWeek >= neededPerWeek.
  */
 
@@ -297,7 +298,7 @@ export function weeklyPlan(event: EventData, progress: EventProgress, now: Date)
   const shortfall = mustCost - report.wallet - report.oneTimeRemaining;
 
   let neededPerWeek: number | null;
-  if (report.weeksLeft === null || report.weeksLeft === 0) {
+  if (report.weeksLeft === null || report.weeksLeft === 0 || mustCost === 0) {
     neededPerWeek = null;
   } else {
     neededPerWeek = shortfall <= 0 ? 0 : Math.ceil(shortfall / report.weeksLeft);

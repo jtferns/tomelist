@@ -34,7 +34,7 @@ export function PlannerPage() {
           </div>
         ) : (
           <p data-testid="pace-line" className="text-sm text-muted-foreground">
-            No end date — no weekly target. Earned {plan.earnedThisWeek} this week.
+            No weekly target yet. Earned {plan.earnedThisWeek} this week.
           </p>
         )}
       </FramedCard>
