@@ -216,6 +216,18 @@ describe("ExchangesPage", () => {
     });
   });
 
+  it("renders the tome cost once per row", () => {
+    render(
+      <ExchangeRow
+        eventId={E}
+        item={{ id: "cost-once", name: "Cost Once", cost: 10, type: "Fashion" }}
+        wallet={0}
+      />
+    );
+    const row = screen.getByTestId("exchange-cost-once");
+    expect(within(row).getAllByText(/tomes/i)).toHaveLength(1);
+  });
+
   it("insufficient wanted item keeps data-insufficient and disables mark exchanged", async () => {
     useAppStore.getState().addTomestones(E, 20);
     await renderExchanges();

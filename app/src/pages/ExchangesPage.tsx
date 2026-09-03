@@ -123,12 +123,6 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
           <p className="truncate font-medium">{item.name}</p>
           {meta}
         </button>
-        <div className="hidden shrink-0 items-center gap-1 text-right sm:flex">
-          <span className="font-display text-lg font-bold text-gold tabular-nums">
-            {item.cost}
-          </span>
-          <span className="text-xs text-muted-foreground">tomes</span>
-        </div>
         {wanted ? (
           <div
             className="relative z-10 flex shrink-0 items-center gap-1"
