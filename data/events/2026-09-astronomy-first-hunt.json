@@ -1,7 +1,7 @@
 {
   "id": "2026-09-astronomy-first-hunt",
   "name": "The First Hunt for Astronomy (Sep 2026)",
-  "tomestone": { "name": "Irregular Tomestone of Astronomy I" },
+  "tomestone": { "name": "Irregular Tomestone of Astronomy I", "icon": "/tomes/2026-09-astronomy-first-hunt.png" },
   "starts": "2026-09-09T08:00:00Z",
   "ends": "2026-10-19T14:59:00Z",
   "endsLabel": "Exchanges remain until Patch 8.1 (Mogpendium claims close after Patch 8.05)",

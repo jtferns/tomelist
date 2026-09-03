@@ -13,7 +13,9 @@ import type { EventData } from "@tomelist/schema";
 export const sampleEvent = {
   id: "2026-03-mogmog-collection",
   name: "Mogmog Collection (Mar 2026)",
-  tomestone: { name: "Irregular Tomestone", icon: "/tomes/2026-03-mogmog-collection.png" },
+  // borrows a real shipped asset so the icon path resolves in preview builds;
+  // the fixture event itself is never bundled
+  tomestone: { name: "Irregular Tomestone", icon: "/tomes/2026-09-astronomy-first-hunt.png" },
   starts: "2026-03-31T08:00:00Z",
   ends: "2026-05-01T08:00:00Z",
   endsLabel: "Release of Patch 7.5",
