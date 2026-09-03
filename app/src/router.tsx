@@ -44,7 +44,9 @@ const routeTree = rootRoute.addChildren([
 ]);
 
 export function createAppRouter() {
-  return createRouter({ routeTree });
+  // Cross-fade page swaps via the View Transitions API; falls back to a plain
+  // startTransition where the browser lacks it (Firefox).
+  return createRouter({ routeTree, defaultViewTransition: true });
 }
 
 declare module "@tanstack/react-router" {
