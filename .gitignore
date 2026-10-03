@@ -38,3 +38,9 @@ ds-bundle/
 .design-sync/.cache/
 .design-sync/learnings/
 .design-sync/node_modules
+
+# impeccable install (local tooling)
+.claude/
+.github/agents/
+.github/hooks/
+.github/skills/
