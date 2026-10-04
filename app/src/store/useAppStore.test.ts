@@ -124,6 +124,52 @@ describe("objective actions", () => {
   });
 });
 
+describe("token actions", () => {
+  it("old progress without tokens reads as 0 and addTokens floors at 0", () => {
+    expect(useAppStore.getState().getProgress(E).tokens ?? 0).toBe(0);
+    useAppStore.getState().addTokens(E, 3);
+    useAppStore.getState().addTokens(E, -5);
+    expect(useAppStore.getState().getProgress(E).tokens).toBe(0);
+  });
+
+  it("logging and undoing a clear moves tokens with tomes", () => {
+    useAppStore.getState().recordObjective(E, "obj-x", 10, 1);
+    expect(useAppStore.getState().getProgress(E).tokens).toBe(1);
+    useAppStore.getState().undoObjective(E, "obj-x", 10, 1);
+    const p = useAppStore.getState().getProgress(E);
+    expect(p.tokens).toBe(0);
+    expect(p.tomestones).toBe(0);
+  });
+
+  it("refuses to undo a clear whose tokens were spent", () => {
+    useAppStore.getState().recordObjective(E, "obj-x", 10, 1);
+    useAppStore.getState().addTokens(E, -1);
+    useAppStore.getState().undoObjective(E, "obj-x", 10, 1);
+    const p = useAppStore.getState().getProgress(E);
+    expect(p.completedObjectives["obj-x"].count).toBe(1);
+    expect(p.tomestones).toBe(10);
+  });
+
+  it("exchange charges both currencies, refuses when tokens are short, and undo refunds both", () => {
+    useAppStore.getState().addTomestones(E, 100);
+    useAppStore.getState().addTokens(E, 9);
+    useAppStore.getState().toggleWishlist(E, "mount");
+    useAppStore.getState().markExchanged(E, "mount", 100, 10);
+    expect(useAppStore.getState().getProgress(E).wishlist["mount"].status).toBe("wanted");
+    expect(useAppStore.getState().getProgress(E).tomestones).toBe(100);
+
+    useAppStore.getState().addTokens(E, 1);
+    useAppStore.getState().markExchanged(E, "mount", 100, 10);
+    let p = useAppStore.getState().getProgress(E);
+    expect(p.wishlist["mount"].status).toBe("exchanged");
+    expect([p.tomestones, p.tokens]).toEqual([0, 0]);
+
+    useAppStore.getState().undoExchanged(E, "mount", 100, 10);
+    p = useAppStore.getState().getProgress(E);
+    expect([p.tomestones, p.tokens]).toEqual([100, 10]);
+  });
+});
+
 describe("migratePersistedState", () => {
   it("migrates legacy string theme and quantity-less wishlist entries", () => {
     const migrated = migratePersistedState({

@@ -22,13 +22,14 @@ type AppState = PersistedState & {
   setOrnament: (ornament: ThemeSettings["ornament"]) => void;
   setDensity: (density: ThemeSettings["density"]) => void;
   addTomestones: (eventId: string, delta: number) => void;
-  recordObjective: (eventId: string, objectiveId: string, points: number) => void;
-  undoObjective: (eventId: string, objectiveId: string, points: number) => void;
+  addTokens: (eventId: string, delta: number) => void;
+  recordObjective: (eventId: string, objectiveId: string, points: number, tokens?: number) => void;
+  undoObjective: (eventId: string, objectiveId: string, points: number, tokens?: number) => void;
   toggleWishlist: (eventId: string, exchangeId: string) => void;
   adjustWishlistQuantity: (eventId: string, exchangeId: string, delta: number) => void;
   setWishlistTier: (eventId: string, exchangeId: string, tier: WishlistEntry["tier"]) => void;
-  markExchanged: (eventId: string, exchangeId: string, cost: number) => void;
-  undoExchanged: (eventId: string, exchangeId: string, cost: number) => void;
+  markExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number) => void;
+  undoExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number) => void;
   resetEvent: (eventId: string) => void;
   replaceState: (state: UserState) => void;
   getProgress: (eventId: string) => EventProgress;
@@ -98,7 +99,11 @@ export const useAppStore = create<AppState>()(
           update(eventId, (p) => {
             p.tomestones = Math.max(0, p.tomestones + delta);
           }),
-        recordObjective: (eventId, objectiveId, points) =>
+        addTokens: (eventId, delta) =>
+          update(eventId, (p) => {
+            p.tokens = Math.max(0, (p.tokens ?? 0) + delta);
+          }),
+        recordObjective: (eventId, objectiveId, points, tokens = 0) =>
           update(eventId, (p) => {
             const cur = p.completedObjectives[objectiveId];
             const history = cur ? [...(cur.history ?? []), cur.lastDoneAt].slice(-HISTORY_LIMIT) : [];
@@ -108,13 +113,15 @@ export const useAppStore = create<AppState>()(
               history,
             };
             p.tomestones += points;
+            if (tokens > 0) p.tokens = (p.tokens ?? 0) + tokens;
           }),
-        undoObjective: (eventId, objectiveId, points) =>
+        undoObjective: (eventId, objectiveId, points, tokens = 0) =>
           update(eventId, (p) => {
             const cur = p.completedObjectives[objectiveId];
             // Refuse rather than clamp: tomes already spent on exchanges can't be taken back.
-            if (!cur || cur.count === 0 || p.tomestones < points) return;
+            if (!cur || cur.count === 0 || p.tomestones < points || (p.tokens ?? 0) < tokens) return;
             p.tomestones -= points;
+            if (tokens > 0) p.tokens = (p.tokens ?? 0) - tokens;
             if (cur.count === 1) {
               delete p.completedObjectives[objectiveId];
               return;
@@ -144,22 +151,25 @@ export const useAppStore = create<AppState>()(
             const entry = p.wishlist[exchangeId];
             if (entry) p.wishlist[exchangeId] = { ...entry, tier };
           }),
-        markExchanged: (eventId, exchangeId, cost) =>
+        markExchanged: (eventId, exchangeId, cost, tokenCost = 0) =>
           update(eventId, (p) => {
             const entry = p.wishlist[exchangeId];
             if (entry && entry.status === "wanted") {
-              p.tomestones = Math.max(0, p.tomestones - cost);
+              if (p.tomestones < cost || (p.tokens ?? 0) < tokenCost) return;
+              p.tomestones -= cost;
+              if (tokenCost > 0) p.tokens = (p.tokens ?? 0) - tokenCost;
               p.wishlist[exchangeId] =
                 entry.quantity > 1
                   ? { ...entry, quantity: entry.quantity - 1 }
                   : { ...entry, status: "exchanged" };
             }
           }),
-        undoExchanged: (eventId, exchangeId, cost) =>
+        undoExchanged: (eventId, exchangeId, cost, tokenCost = 0) =>
           update(eventId, (p) => {
             const entry = p.wishlist[exchangeId];
             if (!entry) return;
             p.tomestones += cost;
+            if (tokenCost > 0) p.tokens = (p.tokens ?? 0) + tokenCost;
             p.wishlist[exchangeId] =
               entry.status === "exchanged"
                 ? { ...entry, status: "wanted" }
