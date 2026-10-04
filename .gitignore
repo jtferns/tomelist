@@ -46,3 +46,7 @@ ds-bundle/
 .github/skills/
 .impeccable/
 docs/design/
+
+# Generated when publishing the Surge redirect
+surge-redirect/200.html
+surge-redirect/CNAME
