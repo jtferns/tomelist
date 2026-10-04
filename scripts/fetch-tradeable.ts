@@ -1,7 +1,7 @@
 /**
  * Records whether each exchange item can be traded, from XIVAPI's Item.IsUntradable.
- * Usage: yarn dlx --quiet tsx scripts/fetch-tradeable.ts data/events/<id>.json [--force]
- * Items that already have `tradeable` are skipped unless --force is passed.
+ * Usage: yarn dlx --quiet tsx scripts/fetch-tradeable.ts data/events/<id>.json [--refresh]
+ * Items that already have `tradeable` are skipped unless --refresh is passed.
  * The JSON is edited in place as text, so its one-line-per-item layout survives.
  */
 import { readFile, writeFile } from "node:fs/promises";
@@ -38,9 +38,9 @@ function setTradeable(text: string, id: string, value: boolean): string {
 
 (async () => {
   const eventPath = process.argv[2];
-  const force = process.argv.includes("--force");
+  const refresh = process.argv.includes("--refresh");
   if (!eventPath) {
-    console.error("Usage: tsx scripts/fetch-tradeable.ts data/events/<id>.json [--force]");
+    console.error("Usage: tsx scripts/fetch-tradeable.ts data/events/<id>.json [--refresh]");
     process.exit(1);
   }
 
@@ -49,7 +49,7 @@ function setTradeable(text: string, id: string, value: boolean): string {
   const missing: string[] = [];
 
   for (const item of event.exchanges as { id: string; name: string; tradeable?: boolean }[]) {
-    if (item.tradeable !== undefined && !force) continue;
+    if (item.tradeable !== undefined && !refresh) continue;
     // Bundles such as "Magicked Prism (Job Mastery) x10" are listed under the single item's name.
     const untradable = await findUntradable(item.name.replace(/ x\d+$/, ""));
     if (untradable === null) {

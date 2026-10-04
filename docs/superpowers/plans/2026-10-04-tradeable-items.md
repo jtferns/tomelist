@@ -35,7 +35,7 @@ New script `scripts/fetch-tradeable.ts`, modelled on `scripts/fetch-icons.ts`:
   `!IsUntradable`.
 - Edit the JSON as text like fetch-icons does, inserting `"tradeable": true|false` after
   `"type"` so the one-line-per-item layout survives. Overwrite an existing value only with
-  `--force`.
+  `--refresh`.
 - Print items it could not find so they can be set by hand.
 - Document it as a step in `scripts/README.md` next to fetch-icons.
 

@@ -11,7 +11,7 @@ Per new event:
    XIVAPI into `app/public/items/` and adds an `icon` to each exchange. Find any item it reports as
    a miss by hand.
 7. `yarn dlx --quiet tsx scripts/fetch-tradeable.ts data/events/<id>.json` records whether each
-   exchange can be traded (`tradeable`), from XIVAPI. Set any reported miss by hand. Add `--force`
+   exchange can be traded (`tradeable`), from XIVAPI. Set any reported miss by hand. Add `--refresh`
    to refresh values already set. The data tests require it on the newest event.
 8. `yarn validate:data` must pass. Open a PR; merging deploys.
 9. Add the event's tomestone art as `app/public/tomes/<eventId>.png` and set
