@@ -45,13 +45,16 @@ localStorage, with past and current events side by side.
 
 - Name: Tomelist.
 - Current visual identity is the shipped FFXIV dark-fantasy look: Cinzel and Alegreya Sans, gold
-  accents, Grand Company palettes (maelstrom, adder, flames) in dark and light, plus ornament and
-  density settings. It is open to redesign, but the FFXIV tone should stay recognizable.
+  accents, five palettes (Grand Companies maelstrom, adder, flames; cities ishgard, crystarium) in
+  dark and light, plus ornament and density settings. It is open to redesign, but the FFXIV tone should stay recognizable.
 
 ## Evidence on Hand
 
 - Real event data: `data/events/2026-09-astronomy-first-hunt.json`, audited against the wiki.
-- Tome art in `app/public/tomes/` is a placeholder upscale and should not be treated as final.
+- Tome art in `app/public/tomes/` is the official 128px image from the event's Lodestone page.
+  No larger official version exists.
+- v1 (2021) was hand-built by jtferns. v2 was rebuilt with Claude, an AI coding assistant, under
+  jtferns's direction, and says so in Settings and the README.
 - There are no testimonials, user counts, or press. Do not fabricate them.
 
 ## Product Principles

@@ -35,8 +35,9 @@ Run from the repo root unless noted:
 Package manager is Yarn 4 (Berry, `nodeLinker: node-modules`, see `.yarnrc.yml`). Node version is
 pinned in `.nvmrc`. CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn test`, and
 `yarn build` on every push/PR, and on `main` additionally deploys `app/dist` to a Cloudflare Worker
-(`wrangler.jsonc`, assets-only, SPA fallback) via `cloudflare/wrangler-action`, gated on the
-`CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets.
+(`wrangler.jsonc`, assets-only, SPA fallback) via `cloudflare/wrangler-action`. The deploy job
+needs the `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets and fails without them; nothing
+in the workflow skips it when they are missing.
 
 ## Architecture
 
@@ -49,29 +50,37 @@ pinned in `.nvmrc`. CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn 
    `getActiveEvent`, and `isEventEnded`. Adding an event means adding a JSON file + manifest entry
    and rebuilding — not shipping new app code.
 3. `app/src/router.tsx` (TanStack Router) redirects `/` to the currently-active event's overview
-   route, and defines the per-event routes `/$eventId/{overview,objectives,exchanges,settings}`,
+   route, and defines the per-event routes `/$eventId/{overview,objectives,planner,exchanges,settings}`,
    rendered inside `EventShell`/`Layout` (`app/src/components/`).
 4. `app/src/store/useAppStore.ts` is a Zustand store (with `persist` middleware) that owns all
-   mutable user state — tomestone totals, completed objectives, wishlist/exchange status, and
-   settings — keyed per event (`events: Record<eventId, EventProgress>`), and syncs to
+   mutable user state (tomestone totals, optional event-token balance, completed objectives with
+   clear history for exact undo, wishlist/exchange status, and settings), keyed per event (`events: Record<eventId, EventProgress>`), and syncs to
    `localStorage` under the key `"tomelist:v2"`. Event content itself is never mutated; this store
    is the only place user progress is written. `EventProgress`/`WishlistEntry` types come from
-   `packages/schema/src/state.ts`. Settings also hold a palette×mode theme (`{ palette:
-   maelstrom|adder|flames, mode: dark|light }`), which `Layout` applies to the document as
-   `data-palette`/`data-theme` attributes; the persisted state uses zustand-persist `version: 2`,
+   `packages/schema/src/state.ts`. Settings also hold a theme (`{ palette:
+   maelstrom|adder|flames|ishgard|crystarium, mode: dark|light, ornament, density }`), which
+   `Layout` applies to the document as `data-palette`/`data-theme` attributes; the persisted state
+   uses zustand-persist `version: 3`,
    with a `migrate` step that upgrades the legacy single-string theme/quantity-less format.
    `EventShell` additionally swaps the page favicon to the currently viewed event's
    `tomestone.icon`.
-5. The pages under `app/src/pages/` (`OverviewPage`, `ObjectivesPage`, `ExchangesPage`,
-   `SettingsPage`) read event content via `getEvent(eventId)` and cross-reference it against
+5. The pages under `app/src/pages/` (`OverviewPage`, `ObjectivesPage`, `PlannerPage`,
+   `ExchangesPage`, `SettingsPage`) read event content via `getEvent(eventId)` and cross-reference it against
    `useAppStore`'s per-event progress to render and update progress.
+
+**Planning logic** lives in `app/src/lib/optimizer.ts` (pure functions: budget verdicts, Run Next
+ranking, weekly plan). Event-content features it understands, all optional in the schema:
+minimogs tagged with an event `week` (only the current week is suggested), multi-clear objectives
+(`clears`, reward paid on the last clear, see `app/src/lib/clears.ts`), and a second event currency
+(`token` on the event, `tokens` on objectives, `tokenCost` on exchanges).
 
 **Schemas** (`packages/schema/src/event.ts`, `state.ts`) are the single source of truth for both
 event-content shape and persisted-state shape, consumed by both `app/` and the data-validation
 tests (`packages/schema/src/data.test.ts`, run via `yarn validate:data`).
 
-**Authoring script** (`scripts/fetch-rewards.ts`) is a standalone aid for drafting exchange-item
-data for a new event; it is not wired into any build/test/CI step. See `scripts/README.md` for the
+**Authoring scripts** (`scripts/fetch-rewards.ts` drafts exchange-item data, `scripts/fetch-icons.ts`
+downloads item icons into `app/public/items/`) are standalone aids for a new event; they are not
+wired into any build/test/CI step. See `scripts/README.md` for the
 full per-event authoring flow (draft exchanges → transcribe objectives → add
 `data/events/<id>.json` → register in `data/manifest.json` → `yarn validate:data`).
 
