@@ -8,6 +8,7 @@ import { FramedCard } from "@/components/ui/framed-card";
 import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
+import { cn } from "@/lib/utils";
 import { tomeCount } from "@/lib/format";
 import { useLogClear } from "@/lib/useLogClear";
 import { budgetReport, weeklyPlan } from "@/lib/optimizer";
@@ -25,21 +26,28 @@ export function PlannerPage() {
   const now = new Date();
   const plan = weeklyPlan(event, eventProgress, now);
   const weekly = plan.minimogWeeks;
+  const haveTokens = plan.tokens >= plan.mustTokenCost;
   const mustCost = budgetReport(event, eventProgress, now).tiers.find((t) => t.tier === "must")?.cumulativeCost ?? 0;
 
   return (
     <div data-testid="planner-page" className="flex flex-col gap-4">
       <FramedCard muted className="p-4">
-        {plan.neededPerWeek === 0 ? (
+        {plan.neededPerWeek === 0 && plan.mustTokensReachable ? (
           <div data-testid="pace-line" className="flex items-center justify-between gap-2">
             <span className="text-sm">
-              {eventProgress.tomestones >= mustCost
+              {eventProgress.tomestones >= mustCost && haveTokens
                 ? "You have enough for your Must-haves."
-                : "The one-time clears you have left cover your Must-haves."}{" "}
+                : plan.mustTokenCost > 0
+                  ? "The clears you have left cover your Must-haves."
+                  : "The one-time clears you have left cover your Must-haves."}{" "}
               Earned {plan.earnedThisWeek} this week.
             </span>
             <Badge variant="tome">Covered</Badge>
           </div>
+        ) : plan.neededPerWeek === 0 ? (
+          <p data-testid="pace-line" className="text-sm">
+            Tomes for your Must-haves are covered. Earned {plan.earnedThisWeek} this week.
+          </p>
         ) : plan.neededPerWeek !== null ? (
           <div data-testid="pace-line" className="flex items-center justify-between gap-2">
             <span className="text-sm">
@@ -52,6 +60,19 @@ export function PlannerPage() {
             No weekly target yet. Earned {plan.earnedThisWeek} this week.
           </p>
         )}
+        {event.token && plan.mustTokenCost > 0 ? (
+          <p
+            data-testid="token-line"
+            className={cn("mt-2 text-sm", plan.mustTokensReachable ? "text-muted-foreground" : "text-destructive")}
+          >
+            Tokens: {plan.tokens} of {plan.mustTokenCost}.
+            {haveTokens || plan.tokensRemaining === null
+              ? null
+              : plan.mustTokensReachable
+                ? ` ${plan.tokensRemaining} left to earn.`
+                : ` Only ${plan.tokensRemaining} left to earn, so the Must-haves can't all be reached.`}
+          </p>
+        ) : null}
       </FramedCard>
 
       <section className="flex flex-col gap-2">

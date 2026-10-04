@@ -157,4 +157,49 @@ describe("PlannerPage", () => {
       "The one-time clears you have left cover your Must-haves."
     );
   });
+
+  async function renderAstronomyPlanner(progress: Partial<ReturnType<typeof emptyEventProgress>>) {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-04T12:00:00Z"));
+    const A = "2026-09-astronomy-first-hunt";
+    useAppStore.setState({
+      events: {
+        [A]: {
+          ...emptyEventProgress(),
+          wishlist: { "uolon-horn": { status: "wanted", tier: "must", quantity: 1 } },
+          ...progress,
+        },
+      },
+    });
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/planner", params: { eventId: A } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("planner-page");
+  }
+
+  it("shows tokens left to earn when the Must-have token goal is reachable", async () => {
+    await renderAstronomyPlanner({ tomestones: 500, tokens: 4 });
+    expect(screen.getByTestId("token-line")).toHaveTextContent("Tokens: 4 of 10. 8 left to earn.");
+    expect(screen.getByTestId("pace-line")).toHaveTextContent("The clears you have left cover your Must-haves.");
+  });
+
+  it("warns when too few tokens are left and does not call the goal covered", async () => {
+    await renderAstronomyPlanner({ tomestones: 500, tokens: 1 });
+    expect(screen.getByTestId("token-line")).toHaveTextContent(
+      "Tokens: 1 of 10. Only 8 left to earn, so the Must-haves can't all be reached."
+    );
+    expect(screen.getByTestId("pace-line")).toHaveTextContent("Tomes for your Must-haves are covered.");
+    expect(screen.getByTestId("pace-line")).not.toHaveTextContent("Covered");
+  });
+
+  it("says you have enough once both tomes and tokens are in hand", async () => {
+    await renderAstronomyPlanner({ tomestones: 500, tokens: 10 });
+    expect(screen.getByTestId("token-line")).toHaveTextContent("Tokens: 10 of 10.");
+    expect(screen.getByTestId("pace-line")).toHaveTextContent("You have enough for your Must-haves.");
+  });
+
+  it("has no token line for an event without a token", async () => {
+    await renderPlanner();
+    expect(screen.queryByTestId("token-line")).not.toBeInTheDocument();
+  });
 });
