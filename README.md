@@ -85,7 +85,8 @@ To try the production build locally, run `yarn build`, then `yarn vite preview` 
 
 [`scripts/README.md`](scripts/README.md) has the full flow: draft the exchange list with
 `scripts/fetch-rewards.ts`, transcribe the objectives, add `data/events/<id>.json`, register it
-in `data/manifest.json`, download item icons with `scripts/fetch-icons.ts`, then run
+in `data/manifest.json`, download item icons with `scripts/fetch-icons.ts`, record tradeability with
+`scripts/fetch-tradeable.ts`, then run
 `yarn validate:data`.
 
 ## Deployment

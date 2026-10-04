@@ -52,4 +52,11 @@ describe("bundled event data", () => {
       if (usesTokens) expect(event.token, `${f}: uses tokens without "token"`).toBeDefined();
     }
   });
+  it("the newest event records whether every exchange is tradeable", () => {
+    const files = readdirSync(join(dataDir, "events")).filter((f) => f.endsWith(".json"));
+    const events = files.map((f) => eventSchema.parse(JSON.parse(readFileSync(join(dataDir, "events", f), "utf8"))));
+    const newest = events.reduce((a, b) => (b.starts > a.starts ? b : a));
+    const missing = newest.exchanges.filter((e) => e.tradeable === undefined).map((e) => e.id);
+    expect(missing, `${newest.id}: run scripts/fetch-tradeable.ts`).toEqual([]);
+  });
 });
