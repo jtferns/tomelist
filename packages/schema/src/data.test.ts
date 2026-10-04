@@ -42,4 +42,14 @@ describe("bundled event data", () => {
       expect(entry.ends).toBe(event.ends);
     }
   });
+  it("events that award or charge tokens define the token", () => {
+    const files = readdirSync(join(dataDir, "events")).filter((f) => f.endsWith(".json"));
+    for (const f of files) {
+      const event = eventSchema.parse(JSON.parse(readFileSync(join(dataDir, "events", f), "utf8")));
+      const usesTokens =
+        event.objectives.some((o) => o.tokens !== undefined) ||
+        event.exchanges.some((e) => e.tokenCost !== undefined);
+      if (usesTokens) expect(event.token, `${f}: uses tokens without "token"`).toBeDefined();
+    }
+  });
 });

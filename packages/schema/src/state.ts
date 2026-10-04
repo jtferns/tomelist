@@ -15,6 +15,8 @@ export const wishlistEntrySchema = z.object({
 
 export const eventProgressSchema = z.object({
   tomestones: z.number().int().min(0),
+  // Event-token balance; absent means 0.
+  tokens: z.number().int().min(0).optional(),
   completedObjectives: z.record(
     z.string(),
     z.object({

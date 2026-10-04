@@ -12,6 +12,8 @@ export const objectiveSchema = z.object({
   notes: z.string().optional(),
   // Event week (1-based) a minimog belongs to. Untagged minimogs are open every week.
   week: z.number().int().positive().optional(),
+  // Event-token award per clear, for events that define `token`.
+  tokens: z.number().int().positive().optional(),
 });
 
 export const exchangeSchema = z.object({
@@ -26,12 +28,16 @@ export const exchangeSchema = z.object({
   icon: z.string().optional(),
   notes: z.string().optional(),
   eorzeadbUrl: z.string().url().optional(),
+  // Event tokens per unit, on top of `cost`.
+  tokenCost: z.number().int().positive().optional(),
 });
 
 export const eventSchema = z.object({
   id: z.string().regex(/^\d{4}-\d{2}-[a-z0-9-]+$/),
   name: z.string().min(1),
   tomestone: z.object({ name: z.string().min(1), icon: z.string().optional() }),
+  // A second event currency, e.g. Uolon Horn Tokens. Absent on most events.
+  token: z.object({ name: z.string().min(1), icon: z.string().optional() }).optional(),
   starts: z.string().datetime({ offset: true }).or(z.string().datetime()),
   ends: z.string().datetime({ offset: true }).or(z.string().datetime()).nullable(),
   endsLabel: z.string().optional(),

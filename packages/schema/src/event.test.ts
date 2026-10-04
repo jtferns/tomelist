@@ -28,6 +28,22 @@ describe("eventSchema", () => {
   it("accepts a valid event", () => {
     expect(eventSchema.parse(validEvent).id).toBe("2026-03-mogmog-collection");
   });
+  it("accepts an event token with token awards and costs", () => {
+    const parsed = eventSchema.parse({
+      ...validEvent,
+      token: { name: "Uolon Horn Token" },
+      objectives: [{ ...validEvent.objectives[0], tokens: 1 }],
+      exchanges: [{ ...validEvent.exchanges[0], tokenCost: 10 }],
+    });
+    expect(parsed.token?.name).toBe("Uolon Horn Token");
+    expect(parsed.objectives[0].tokens).toBe(1);
+    expect(parsed.exchanges[0].tokenCost).toBe(10);
+  });
+  it("rejects a zero token award", () => {
+    expect(() =>
+      eventSchema.parse({ ...validEvent, objectives: [{ ...validEvent.objectives[0], tokens: 0 }] })
+    ).toThrow();
+  });
   it("rejects unknown objective kind", () => {
     const bad = structuredClone(validEvent);
     bad.objectives[0].kind = "bogus";
