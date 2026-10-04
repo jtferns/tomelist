@@ -3,6 +3,7 @@ import {
   emptyEventProgress,
   type EventProgress,
   type ThemeSettings,
+  type UserState,
   type WishlistEntry,
 } from "@tomelist/schema";
 import { create } from "zustand";
@@ -28,6 +29,8 @@ type AppState = PersistedState & {
   setWishlistTier: (eventId: string, exchangeId: string, tier: WishlistEntry["tier"]) => void;
   markExchanged: (eventId: string, exchangeId: string, cost: number) => void;
   undoExchanged: (eventId: string, exchangeId: string, cost: number) => void;
+  resetEvent: (eventId: string) => void;
+  replaceState: (state: UserState) => void;
   getProgress: (eventId: string) => EventProgress;
 };
 
@@ -145,6 +148,14 @@ export const useAppStore = create<AppState>()(
                 ? { ...entry, status: "wanted" }
                 : { ...entry, quantity: entry.quantity + 1 };
           }),
+        resetEvent: (eventId) =>
+          set((s) => {
+            const events = { ...s.events };
+            delete events[eventId];
+            return { events, updatedAt: new Date().toISOString() };
+          }),
+        replaceState: (state) =>
+          set({ settings: state.settings, events: state.events, updatedAt: new Date().toISOString() }),
         // Returns a live reference into the store's state (or a fresh empty progress when the
         // event has no entry yet). Callers must treat the result as read-only — do not mutate
         // it in place. Pure consumers (e.g. the optimizer in lib/optimizer.ts) rely on this.

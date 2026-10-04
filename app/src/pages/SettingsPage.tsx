@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
+import { ProgressBackup } from "@/components/ProgressBackup";
 import { Badge } from "@/components/ui/badge";
 import { Chip } from "@/components/ui/chip";
 import { FramedCard } from "@/components/ui/framed-card";
@@ -30,6 +31,7 @@ const densities: { id: ThemeSettings["density"]; label: string }[] = [
 ];
 
 export function SettingsPage() {
+  const { eventId } = useParams({ from: "/$eventId" });
   const theme = useAppStore((s) => s.settings.theme);
   const setPalette = useAppStore((s) => s.setPalette);
   const setMode = useAppStore((s) => s.setMode);
@@ -111,6 +113,8 @@ export function SettingsPage() {
             ))}
           </ul>
         </section>
+
+        <ProgressBackup eventId={eventId} />
 
         <div className="flex flex-col gap-1 text-xs text-muted-foreground">
           <p>Tomelist v2.0.0-dev</p>
