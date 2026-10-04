@@ -8,7 +8,8 @@ export const themeSettingsSchema = z.object({
 });
 
 export const wishlistEntrySchema = z.object({
-  status: z.enum(["wanted", "exchanged"]),
+  // "covering": a friend is getting it, so it is out of the player's own budget.
+  status: z.enum(["wanted", "covering", "exchanged"]),
   tier: z.enum(["must", "want", "maybe"]),
   quantity: z.number().int().min(1),
 });

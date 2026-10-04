@@ -33,7 +33,7 @@ import { cn } from "@/lib/utils";
 import { getWishlistTokenTotal, getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 import { useUndoToast } from "@/components/UndoToast";
-import type { Exchange } from "@tomelist/schema";
+import type { Exchange, WishlistEntry } from "@tomelist/schema";
 
 const TYPE_GLYPH: Record<string, LucideIcon> = {
   Mount: Rabbit,
@@ -66,9 +66,11 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 ];
 const TIER_RANK = { must: 0, want: 1, maybe: 2 } as const;
 
-function tierGroupRank(entry: { status: "wanted" | "exchanged"; tier: "must" | "want" | "maybe" } | undefined) {
-  if (!entry) return 3;
-  if (entry.status === "exchanged") return 4;
+// Wanted tiers first, then items a friend is covering, then unlisted, then exchanged.
+function tierGroupRank(entry: WishlistEntry | undefined) {
+  if (!entry) return 4;
+  if (entry.status === "exchanged") return 5;
+  if (entry.status === "covering") return 3;
   return TIER_RANK[entry.tier];
 }
 

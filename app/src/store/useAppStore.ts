@@ -29,6 +29,9 @@ type AppState = PersistedState & {
   toggleWishlist: (eventId: string, exchangeId: string) => void;
   adjustWishlistQuantity: (eventId: string, exchangeId: string, delta: number) => void;
   setWishlistTier: (eventId: string, exchangeId: string, tier: WishlistEntry["tier"]) => void;
+  setCovering: (eventId: string, exchangeId: string, covering: boolean) => void;
+  markReceived: (eventId: string, exchangeId: string) => void;
+  undoReceived: (eventId: string, exchangeId: string) => void;
   markExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number) => void;
   undoExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number) => void;
   resetEvent: (eventId: string) => void;
@@ -155,6 +158,24 @@ export const useAppStore = create<AppState>()(
           update(eventId, (p) => {
             const entry = p.wishlist[exchangeId];
             if (entry) p.wishlist[exchangeId] = { ...entry, tier };
+          }),
+        setCovering: (eventId, exchangeId, covering) =>
+          update(eventId, (p) => {
+            const entry = p.wishlist[exchangeId];
+            if (!entry) return;
+            if (covering && entry.status === "wanted") p.wishlist[exchangeId] = { ...entry, status: "covering" };
+            if (!covering && entry.status === "covering") p.wishlist[exchangeId] = { ...entry, status: "wanted" };
+          }),
+        // Receiving a friend's item spends none of the player's tomes or tokens.
+        markReceived: (eventId, exchangeId) =>
+          update(eventId, (p) => {
+            const entry = p.wishlist[exchangeId];
+            if (entry?.status === "covering") p.wishlist[exchangeId] = { ...entry, status: "exchanged" };
+          }),
+        undoReceived: (eventId, exchangeId) =>
+          update(eventId, (p) => {
+            const entry = p.wishlist[exchangeId];
+            if (entry?.status === "exchanged") p.wishlist[exchangeId] = { ...entry, status: "covering" };
           }),
         markExchanged: (eventId, exchangeId, cost, tokenCost = 0) =>
           update(eventId, (p) => {

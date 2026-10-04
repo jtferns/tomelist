@@ -170,6 +170,41 @@ describe("token actions", () => {
   });
 });
 
+describe("friend covering", () => {
+  const entry = () => useAppStore.getState().getProgress(E).wishlist["toad-head"];
+
+  it("moves a wanted item to covering and back", () => {
+    useAppStore.getState().toggleWishlist(E, "toad-head");
+    useAppStore.getState().setCovering(E, "toad-head", true);
+    expect(entry().status).toBe("covering");
+    useAppStore.getState().setCovering(E, "toad-head", false);
+    expect(entry().status).toBe("wanted");
+  });
+
+  it("receiving and undoing leave tomes and tokens untouched", () => {
+    useAppStore.getState().addTomestones(E, 40);
+    useAppStore.getState().addTokens(E, 2);
+    useAppStore.getState().toggleWishlist(E, "toad-head");
+    useAppStore.getState().setCovering(E, "toad-head", true);
+    useAppStore.getState().markReceived(E, "toad-head");
+    expect(entry().status).toBe("exchanged");
+    useAppStore.getState().undoReceived(E, "toad-head");
+    expect(entry().status).toBe("covering");
+    const p = useAppStore.getState().getProgress(E);
+    expect([p.tomestones, p.tokens]).toEqual([40, 2]);
+  });
+
+  it("Log exchange ignores a covered item, and unwanting removes it", () => {
+    useAppStore.getState().addTomestones(E, 40);
+    useAppStore.getState().toggleWishlist(E, "toad-head");
+    useAppStore.getState().setCovering(E, "toad-head", true);
+    useAppStore.getState().markExchanged(E, "toad-head", 30);
+    expect(useAppStore.getState().getProgress(E).tomestones).toBe(40);
+    useAppStore.getState().toggleWishlist(E, "toad-head");
+    expect(entry()).toBeUndefined();
+  });
+});
+
 describe("migratePersistedState", () => {
   it("migrates legacy string theme and quantity-less wishlist entries", () => {
     const migrated = migratePersistedState({
