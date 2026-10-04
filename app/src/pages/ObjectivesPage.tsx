@@ -52,7 +52,7 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
         disabled={exhausted}
         onClick={() => recordObjective(eventId, objective.id, objective.points)}
       >
-        {exhausted ? "Done" : "Did it"}
+        {exhausted ? "Cleared" : "Log clear"}
       </Button>
       <Button
         size="icon"

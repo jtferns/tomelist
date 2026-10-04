@@ -64,7 +64,7 @@ export function PlannerPage() {
                     size="sm"
                     onClick={() => recordObjective(eventId, objective.id, objective.points)}
                   >
-                    Did it
+                    Log clear
                   </Button>
                 </ListRow>
               </Fragment>
@@ -95,7 +95,7 @@ export function PlannerPage() {
                       size="sm"
                       onClick={() => recordObjective(eventId, objective.id, objective.points)}
                     >
-                      Did it
+                      Log clear
                     </Button>
                   )}
                 </ListRow>

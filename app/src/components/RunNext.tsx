@@ -52,7 +52,7 @@ export function RunNext({ eventId }: { eventId: string }) {
                   size="sm"
                   onClick={() => recordObjective(eventId, objective.id, objective.points)}
                 >
-                  Done
+                  Log clear
                 </Button>
               </ListRow>
             </div>

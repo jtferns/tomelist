@@ -39,15 +39,15 @@ describe("ObjectivesPage", () => {
   it("did-it increments count and wallet", async () => {
     await renderObjectives();
     const row = screen.getByTestId("objective-obj-moogle-dungeons");
-    await userEvent.click(within(row).getByRole("button", { name: /did it/i }));
+    await userEvent.click(within(row).getByRole("button", { name: /log clear/i }));
     expect(useAppStore.getState().getProgress(E).tomestones).toBe(10);
     expect(within(row).getByTestId("objective-count")).toHaveTextContent("1");
   });
   it("one-time objective disables after completion", async () => {
     await renderObjectives();
     const row = screen.getByTestId("objective-obj-ultimog-msq");
-    await userEvent.click(within(row).getByRole("button", { name: /did it/i }));
-    expect(within(row).getByRole("button", { name: /done/i })).toBeDisabled();
+    await userEvent.click(within(row).getByRole("button", { name: /log clear/i }));
+    expect(within(row).getByRole("button", { name: /cleared/i })).toBeDisabled();
   });
 
   it("renders category filter chips for All + each category", async () => {
@@ -87,8 +87,8 @@ describe("ObjectivesPage", () => {
   it("undo works after a non-repeatable objective is exhausted", async () => {
     await renderObjectives();
     const row = screen.getByTestId("objective-obj-ultimog-msq");
-    await userEvent.click(within(row).getByRole("button", { name: /did it/i }));
-    const doneButton = within(row).getByRole("button", { name: /done/i });
+    await userEvent.click(within(row).getByRole("button", { name: /log clear/i }));
+    const doneButton = within(row).getByRole("button", { name: /cleared/i });
     expect(doneButton).toBeDisabled();
     const undoButton = within(row).getByRole("button", { name: /undo/i });
     expect(undoButton).not.toBeDisabled();
@@ -96,7 +96,7 @@ describe("ObjectivesPage", () => {
     await userEvent.click(undoButton);
     expect(within(row).getByTestId("objective-count")).toHaveTextContent("0");
     expect(within(row).getByRole("button", { name: /undo/i })).toBeDisabled();
-    expect(within(row).getByRole("button", { name: /did it/i })).not.toBeDisabled();
+    expect(within(row).getByRole("button", { name: /log clear/i })).not.toBeDisabled();
   });
 
   it("filtering to a category with no objectives in a kind group skips that section", async () => {

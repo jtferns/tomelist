@@ -41,10 +41,10 @@ describe("PlannerPage", () => {
     expect(screen.getByRole("heading", { level: 2, name: /Weeklies/i })).toBeInTheDocument();
   });
 
-  it("clicking a pick's Did it button increments wallet and removes it from suggestions", async () => {
+  it("clicking a pick's Log clear button increments wallet and removes it from suggestions", async () => {
     await renderPlanner();
     const pick = screen.getByTestId("pick-obj-minimog-fishing");
-    await userEvent.click(within(pick).getByRole("button", { name: "Did it" }));
+    await userEvent.click(within(pick).getByRole("button", { name: "Log clear" }));
     expect(useAppStore.getState().events[E]?.tomestones).toBe(20);
     expect(screen.queryByTestId("pick-obj-minimog-fishing")).not.toBeInTheDocument();
     expect(screen.getByText("Both picks used this week.")).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe("PlannerPage", () => {
     });
     await renderPlanner();
     const pick = screen.getByTestId("pick-obj-minimog-fishing");
-    await userEvent.click(within(pick).getByRole("button", { name: "Did it" }));
+    await userEvent.click(within(pick).getByRole("button", { name: "Log clear" }));
     expect(useAppStore.getState().events[E]?.tomestones).toBe(25);
   });
 
@@ -102,10 +102,10 @@ describe("PlannerPage", () => {
 
     const claimedRow = screen.getByTestId("weekly-obj-weekly-random");
     expect(within(claimedRow).getByText("Claimed")).toBeInTheDocument();
-    expect(within(claimedRow).queryByRole("button", { name: "Did it" })).not.toBeInTheDocument();
+    expect(within(claimedRow).queryByRole("button", { name: "Log clear" })).not.toBeInTheDocument();
 
     const openRow = screen.getByTestId("weekly-obj-weekly-second");
-    expect(within(openRow).getByRole("button", { name: "Did it" })).toBeInTheDocument();
+    expect(within(openRow).getByRole("button", { name: "Log clear" })).toBeInTheDocument();
     expect(within(openRow).queryByText("Claimed")).not.toBeInTheDocument();
   });
 });

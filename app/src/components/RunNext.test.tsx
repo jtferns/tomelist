@@ -58,10 +58,10 @@ describe("RunNext", () => {
     expect(screen.queryByTestId("runs-to-goal")).not.toBeInTheDocument();
   });
 
-  it("clicking Done on the top row records the objective and drops it from the ranking", async () => {
+  it("clicking Log clear on the top row records the objective and drops it from the ranking", async () => {
     await renderOverview();
     const topRow = screen.getByTestId("run-next-obj-ultimog-msq");
-    const doneButton = within(topRow).getByRole("button", { name: /done/i });
+    const doneButton = within(topRow).getByRole("button", { name: /log clear/i });
     await userEvent.click(doneButton);
 
     expect(useAppStore.getState().events[E]?.tomestones).toBe(50);

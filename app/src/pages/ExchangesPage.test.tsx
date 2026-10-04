@@ -79,16 +79,16 @@ describe("ExchangesPage", () => {
     expect(screen.getByTestId("exchange-fat-cat-parasol")).toHaveAttribute("data-insufficient", "true");
   });
 
-  it("mark exchanged deducts one unit and decrements quantity", async () => {
+  it("Exchanged deducts one unit and decrements quantity", async () => {
     useAppStore.getState().addTomestones(E, 120);
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
     await userEvent.click(screen.getByRole("button", { name: /more fat cat parasol/i })); // qty 2
     const row = screen.getByTestId("exchange-fat-cat-parasol");
-    await userEvent.click(within(row).getByRole("button", { name: /mark exchanged/i }));
+    await userEvent.click(within(row).getByRole("button", { name: /^exchanged$/i }));
     expect(useAppStore.getState().getProgress(E).tomestones).toBe(70);
     expect(screen.getByTestId("qty-fat-cat-parasol")).toHaveTextContent("1");
-    await userEvent.click(within(row).getByRole("button", { name: /mark exchanged/i }));
+    await userEvent.click(within(row).getByRole("button", { name: /^exchanged$/i }));
     expect(useAppStore.getState().getProgress(E).tomestones).toBe(20);
     expect(within(row).getByText(/exchanged/i)).toBeInTheDocument();
   });
@@ -98,7 +98,7 @@ describe("ExchangesPage", () => {
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
     const row = screen.getByTestId("exchange-fat-cat-parasol");
-    await userEvent.click(within(row).getByRole("button", { name: /mark exchanged/i }));
+    await userEvent.click(within(row).getByRole("button", { name: /^exchanged$/i }));
     expect(useAppStore.getState().getProgress(E).tomestones).toBe(10);
     await userEvent.click(within(screen.getByTestId("undo-toast")).getByRole("button", { name: /undo/i }));
     expect(useAppStore.getState().getProgress(E).tomestones).toBe(60);
@@ -112,20 +112,20 @@ describe("ExchangesPage", () => {
     expect(screen.getByTestId("exchange-one")).not.toHaveTextContent("1 tomes");
   });
 
-  it("disables mark exchanged when wallet can't cover one unit", async () => {
+  it("disables Exchanged when wallet can't cover one unit", async () => {
     useAppStore.getState().addTomestones(E, 20);
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
     const row = screen.getByTestId("exchange-fat-cat-parasol");
-    expect(within(row).getByRole("button", { name: /mark exchanged/i })).toBeDisabled();
+    expect(within(row).getByRole("button", { name: /^exchanged$/i })).toBeDisabled();
   });
 
-  it("enables mark exchanged once wallet covers one unit", async () => {
+  it("enables Exchanged once wallet covers one unit", async () => {
     useAppStore.getState().addTomestones(E, 60);
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
     const row = screen.getByTestId("exchange-fat-cat-parasol");
-    expect(within(row).getByRole("button", { name: /mark exchanged/i })).toBeEnabled();
+    expect(within(row).getByRole("button", { name: /^exchanged$/i })).toBeEnabled();
   });
 
   it("shows a tier chip defaulting to Nice that cycles want -> maybe -> must", async () => {
@@ -180,7 +180,7 @@ describe("ExchangesPage", () => {
     // Want and exchange miners-earring so it lands in the "exchanged" bucket.
     await userEvent.click(screen.getByRole("button", { name: /want miner's earring/i }));
     const earringRow = screen.getByTestId("exchange-miners-earring");
-    await userEvent.click(within(earringRow).getByRole("button", { name: /mark exchanged/i }));
+    await userEvent.click(within(earringRow).getByRole("button", { name: /^exchanged$/i }));
 
     await userEvent.click(screen.getByTestId("sort-tier"));
     const ids = screen.getAllByTestId(/^exchange-/).map((el) => el.getAttribute("data-testid"));
@@ -294,12 +294,12 @@ describe("ExchangesPage", () => {
     expect(within(row).getAllByText(/tomes/i)).toHaveLength(1);
   });
 
-  it("insufficient wanted item keeps data-insufficient and disables mark exchanged", async () => {
+  it("insufficient wanted item keeps data-insufficient and disables Exchanged", async () => {
     useAppStore.getState().addTomestones(E, 20);
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
     const row = screen.getByTestId("exchange-fat-cat-parasol");
     expect(row).toHaveAttribute("data-insufficient", "true");
-    expect(within(row).getByRole("button", { name: /mark exchanged/i })).toBeDisabled();
+    expect(within(row).getByRole("button", { name: /^exchanged$/i })).toBeDisabled();
   });
 });

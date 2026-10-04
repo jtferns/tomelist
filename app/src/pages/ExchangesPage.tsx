@@ -214,7 +214,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
                 );
               }}
             >
-              Mark exchanged
+              Exchanged
             </Button>
           </>
         ) : (
