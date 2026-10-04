@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 import { getWishlistTokenTotal, getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 import { useUndoToast } from "@/components/UndoToast";
+import { AskFriendPanel } from "@/components/AskFriendPanel";
 import type { Exchange, WishlistEntry } from "@tomelist/schema";
 
 const TYPE_GLYPH: Record<string, LucideIcon> = {
@@ -297,6 +298,7 @@ export function ExchangesPage() {
   const [sortKey, setSortKey] = useState<SortKey>("default");
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [askOpen, setAskOpen] = useState(false);
   useEorzeaTooltips(Boolean(event?.exchanges.some((e) => e.eorzeadbUrl)));
   if (!event) return <UnknownEvent testId="exchanges-page" />;
   const wantedTotal = getWishlistTotal(event, wishlist);
@@ -361,6 +363,22 @@ export function ExchangesPage() {
           ) : null}
         </p>
       </SectionHeader>
+      {event.exchanges.some((e) => e.tradeable) ? (
+        <>
+          <Button
+            variant="outline"
+            size="sm"
+            className="self-start"
+            aria-expanded={askOpen}
+            aria-controls="ask-friend-panel"
+            onClick={() => setAskOpen((open) => !open)}
+          >
+            <Handshake aria-hidden="true" />
+            {askOpen ? "Hide ask-a-friend list" : "Ask a friend"}
+          </Button>
+          {askOpen ? <AskFriendPanel event={event} wishlist={wishlist} /> : null}
+        </>
+      ) : null}
       <input
         type="search"
         value={query}

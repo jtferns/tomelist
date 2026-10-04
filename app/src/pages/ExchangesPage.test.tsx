@@ -1,7 +1,7 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useUndoToast } from "@/components/UndoToast";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";
@@ -404,5 +404,68 @@ describe("ExchangesPage", () => {
     await renderAstronomyExchanges();
     const row = screen.getByTestId("exchange-uolon-horn");
     expect(within(row).queryByRole("button", { name: "Friend's covering this" })).not.toBeInTheDocument();
+  });
+
+  it("Ask a friend lists what to ask for, what friends cover and what to earn, and copies the ask", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    useAppStore.setState({
+      events: {
+        "2026-09-astronomy-first-hunt": {
+          ...emptyEventProgress(),
+          wishlist: {
+            domakin: { status: "wanted", tier: "must", quantity: 2 },
+            "bamboo-fence": { status: "covering", tier: "want", quantity: 1 },
+            "uolon-horn": { status: "wanted", tier: "must", quantity: 1 },
+          },
+        },
+      },
+    });
+    await renderAstronomyExchanges();
+    await userEvent.click(screen.getByRole("button", { name: "Ask a friend" }));
+    const panel = screen.getByTestId("ask-friend-panel");
+    expect(panel).toHaveTextContent("Domakin ×2");
+    expect(within(panel).getByTestId("ask-total")).toHaveTextContent("14 tomes");
+    expect(panel).toHaveTextContent("Friends are covering");
+    expect(panel).toHaveTextContent("Bamboo Fence");
+    expect(panel).toHaveTextContent("You'll need to earn these");
+    expect(panel).toHaveTextContent("Uolon Horn");
+
+    await userEvent.click(within(panel).getByRole("button", { name: "Copy list" }));
+    expect(writeText).toHaveBeenCalledWith(
+      [
+        "Tomelist: The First Hunt for Astronomy (Sep 2026)",
+        "Looking for help with (all tradeable):",
+        "- Domakin x2: 14 tomes",
+        "Total: 14 tomes",
+      ].join("\n")
+    );
+    expect(within(panel).getByRole("button", { name: "Copied" })).toBeInTheDocument();
+  });
+
+  it("falls back to selected text when the clipboard is blocked", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: vi.fn().mockRejectedValue(new Error("blocked")) },
+      configurable: true,
+    });
+    useAppStore.setState({
+      events: {
+        "2026-09-astronomy-first-hunt": {
+          ...emptyEventProgress(),
+          wishlist: { domakin: { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    await renderAstronomyExchanges();
+    await userEvent.click(screen.getByRole("button", { name: "Ask a friend" }));
+    await userEvent.click(screen.getByRole("button", { name: "Copy list" }));
+    expect(await screen.findByTestId("ask-fallback")).toHaveValue(
+      "Tomelist: The First Hunt for Astronomy (Sep 2026)\nLooking for help with (all tradeable):\n- Domakin: 7 tomes\nTotal: 7 tomes"
+    );
+  });
+
+  it("has no Ask a friend button for an event without tradeable data", async () => {
+    await renderExchanges();
+    expect(screen.queryByRole("button", { name: "Ask a friend" })).not.toBeInTheDocument();
   });
 });
