@@ -14,7 +14,7 @@ import { useAppStore } from "@/store/useAppStore";
 import type { Exchange } from "@tomelist/schema";
 
 const TIER_CYCLE = { must: "want", want: "maybe", maybe: "must" } as const;
-const TIER_LABEL = { must: "Must", want: "Want", maybe: "Maybe" } as const;
+const TIER_LABEL = { must: "Must", want: "Nice", maybe: "Maybe" } as const;
 const TIER_VARIANT = { must: "default", want: "secondary", maybe: "outline" } as const;
 
 type SortKey = "default" | "tier" | "cost" | "type";

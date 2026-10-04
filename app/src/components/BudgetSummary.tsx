@@ -11,7 +11,7 @@ import { useAppStore } from "@/store/useAppStore";
 
 const TIER_LABELS: Record<TierVerdict["tier"], string> = {
   must: "Must",
-  want: "Want",
+  want: "Nice",
   maybe: "Maybe",
 };
 

@@ -107,11 +107,11 @@ describe("ExchangesPage", () => {
     expect(within(row).getByRole("button", { name: /mark exchanged/i })).toBeEnabled();
   });
 
-  it("shows a tier chip defaulting to Want that cycles want -> maybe -> must", async () => {
+  it("shows a tier chip defaulting to Nice that cycles want -> maybe -> must", async () => {
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
     const chip = screen.getByTestId("tier-fat-cat-parasol");
-    expect(chip).toHaveTextContent("Want");
+    expect(chip).toHaveTextContent("Nice");
     expect(useAppStore.getState().events[E]?.wishlist["fat-cat-parasol"]?.tier).toBe("want");
 
     await userEvent.click(chip);
