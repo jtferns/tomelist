@@ -38,9 +38,12 @@ export function useCountUp(target: number, durationMs = DEFAULT_DURATION_MS): nu
     }
 
     const from = fromRef.current;
-    const start = performance.now();
+    // Measure from the first frame's own timestamp. performance.now() and the frame clock can
+    // have different origins (jsdom does), which would leave the elapsed time negative.
+    let start: number | null = null;
 
     const tick = (now: number) => {
+      if (start === null) start = now;
       const t = Math.min(1, Math.max(0, (now - start) / durationMs));
       const value = from + (target - from) * easeOutCubic(t);
       setDisplay(t >= 1 ? target : Math.round(value));
