@@ -28,14 +28,26 @@ describe("ExchangesPage", () => {
     expect(screen.getByTestId("exchange-fat-cat-parasol")).toHaveTextContent("50");
   });
 
-  it("tapping the card wants it and updates the summary", async () => {
+  it("tapping Want adds the item and updates the summary", async () => {
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
     expect(screen.getByTestId("wanted-total")).toHaveTextContent("50");
     expect(screen.getByTestId("qty-fat-cat-parasol")).toHaveTextContent("1");
   });
 
-  it("tapping a wanted card untoggles it", async () => {
+  it("labels the Want button and keeps wanted names at full strength", async () => {
+    await renderExchanges();
+    const want = screen.getByRole("button", { name: /want fat cat parasol/i });
+    expect(want).toHaveTextContent("Want");
+    expect(want).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(want);
+    expect(want).toHaveTextContent("Wanted");
+    expect(want).toHaveAttribute("aria-pressed", "true");
+    const name = within(screen.getByTestId("exchange-fat-cat-parasol")).getByText("Fat Cat Parasol");
+    expect(name.closest(".italic, .opacity-60")).toBeNull();
+  });
+
+  it("tapping Wanted again removes the item", async () => {
     await renderExchanges();
     const card = () => screen.getByRole("button", { name: /want fat cat parasol/i });
     await userEvent.click(card());
@@ -52,7 +64,7 @@ describe("ExchangesPage", () => {
     await userEvent.click(screen.getByRole("button", { name: /fewer fat cat parasol/i }));
     await userEvent.click(screen.getByRole("button", { name: /fewer fat cat parasol/i }));
     expect(screen.getByTestId("qty-fat-cat-parasol")).toHaveTextContent("1");
-    // stepper clicks must not toggle the card off
+    // stepper clicks must not remove the item
     expect(screen.getByTestId("wanted-total")).toHaveTextContent("50");
   });
 

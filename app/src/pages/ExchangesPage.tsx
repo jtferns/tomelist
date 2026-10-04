@@ -69,8 +69,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
           target="_blank"
           rel="noopener noreferrer"
           data-testid={`eorzeadb-${item.id}`}
-          className={cn("eorzeadb_link", "relative z-10 underline underline-offset-2")}
-          onClick={(e) => e.stopPropagation()}
+          className="eorzeadb_link underline underline-offset-2"
         >
           db
         </a>
@@ -97,39 +96,28 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
     <FramedCard
       data-testid={`exchange-${item.id}`}
       data-insufficient={insufficient ? "true" : undefined}
-      className={cn(
-        "list-enter group relative transition-colors hover:bg-accent/40",
-        wanted && "border-gold/60"
-      )}
+      className={cn("list-enter", wanted && "border-gold")}
     >
-      <div className="flex items-center gap-3 p-3">
+      <div className="flex items-center gap-3 px-3 pt-3">
         {icon}
-        <span
-          aria-hidden="true"
-          className={cn(
-            "size-[18px] shrink-0 rotate-45 border border-border transition-colors group-hover:border-gold/70",
-            wanted && "border-gold bg-gold/20"
-          )}
-        />
-        <button
-          type="button"
+        <div className="min-w-0 flex-1">
+          <p className="line-clamp-2 font-medium leading-snug">{item.name}</p>
+          {meta}
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-1 px-3 pt-2 pb-3">
+        <Button
+          variant="outline"
+          size="sm"
           aria-pressed={wanted}
           aria-label={`Want ${item.name}`}
           onClick={() => toggleWishlist(eventId, item.id)}
-          className={cn(
-            "min-w-0 flex-1 cursor-pointer text-left outline-none after:absolute after:inset-0 after:content-[''] focus-visible:ring-[3px] focus-visible:ring-ring/50",
-            insufficient && "italic opacity-60"
-          )}
+          className={cn(wanted && "border-gold text-gold")}
         >
-          <p className="line-clamp-2 font-medium leading-snug">{item.name}</p>
-          {meta}
-        </button>
+          {wanted ? "✓ Wanted" : "Want"}
+        </Button>
         {wanted ? (
-          <div
-            className="relative z-10 flex shrink-0 items-center gap-1"
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.stopPropagation()}
-          >
+          <>
             <Button
               variant={TIER_VARIANT[tier]}
               size="sm"
@@ -161,12 +149,13 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
             <Button
               variant="action"
               size="sm"
+              className="ml-auto"
               disabled={wallet < item.cost}
               onClick={() => markExchanged(eventId, item.id, item.cost)}
             >
               Mark exchanged
             </Button>
-          </div>
+          </>
         ) : null}
       </div>
     </FramedCard>
