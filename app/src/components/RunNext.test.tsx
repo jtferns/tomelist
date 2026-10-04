@@ -3,6 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { emptyEventProgress } from "@tomelist/schema";
 import { beforeEach, describe, expect, it } from "vitest";
+import { useUndoToast } from "@/components/UndoToast";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";
 
@@ -20,6 +21,7 @@ async function renderOverview() {
 beforeEach(() => {
   localStorage.clear();
   useAppStore.setState({ events: {} });
+  useUndoToast.setState({ toast: null });
 });
 
 describe("RunNext", () => {
@@ -66,6 +68,17 @@ describe("RunNext", () => {
 
     expect(useAppStore.getState().events[E]?.tomestones).toBe(50);
     expect(screen.queryByTestId("run-next-obj-ultimog-msq")).not.toBeInTheDocument();
+  });
+
+  it("logging a clear shows what it earned, and Undo takes it back", async () => {
+    await renderOverview();
+    const topRow = screen.getByTestId("run-next-obj-ultimog-msq");
+    await userEvent.click(within(topRow).getByRole("button", { name: /log clear/i }));
+    const toast = screen.getByTestId("undo-toast");
+    expect(toast).toHaveTextContent("+50 tomes");
+    await userEvent.click(within(toast).getByRole("button", { name: /undo/i }));
+    expect(useAppStore.getState().events[E]?.tomestones).toBe(0);
+    expect(screen.getByTestId("run-next-obj-ultimog-msq")).toBeInTheDocument();
   });
 
   it("renders without crashing when fewer than 3 objectives are rankable", async () => {

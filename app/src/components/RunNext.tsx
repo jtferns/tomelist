@@ -7,13 +7,14 @@ import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionHeader } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { tomeCount } from "@/lib/format";
+import { useLogClear } from "@/lib/useLogClear";
 import { rankRunNext, runsToMustGoal, budgetReport } from "@/lib/optimizer";
 import { useAppStore } from "@/store/useAppStore";
 
 export function RunNext({ eventId }: { eventId: string }) {
   const event = getEvent(eventId);
   const progress = useAppStore((s) => s.events[eventId]);
-  const recordObjective = useAppStore((s) => s.recordObjective);
+  const logClear = useLogClear(eventId);
 
   if (!event) return null;
 
@@ -50,7 +51,7 @@ export function RunNext({ eventId }: { eventId: string }) {
                 <Button
                   variant="action"
                   size="sm"
-                  onClick={() => recordObjective(eventId, objective.id, objective.points)}
+                  onClick={() => logClear(objective)}
                 >
                   Log clear
                 </Button>

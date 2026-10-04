@@ -10,6 +10,7 @@ import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { tomeCount } from "@/lib/format";
+import { useLogClear } from "@/lib/useLogClear";
 import { useAppStore } from "@/store/useAppStore";
 import type { Objective } from "@tomelist/schema";
 
@@ -25,7 +26,7 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
   const count = useAppStore(
     (s) => s.events[eventId]?.completedObjectives[objective.id]?.count ?? 0
   );
-  const recordObjective = useAppStore((s) => s.recordObjective);
+  const logClear = useLogClear(eventId);
   const undoObjective = useAppStore((s) => s.undoObjective);
   const exhausted = objective.repeatable === false && count >= 1;
   return (
@@ -41,19 +42,6 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
           <p className="mt-1 text-xs text-muted-foreground">{objective.requirement}</p>
         ) : null}
       </div>
-      <AnimatedCount
-        data-testid="objective-count"
-        value={count}
-        className="font-display text-lg font-bold text-gold tabular-nums"
-      />
-      <Button
-        variant="action"
-        size="sm"
-        disabled={exhausted}
-        onClick={() => recordObjective(eventId, objective.id, objective.points)}
-      >
-        {exhausted ? "Cleared" : "Log clear"}
-      </Button>
       <Button
         size="icon"
         variant="ghost"
@@ -63,6 +51,19 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
         onClick={() => undoObjective(eventId, objective.id, objective.points)}
       >
         <RotateCcw className="size-4" />
+      </Button>
+      <AnimatedCount
+        data-testid="objective-count"
+        value={count}
+        className="font-display text-lg font-bold text-gold tabular-nums"
+      />
+      <Button
+        variant="action"
+        size="sm"
+        disabled={exhausted}
+        onClick={() => logClear(objective)}
+      >
+        {exhausted ? "Cleared" : "Log clear"}
       </Button>
     </ListRow>
   );

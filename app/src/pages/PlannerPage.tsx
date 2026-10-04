@@ -8,6 +8,7 @@ import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { tomeCount } from "@/lib/format";
+import { useLogClear } from "@/lib/useLogClear";
 import { weeklyPlan } from "@/lib/optimizer";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -15,7 +16,7 @@ export function PlannerPage() {
   const { eventId } = useParams({ from: "/$eventId" });
   const event = getEvent(eventId);
   const progress = useAppStore((s) => s.events[eventId]);
-  const recordObjective = useAppStore((s) => s.recordObjective);
+  const logClear = useLogClear(eventId);
 
   if (!event) return <div data-testid="planner-page">Unknown event.</div>;
 
@@ -62,7 +63,7 @@ export function PlannerPage() {
                   <Button
                     variant="action"
                     size="sm"
-                    onClick={() => recordObjective(eventId, objective.id, objective.points)}
+                    onClick={() => logClear(objective)}
                   >
                     Log clear
                   </Button>
@@ -93,7 +94,7 @@ export function PlannerPage() {
                     <Button
                       variant="action"
                       size="sm"
-                      onClick={() => recordObjective(eventId, objective.id, objective.points)}
+                      onClick={() => logClear(objective)}
                     >
                       Log clear
                     </Button>
