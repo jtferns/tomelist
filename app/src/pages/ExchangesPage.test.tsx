@@ -6,7 +6,7 @@ import { useUndoToast } from "@/components/UndoToast";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";
 import { ExchangeRow } from "@/pages/ExchangesPage";
-import type { Exchange } from "@tomelist/schema";
+import { emptyEventProgress, type Exchange } from "@tomelist/schema";
 
 const E = "2026-03-mogmog-collection";
 
@@ -301,5 +301,36 @@ describe("ExchangesPage", () => {
     const row = screen.getByTestId("exchange-fat-cat-parasol");
     expect(row).toHaveAttribute("data-insufficient", "true");
     expect(within(row).getByRole("button", { name: /^log exchange$/i })).toBeDisabled();
+  });
+
+  it("shows and enforces a token cost alongside tomes", async () => {
+    const A = "2026-09-astronomy-first-hunt";
+    useAppStore.setState({
+      events: {
+        [A]: {
+          ...emptyEventProgress(),
+          tomestones: 120,
+          tokens: 7,
+          wishlist: { "uolon-horn": { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/exchanges", params: { eventId: A } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("exchanges-page");
+
+    const row = screen.getByTestId("exchange-uolon-horn");
+    expect(row).toHaveTextContent("100 tomes + 10 tokens");
+    expect(within(row).getByTestId("short-uolon-horn")).toHaveTextContent("3 tokens short");
+    expect(within(row).getByRole("button", { name: /^log exchange$/i })).toBeDisabled();
+
+    useAppStore.getState().addTokens(A, 3);
+    const button = await within(row).findByRole("button", { name: /^log exchange$/i });
+    expect(button).toBeEnabled();
+    await userEvent.click(button);
+    const p = useAppStore.getState().events[A]!;
+    expect([p.tomestones, p.tokens]).toEqual([20, 0]);
+    expect(screen.getByTestId("undo-toast")).toHaveTextContent("−100 tomes, −10 tokens");
   });
 });

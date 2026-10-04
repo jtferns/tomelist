@@ -27,7 +27,7 @@ import { Chip } from "@/components/ui/chip";
 import { FramedCard } from "@/components/ui/framed-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
-import { tomeCount } from "@/lib/format";
+import { tokenCount, tomeCount } from "@/lib/format";
 import { useEorzeaTooltips } from "@/lib/useEorzeaTooltips";
 import { cn } from "@/lib/utils";
 import { getWishlistTotal } from "@/lib/wishlist";
@@ -83,7 +83,9 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
   const wanted = entry?.status === "wanted";
   const exchanged = entry?.status === "exchanged";
   const quantity = entry?.quantity ?? 1;
-  const insufficient = wanted && item.cost * quantity > wallet;
+  const tokenCost = item.tokenCost ?? 0;
+  const tokenBalance = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
+  const insufficient = wanted && (item.cost * quantity > wallet || tokenCost * quantity > tokenBalance);
   const tier = entry?.tier ?? "want";
   const tierLabel = TIER_LABEL[tier];
 
@@ -97,17 +99,28 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
       )}
     </div>
   );
-  const short = item.cost * quantity - wallet;
+  const short = Math.max(0, item.cost * quantity - wallet);
+  const tokensShort = Math.max(0, tokenCost * quantity - tokenBalance);
+  const shortText =
+    short > 0 && tokensShort > 0
+      ? `${short} + ${tokenCount(tokensShort)} short`
+      : tokensShort > 0
+        ? `${tokenCount(tokensShort)} short`
+        : `${short} short`;
   const shortNote =
-    short > 0 ? (
+    short > 0 || tokensShort > 0 ? (
       <span data-testid={`short-${item.id}`} className="ml-auto text-sm text-muted-foreground">
-        {short} short
+        {shortText}
       </span>
     ) : null;
+  const canExchangeOne = wallet >= item.cost && tokenBalance >= tokenCost;
 
   const meta = (
     <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-      <Badge variant="tome">{tomeCount(item.cost)}</Badge>
+      <Badge variant="tome">
+        {tomeCount(item.cost)}
+        {tokenCost > 0 ? ` + ${tokenCount(tokenCost)}` : null}
+      </Badge>
       <span>{item.type}</span>
       {item.tradeable ? <Badge variant="gold-outline">tradeable</Badge> : null}
       {item.altSources?.length ? (
@@ -206,12 +219,13 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
             <Button
               variant="action"
               size="sm"
-              className={cn(short <= 0 && "ml-auto")}
-              disabled={wallet < item.cost}
+              className={cn(!shortNote && "ml-auto")}
+              disabled={!canExchangeOne}
               onClick={() => {
-                markExchanged(eventId, item.id, item.cost);
-                showToast(`Exchanged ${item.name}, −${tomeCount(item.cost)}`, () =>
-                  undoExchanged(eventId, item.id, item.cost)
+                markExchanged(eventId, item.id, item.cost, tokenCost);
+                const spent = tokenCost > 0 ? `${tomeCount(item.cost)}, −${tokenCount(tokenCost)}` : tomeCount(item.cost);
+                showToast(`Exchanged ${item.name}, −${spent}`, () =>
+                  undoExchanged(eventId, item.id, item.cost, tokenCost)
                 );
               }}
             >
