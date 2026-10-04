@@ -1,8 +1,7 @@
 {
   "name": "tomelist",
   "compatibility_date": "2026-07-01",
-  "assets": {
-    "directory": "./app/dist",
-    "not_found_handling": "single-page-application"
-  }
+  // Cloudflare Pages project. With no 404.html in the output, Pages serves index.html for
+  // unknown paths, which the SPA router needs.
+  "pages_build_output_dir": "./app/dist"
 }

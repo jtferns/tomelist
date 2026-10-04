@@ -4,6 +4,9 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+# Read-only by default; only the deploy job asks for more.
+permissions:
+  contents: read
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -21,6 +24,9 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -33,3 +39,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy app/dist --project-name=tomelist --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
