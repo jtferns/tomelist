@@ -33,6 +33,15 @@ describe("RunNext", () => {
     expect(card).toHaveTextContent("Minimog: Ocean fishing voyage");
   });
 
+  it("wraps long titles to two lines instead of cutting them to one", async () => {
+    await renderOverview();
+    const title = within(screen.getByTestId("run-next-obj-ultimog-msq")).getByText(
+      "Ultimog: Complete the event quest"
+    );
+    expect(title).toHaveClass("line-clamp-2");
+    expect(title).not.toHaveClass("truncate");
+  });
+
   it("shows the hint when a must-tier wanted item is seeded and the wallet is short", async () => {
     const progress = emptyEventProgress();
     progress.tomestones = 0;

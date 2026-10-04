@@ -84,7 +84,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
         <div className="flex items-center gap-3 p-3">
           {icon}
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium">{item.name}</p>
+            <p className="line-clamp-2 font-medium leading-snug">{item.name}</p>
             {meta}
           </div>
           <Badge variant="gold-outline">Exchanged</Badge>
@@ -121,7 +121,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
             insufficient && "italic opacity-60"
           )}
         >
-          <p className="truncate font-medium">{item.name}</p>
+          <p className="line-clamp-2 font-medium leading-snug">{item.name}</p>
           {meta}
         </button>
         {wanted ? (

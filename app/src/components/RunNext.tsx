@@ -39,7 +39,7 @@ export function RunNext({ eventId }: { eventId: string }) {
               {index > 0 ? <ListRowDivider /> : null}
               <ListRow data-testid={`run-next-${objective.id}`} className="justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{objective.title}</p>
+                  <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
                     <Badge variant="tome">{objective.points} tomes</Badge>
                     <Badge variant="gold-outline">{objective.effort}</Badge>
