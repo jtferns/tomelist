@@ -44,5 +44,5 @@ ds-bundle/
 .github/agents/
 .github/hooks/
 .github/skills/
-.impeccable/live/
-.impeccable/config.local.json
+.impeccable/
+docs/design/
