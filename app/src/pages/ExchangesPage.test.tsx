@@ -120,7 +120,7 @@ describe("ExchangesPage", () => {
     expect(within(row).getByRole("button", { name: /^exchanged$/i })).toBeDisabled();
   });
 
-  it("enables Exchanged once wallet covers one unit", async () => {
+  it("Exchanged works once the wallet covers one unit", async () => {
     useAppStore.getState().addTomestones(E, 60);
     await renderExchanges();
     await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
