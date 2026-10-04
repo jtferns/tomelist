@@ -60,7 +60,7 @@ export function AskFriendPanel({
   }
 
   return (
-    <FramedCard data-testid="ask-friend-panel" id="ask-friend-panel" className="flex flex-col gap-4 p-4">
+    <FramedCard data-testid="ask-friend-panel" id="ask-friend-panel" className="flex w-full max-w-xl flex-col gap-4 p-4">
       {groups.ask.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           Nothing to ask for yet. Want a tradeable item, and it shows up here as a list to send friends.
