@@ -40,12 +40,22 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
 
   const report = budgetReport(event, progress ?? emptyEventProgress(), new Date());
   const visibleTiers = report.tiers.filter((tier) => tier.cumulativeCost > 0);
+  const coveredCount = Object.values(progress?.wishlist ?? {}).filter((e) => e.status === "covering").length;
+  const coveredLine =
+    coveredCount > 0 ? (
+      <p data-testid="budget-covered" className="text-xs text-muted-foreground">
+        {coveredCount === 1 ? "1 item a friend is covering" : `${coveredCount} items friends are covering`}, not
+        counted here.
+      </p>
+    ) : null;
 
   if (visibleTiers.length === 0) {
     return (
       <FramedCard muted data-testid="budget-summary">
         <ListRow className="justify-between">
-          <span className="text-sm text-muted-foreground">Nothing wishlisted yet.</span>
+          <span className="text-sm text-muted-foreground">
+            {coveredCount > 0 ? "Friends are covering everything you want." : "Nothing wishlisted yet."}
+          </span>
           <Link
             to="/$eventId/exchanges"
             params={{ eventId }}
@@ -81,6 +91,7 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
           </div>
         ))}
       </div>
+      {coveredLine}
       <p className="text-xs text-muted-foreground">
         +{report.weeklyRate}/wk
         {report.weeksLeft !== null ? ` · ${report.weeksLeft} wk left` : ""}

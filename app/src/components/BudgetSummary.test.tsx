@@ -104,4 +104,14 @@ describe("BudgetSummary", () => {
     expect(screen.getByTestId("budget-tokens-must")).toHaveTextContent("+ 10 tokens");
     expect(screen.getByTestId("budget-tier-must")).toHaveTextContent("6 tokens to go");
   });
+
+  it("notes items friends are covering, which the tiers leave out", async () => {
+    const progress = emptyEventProgress();
+    progress.wishlist[EXCHANGE_ID] = { status: "wanted", tier: "must", quantity: 1 };
+    progress.wishlist["fat-cat-parasol"] = { status: "covering", tier: "must", quantity: 1 };
+    useAppStore.setState({ events: { [E]: progress } });
+    await renderOverview();
+    expect(screen.getByTestId("budget-covered")).toHaveTextContent("1 item a friend is covering, not counted here.");
+    expect(screen.getByTestId("budget-tier-must")).toHaveTextContent(String(COST));
+  });
 });
