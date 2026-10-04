@@ -21,6 +21,10 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  *   counted via the top-2 rule, never via the generic weekly sum.
  * - Objectives with repeatable === true (unbounded grinds) are EXCLUDED from all
  *   projections -- unbounded income would make every tier trivially affordable.
+ * - Week-tagged minimogs (objective.week set) belong to one event week and close at the next
+ *   reset. They are not weekly income: each one still ahead (week >= eventWeek, not completed)
+ *   counts once in oneTimeRemaining, and weeklyRate skips them. Untagged minimogs keep the
+ *   top-2 rule above.
  * - weeksLeft: null if event.ends is null. Otherwise ceil((ends - now) / 7 days), floored
  *   at 0.
  * - projectedIncome = wallet + oneTimeRemaining + weeklyRate * weeksLeft; null when
@@ -53,7 +57,8 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  * -----------
  * - doneThisWeek(id): completedObjectives[id] exists AND its lastDoneAt parses to a time >=
  *   lastWeeklyReset(now).
- * - suggestedMinimogs: kind === "minimog" objectives NOT doneThisWeek, scored and ordered
+ * - suggestedMinimogs: week-tagged minimogs for the current eventWeek that are not completed,
+ *   plus untagged kind === "minimog" objectives NOT doneThisWeek, scored and ordered
  *   exactly like rankRunNext (points / EFFORT_WEIGHTS[effort] desc, then points desc, then id
  *   asc), truncated to the top 2 — the game allows 2 Minimog picks per week.
  * - weeklies: objectives with repeatable === "weekly" (any kind other than minimog — minimogs
@@ -68,6 +73,8 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  *   When weeksLeft is null or 0, or nothing is wishlisted at the must tier (mustCost 0):
  *   null (no meaningful weekly target).
  * - onPace: null when neededPerWeek is null; otherwise earnedThisWeek >= neededPerWeek.
+ * - currentWeek: eventWeek(event, now).
+ * - minimogWeeks: the highest week tag among the event's minimogs, or null when none are tagged.
  */
 
 export const EFFORT_WEIGHTS = { quick: 1, medium: 2, long: 4 } as const;
@@ -100,9 +107,18 @@ function isUnboundedGrind(objective: Objective): boolean {
   return objective.repeatable === true;
 }
 
-function computeOneTimeRemaining(event: EventData, progress: EventProgress): number {
+function isWeekMinimog(objective: Objective): boolean {
+  return objective.kind === "minimog" && objective.week !== undefined;
+}
+
+function computeOneTimeRemaining(event: EventData, progress: EventProgress, now: Date): number {
+  const week = eventWeek(event, now);
   let total = 0;
   for (const objective of event.objectives) {
+    if (isWeekMinimog(objective)) {
+      if (objective.week! >= week && !isCompleted(progress, objective.id)) total += objective.points;
+      continue;
+    }
     if (objective.repeatable !== false) continue;
     // Minimogs are weekly picks by game mechanics whatever their repeatable
     // flag says — they earn through weeklyRate's top-2 rule, and counting a
@@ -118,7 +134,7 @@ function computeWeeklyRate(event: EventData): number {
   let total = 0;
   const minimogs: Objective[] = [];
   for (const objective of event.objectives) {
-    if (isUnboundedGrind(objective)) continue;
+    if (isUnboundedGrind(objective) || isWeekMinimog(objective)) continue;
     if (objective.kind === "minimog") {
       minimogs.push(objective);
       continue;
@@ -156,7 +172,7 @@ function weeksUntil(ends: string, now: Date): number {
 
 export function budgetReport(event: EventData, progress: EventProgress, now: Date): BudgetReport {
   const wallet = progress.tomestones;
-  const oneTimeRemaining = computeOneTimeRemaining(event, progress);
+  const oneTimeRemaining = computeOneTimeRemaining(event, progress, now);
   const weeklyRate = computeWeeklyRate(event);
   const weeksLeft = event.ends === null ? null : weeksUntil(event.ends, now);
   const projectedIncome = weeksLeft === null ? null : wallet + oneTimeRemaining + weeklyRate * weeksLeft;
@@ -201,10 +217,26 @@ export function lastWeeklyReset(now: Date): Date {
   return reset;
 }
 
+/**
+ * 1-based event week at `now`: week 1 runs from `starts` to the first weekly reset after it,
+ * and each reset after that starts a new week. 0 before the event starts.
+ */
+export function eventWeek(event: EventData, now: Date): number {
+  const starts = new Date(event.starts).getTime();
+  if (now.getTime() < starts) return 0;
+  const firstReset = lastWeeklyReset(new Date(starts)).getTime() + MS_PER_WEEK;
+  const latestReset = lastWeeklyReset(now).getTime();
+  if (latestReset < firstReset) return 1;
+  return Math.round((latestReset - firstReset) / MS_PER_WEEK) + 2;
+}
+
 export type RankedObjective = { objective: Objective; score: number };
 
-function isAvailableForRunNext(objective: Objective, progress: EventProgress, now: Date): boolean {
+function isAvailableForRunNext(event: EventData, objective: Objective, progress: EventProgress, now: Date): boolean {
   const record = progress.completedObjectives[objective.id];
+  if (isWeekMinimog(objective)) {
+    return objective.week === eventWeek(event, now) && (record?.count ?? 0) === 0;
+  }
   if (objective.repeatable === true) return true;
   if (objective.repeatable === "weekly" || objective.kind === "minimog") {
     if (!record) return true;
@@ -218,7 +250,7 @@ function isAvailableForRunNext(objective: Objective, progress: EventProgress, no
 
 export function rankRunNext(event: EventData, progress: EventProgress, now: Date): RankedObjective[] {
   const ranked: RankedObjective[] = event.objectives
-    .filter((objective) => isAvailableForRunNext(objective, progress, now))
+    .filter((objective) => isAvailableForRunNext(event, objective, progress, now))
     .map((objective) => ({ objective, score: objective.points / EFFORT_WEIGHTS[objective.effort] }));
 
   ranked.sort((a, b) => {
@@ -262,6 +294,8 @@ export type WeeklyPlan = {
   earnedThisWeek: number;
   neededPerWeek: number | null;
   onPace: boolean | null;
+  currentWeek: number;
+  minimogWeeks: number | null;
 };
 
 function doneThisWeek(progress: EventProgress, objectiveId: string, now: Date): boolean {
@@ -273,8 +307,15 @@ function doneThisWeek(progress: EventProgress, objectiveId: string, now: Date): 
 }
 
 export function weeklyPlan(event: EventData, progress: EventProgress, now: Date): WeeklyPlan {
+  const currentWeek = eventWeek(event, now);
   const suggestedMinimogs = event.objectives
-    .filter((objective) => objective.kind === "minimog" && !doneThisWeek(progress, objective.id, now))
+    .filter((objective) => {
+      if (objective.kind !== "minimog") return false;
+      if (isWeekMinimog(objective)) {
+        return objective.week === currentWeek && !isCompleted(progress, objective.id);
+      }
+      return !doneThisWeek(progress, objective.id, now);
+    })
     .map((objective) => ({ objective, score: objective.points / EFFORT_WEIGHTS[objective.effort] }))
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
@@ -306,5 +347,8 @@ export function weeklyPlan(event: EventData, progress: EventProgress, now: Date)
 
   const onPace = neededPerWeek === null ? null : earnedThisWeek >= neededPerWeek;
 
-  return { suggestedMinimogs, weeklies, earnedThisWeek, neededPerWeek, onPace };
+  const weekTags = event.objectives.filter(isWeekMinimog).map((objective) => objective.week!);
+  const minimogWeeks = weekTags.length > 0 ? Math.max(...weekTags) : null;
+
+  return { suggestedMinimogs, weeklies, earnedThisWeek, neededPerWeek, onPace, currentWeek, minimogWeeks };
 }

@@ -10,6 +10,8 @@ export const objectiveSchema = z.object({
   repeatable: z.union([z.boolean(), z.literal("weekly")]),
   requirement: z.string().optional(),
   notes: z.string().optional(),
+  // Event week (1-based) a minimog belongs to. Untagged minimogs are open every week.
+  week: z.number().int().positive().optional(),
 });
 
 export const exchangeSchema = z.object({

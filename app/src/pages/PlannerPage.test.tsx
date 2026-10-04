@@ -108,4 +108,17 @@ describe("PlannerPage", () => {
     expect(within(openRow).getByRole("button", { name: "Log clear" })).toBeInTheDocument();
     expect(within(openRow).queryByText("Claimed")).not.toBeInTheDocument();
   });
+
+  it("names the current week and shows only that week's minimog for a week-tagged event", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-04T12:00:00Z"));
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/planner", params: { eventId: "2026-09-astronomy-first-hunt" } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("planner-page");
+    expect(screen.getByRole("heading", { level: 2, name: /Week 4 of 6/ })).toBeInTheDocument();
+    expect(screen.getByTestId("pick-obj-minimog-w4")).toBeInTheDocument();
+    expect(screen.queryByTestId("pick-obj-minimog-w1")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("pick-obj-minimog-w5")).not.toBeInTheDocument();
+  });
 });

@@ -24,6 +24,7 @@ export function PlannerPage() {
   const eventProgress = progress ?? emptyEventProgress();
   const now = new Date();
   const plan = weeklyPlan(event, eventProgress, now);
+  const weekly = plan.minimogWeeks;
 
   return (
     <div data-testid="planner-page" className="flex flex-col gap-4">
@@ -43,11 +44,19 @@ export function PlannerPage() {
       </FramedCard>
 
       <section className="flex flex-col gap-2">
-        <SectionKicker as="h2">Minimog picks</SectionKicker>
+        <SectionKicker as="h2">
+          {weekly ? `Minimog · Week ${Math.min(Math.max(plan.currentWeek, 1), weekly)} of ${weekly}` : "Minimog picks"}
+        </SectionKicker>
         <FramedCard corners>
           {plan.suggestedMinimogs.length === 0 ? (
             <p className="p-4 text-center text-sm text-muted-foreground">
-              Both picks used this week. New picks open at the weekly reset.
+              {!weekly
+                ? "Both picks used this week. New picks open at the weekly reset."
+                : plan.currentWeek < 1
+                  ? "Minimogs open when the event starts."
+                  : plan.currentWeek >= weekly
+                  ? "All Minimog weeks are done."
+                  : "This week's Minimog is done. The next one opens at the weekly reset."}
             </p>
           ) : (
             plan.suggestedMinimogs.map(({ objective }, index) => (

@@ -3,6 +3,7 @@ import type { EventData, Exchange, Objective } from "@tomelist/schema";
 import { emptyEventProgress, type EventProgress } from "@tomelist/schema";
 import {
   budgetReport,
+  eventWeek,
   EFFORT_WEIGHTS,
   lastWeeklyReset,
   rankRunNext,
@@ -479,5 +480,51 @@ describe("budgetReport - purity", () => {
     const before = JSON.parse(JSON.stringify(p));
     budgetReport(ev, p, NOW);
     expect(p).toEqual(before);
+  });
+});
+
+describe("week-tagged minimogs", () => {
+  // Starts Wed 2026-01-07; resets fall on Tue 01-13, 01-20, 01-27.
+  const ev = event({
+    starts: "2026-01-07T08:00:00Z",
+    ends: "2026-02-01T00:00:00Z",
+    objectives: [
+      objective({ id: "mm-w1", kind: "minimog", week: 1, points: 10, repeatable: "weekly" }),
+      objective({ id: "mm-w2", kind: "minimog", week: 2, points: 10, repeatable: "weekly" }),
+      objective({ id: "mm-w3", kind: "minimog", week: 3, points: 10, repeatable: "weekly" }),
+    ],
+  });
+  const WEEK2 = new Date("2026-01-15T00:00:00Z");
+
+  it("eventWeek counts weekly resets since the start", () => {
+    expect(eventWeek(ev, new Date("2026-01-06T00:00:00Z"))).toBe(0);
+    expect(eventWeek(ev, new Date("2026-01-07T08:00:00Z"))).toBe(1);
+    expect(eventWeek(ev, new Date("2026-01-13T07:59:59Z"))).toBe(1);
+    expect(eventWeek(ev, new Date("2026-01-13T08:00:00Z"))).toBe(2);
+    expect(eventWeek(ev, new Date("2026-01-28T00:00:00Z"))).toBe(4);
+  });
+
+  it("budget counts current and future weeks once each and skips past weeks", () => {
+    const report = budgetReport(ev, progress(), WEEK2);
+    expect(report.weeklyRate).toBe(0);
+    expect(report.oneTimeRemaining).toBe(20);
+  });
+
+  it("budget drops a completed current-week minimog", () => {
+    const p = progress({ completedObjectives: { "mm-w2": { count: 1, lastDoneAt: WEEK2.toISOString() } } });
+    expect(budgetReport(ev, p, WEEK2).oneTimeRemaining).toBe(10);
+  });
+
+  it("planner and run-next suggest only the current week's minimog", () => {
+    const plan = weeklyPlan(ev, progress(), WEEK2);
+    expect(plan.suggestedMinimogs.map((r) => r.objective.id)).toEqual(["mm-w2"]);
+    expect(plan.currentWeek).toBe(2);
+    expect(plan.minimogWeeks).toBe(3);
+    expect(rankRunNext(ev, progress(), WEEK2).map((r) => r.objective.id)).toEqual(["mm-w2"]);
+  });
+
+  it("suggests nothing once the current week's minimog is done", () => {
+    const p = progress({ completedObjectives: { "mm-w2": { count: 1, lastDoneAt: WEEK2.toISOString() } } });
+    expect(weeklyPlan(ev, p, WEEK2).suggestedMinimogs).toEqual([]);
   });
 });
