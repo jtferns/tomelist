@@ -88,4 +88,14 @@ describe("OverviewPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Subtract 1 Uolon Horn Token" }));
     expect(useAppStore.getState().events[A]?.tokens).toBe(0);
   });
+
+  it("lets a new player tick the wallet step while starting at 0 tomes", async () => {
+    await renderOverview();
+    const card = screen.getByTestId("first-run");
+    const firstStep = card.querySelectorAll("li")[0];
+    expect(firstStep).toHaveAttribute("data-done", "false");
+    await userEvent.click(screen.getByRole("button", { name: "start at 0" }));
+    expect(firstStep).toHaveAttribute("data-done", "true");
+    expect(useAppStore.getState().events[E]?.tomestones).toBe(0);
+  });
 });

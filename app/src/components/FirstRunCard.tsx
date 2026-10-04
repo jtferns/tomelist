@@ -7,8 +7,23 @@ import { useAppStore } from "@/store/useAppStore";
 
 export function FirstRunCard({ eventId }: { eventId: string }) {
   const progress = useAppStore((s) => s.events[eventId]);
+  const confirmWallet = useAppStore((s) => s.confirmWallet);
   const steps = [
-    { done: (progress?.tomestones ?? 0) > 0, label: <>Enter the tomestones you have now, below</> },
+    {
+      done: (progress?.tomestones ?? 0) > 0 || progress?.walletSet === true,
+      label: (
+        <>
+          Enter the tomestones you have now, below, or{" "}
+          <button
+            type="button"
+            onClick={() => confirmWallet(eventId)}
+            className="text-gold underline underline-offset-2 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          >
+            start at 0
+          </button>
+        </>
+      ),
+    },
     {
       done: Object.values(progress?.wishlist ?? {}).length > 0,
       label: (

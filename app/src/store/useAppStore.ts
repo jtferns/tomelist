@@ -23,6 +23,7 @@ type AppState = PersistedState & {
   setDensity: (density: ThemeSettings["density"]) => void;
   addTomestones: (eventId: string, delta: number) => void;
   addTokens: (eventId: string, delta: number) => void;
+  confirmWallet: (eventId: string) => void;
   recordObjective: (eventId: string, objectiveId: string, points: number, tokens?: number) => void;
   undoObjective: (eventId: string, objectiveId: string, points: number, tokens?: number) => void;
   toggleWishlist: (eventId: string, exchangeId: string) => void;
@@ -98,6 +99,10 @@ export const useAppStore = create<AppState>()(
         addTomestones: (eventId, delta) =>
           update(eventId, (p) => {
             p.tomestones = Math.max(0, p.tomestones + delta);
+          }),
+        confirmWallet: (eventId) =>
+          update(eventId, (p) => {
+            p.walletSet = true;
           }),
         addTokens: (eventId, delta) =>
           update(eventId, (p) => {

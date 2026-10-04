@@ -17,6 +17,8 @@ export const eventProgressSchema = z.object({
   tomestones: z.number().int().min(0),
   // Event-token balance; absent means 0.
   tokens: z.number().int().min(0).optional(),
+  // True once the player has set their starting wallet, including "starting at 0".
+  walletSet: z.boolean().optional(),
   completedObjectives: z.record(
     z.string(),
     z.object({
