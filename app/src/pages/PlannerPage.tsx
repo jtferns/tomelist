@@ -10,7 +10,7 @@ import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
 import { tomeCount } from "@/lib/format";
 import { useLogClear } from "@/lib/useLogClear";
-import { weeklyPlan } from "@/lib/optimizer";
+import { budgetReport, weeklyPlan } from "@/lib/optimizer";
 import { useAppStore } from "@/store/useAppStore";
 
 export function PlannerPage() {
@@ -25,11 +25,22 @@ export function PlannerPage() {
   const now = new Date();
   const plan = weeklyPlan(event, eventProgress, now);
   const weekly = plan.minimogWeeks;
+  const mustCost = budgetReport(event, eventProgress, now).tiers.find((t) => t.tier === "must")?.cumulativeCost ?? 0;
 
   return (
     <div data-testid="planner-page" className="flex flex-col gap-4">
       <FramedCard muted className="p-4">
-        {plan.neededPerWeek !== null ? (
+        {plan.neededPerWeek === 0 ? (
+          <div data-testid="pace-line" className="flex items-center justify-between gap-2">
+            <span className="text-sm">
+              {eventProgress.tomestones >= mustCost
+                ? "You have enough for your Must-haves."
+                : "The one-time clears you have left cover your Must-haves."}{" "}
+              Earned {plan.earnedThisWeek} this week.
+            </span>
+            <Badge variant="tome">Covered</Badge>
+          </div>
+        ) : plan.neededPerWeek !== null ? (
           <div data-testid="pace-line" className="flex items-center justify-between gap-2">
             <span className="text-sm">
               Earned {plan.earnedThisWeek} / need ~{plan.neededPerWeek} this week

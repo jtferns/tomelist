@@ -121,4 +121,40 @@ describe("PlannerPage", () => {
     expect(screen.queryByTestId("pick-obj-minimog-w1")).not.toBeInTheDocument();
     expect(screen.queryByTestId("pick-obj-minimog-w5")).not.toBeInTheDocument();
   });
+
+  it("says the goal is covered instead of 'need ~0' when the wallet covers the Must-haves", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-03-20T12:00:00Z"));
+    useAppStore.setState({
+      events: {
+        [E]: {
+          ...emptyEventProgress(),
+          tomestones: 1000,
+          wishlist: { "fat-cat-parasol": { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    await renderPlanner();
+    const line = screen.getByTestId("pace-line");
+    expect(line).toHaveTextContent("You have enough for your Must-haves. Earned 0 this week.");
+    expect(line).toHaveTextContent("Covered");
+    expect(line).not.toHaveTextContent("need");
+  });
+
+  it("credits remaining one-time clears when they, not the wallet, cover the Must-haves", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-03-20T12:00:00Z"));
+    useAppStore.setState({
+      events: {
+        [E]: {
+          ...emptyEventProgress(),
+          wishlist: { "fat-cat-parasol": { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    await renderPlanner();
+    expect(screen.getByTestId("pace-line")).toHaveTextContent(
+      "The one-time clears you have left cover your Must-haves."
+    );
+  });
 });
