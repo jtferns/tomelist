@@ -22,14 +22,12 @@ beforeEach(() => {
 });
 
 describe("ProgressHud", () => {
-  it("shows wallet count and goal hint on every tab, including objectives", async () => {
+  it("shows wallet count and a Set a goal link on every tab, including objectives", async () => {
     useAppStore.getState().addTomestones(E, 30);
     await renderAt("objectives");
     expect(screen.getByTestId("hud-count")).toHaveTextContent("30");
     expect(screen.queryByTestId("hud-total")).not.toBeInTheDocument();
-    expect(
-      screen.getByText("No goal yet — wishlist exchanges to set one"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("hud-set-goal")).toHaveAttribute("href", `/${E}/exchanges`);
   });
 
   it("shows progress toward the wishlist total", async () => {
@@ -38,8 +36,7 @@ describe("ProgressHud", () => {
     await renderAt("overview");
     expect(screen.getByTestId("hud-count")).toHaveTextContent("25");
     expect(screen.getByTestId("hud-total")).toHaveTextContent("50");
-    expect(screen.getByTestId("hud-pct")).toHaveTextContent("50%");
-    expect(screen.getByTestId("hud-bar")).toHaveStyle({ width: "50%" });
+    expect(screen.getByTestId("hud-bar")).toHaveStyle({ transform: "scaleX(0.5)" });
   });
 
   it("switches events keeping the current tab", async () => {
@@ -49,32 +46,22 @@ describe("ProgressHud", () => {
     expect(router.state.location.pathname).toBe(`/${E}/exchanges`);
   });
 
-  it("shows the tomestone label and gold tabular-nums count", async () => {
+  it("names the tomestone on the wallet link and shows a gold tabular-nums count", async () => {
     useAppStore.getState().addTomestones(E, 30);
     await renderAt("objectives");
     const event = getEvent(E);
-    expect(screen.getByText(event!.tomestone.name)).toBeInTheDocument();
+    expect(screen.getByLabelText(new RegExp(event!.tomestone.name))).toBeInTheDocument();
     const count = screen.getByTestId("hud-count");
     expect(count).toHaveTextContent("30");
     expect(count.className).toMatch(/tabular-nums/);
     expect(count.className).toMatch(/text-gold/);
   });
 
-  it("shows the exact empty-goal copy and no percent span", async () => {
-    useAppStore.getState().addTomestones(E, 30);
-    await renderAt("objectives");
-    expect(
-      screen.getByText("No goal yet — wishlist exchanges to set one"),
-    ).toBeInTheDocument();
-    expect(screen.queryByTestId("hud-pct")).not.toBeInTheDocument();
-  });
-
-  it("clamps pct at 100 when tomestones exceed the total", async () => {
+  it("clamps the bar at full when tomestones exceed the total", async () => {
     useAppStore.getState().addTomestones(E, 999);
     useAppStore.getState().toggleWishlist(E, "fat-cat-parasol"); // 50 tomes
     await renderAt("overview");
-    expect(screen.getByTestId("hud-pct")).toHaveTextContent("100%");
-    expect(screen.getByTestId("hud-bar")).toHaveStyle({ width: "100%" });
+    expect(screen.getByTestId("hud-bar")).toHaveStyle({ transform: "scaleX(1)" });
   });
 
   it("renders without an img when the event has no tomestone icon", async () => {
@@ -85,7 +72,7 @@ describe("ProgressHud", () => {
       useAppStore.getState().addTomestones(E, 10);
       await renderAt("objectives");
       expect(screen.getByTestId("hud-count")).toHaveTextContent("10");
-      const link = screen.getByLabelText("Open wallet on Overview");
+      const link = screen.getByLabelText(/open wallet on Overview/);
       expect(link.querySelector("img")).not.toBeInTheDocument();
     } finally {
       event!.tomestone.icon = originalIcon;
