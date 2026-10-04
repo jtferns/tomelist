@@ -81,7 +81,10 @@ export function ObjectivesPage() {
   return (
     <div data-testid="objectives-page" className="flex flex-col gap-6">
       {categories.length >= 2 ? (
-        <div data-testid="category-filters" className="flex flex-wrap items-center gap-1.5">
+        <div
+          data-testid="category-filters"
+          className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none]"
+        >
           <Chip
             active={category === null}
             data-testid="filter-all"
