@@ -106,4 +106,15 @@ describe("ObjectivesPage", () => {
     await userEvent.click(screen.getByTestId("filter-Dungeons"));
     expect(screen.queryByText(/Ultimog Challenges/i)).not.toBeInTheDocument();
   });
+
+  it("blocks undo and says why when the clear's tomes were spent", async () => {
+    await renderObjectives();
+    const row = screen.getByTestId("objective-obj-ultimog-msq");
+    await userEvent.click(within(row).getByRole("button", { name: /log clear/i }));
+    useAppStore.getState().addTomestones(E, -45);
+    expect(await within(row).findByTestId("undo-blocked")).toHaveTextContent(
+      "45 tomes from this clear already went to exchanges. Undo an exchange first."
+    );
+    expect(within(row).getByRole("button", { name: /undo/i })).toBeDisabled();
+  });
 });

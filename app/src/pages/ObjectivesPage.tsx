@@ -10,7 +10,7 @@ import { FramedCard } from "@/components/ui/framed-card";
 import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
-import { tomeCount } from "@/lib/format";
+import { tomeCount, undoClearBlockedReason } from "@/lib/format";
 import { useLogClear } from "@/lib/useLogClear";
 import { useAppStore } from "@/store/useAppStore";
 import type { Objective } from "@tomelist/schema";
@@ -29,6 +29,8 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
   );
   const logClear = useLogClear(eventId);
   const undoObjective = useAppStore((s) => s.undoObjective);
+  const wallet = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
+  const undoBlocked = count > 0 ? undoClearBlockedReason(wallet, objective.points) : null;
   const exhausted = objective.repeatable === false && count >= 1;
   return (
     <ListRow data-testid={`objective-${objective.id}`} className="list-enter">
@@ -42,12 +44,17 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
         {objective.requirement ? (
           <p className="mt-1 text-xs text-muted-foreground">{objective.requirement}</p>
         ) : null}
+        {undoBlocked ? (
+          <p data-testid="undo-blocked" className="mt-1 text-xs text-muted-foreground">
+            {undoBlocked}
+          </p>
+        ) : null}
       </div>
       <Button
         size="icon"
         variant="ghost"
         aria-label={`Undo ${objective.title}`}
-        disabled={count === 0}
+        disabled={count === 0 || undoBlocked !== null}
         className="hover:text-gold"
         onClick={() => undoObjective(eventId, objective.id, objective.points)}
       >

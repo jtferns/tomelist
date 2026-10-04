@@ -17,7 +17,12 @@ export const eventProgressSchema = z.object({
   tomestones: z.number().int().min(0),
   completedObjectives: z.record(
     z.string(),
-    z.object({ count: z.number().int().min(0), lastDoneAt: z.string() })
+    z.object({
+      count: z.number().int().min(0),
+      lastDoneAt: z.string(),
+      // Earlier clear times, oldest first, so undo can restore lastDoneAt.
+      history: z.array(z.string()).optional(),
+    })
   ),
   minimogPicks: z.array(z.string()),
   wishlist: z.record(z.string(), wishlistEntrySchema),

@@ -68,6 +68,8 @@ export function migratePersistedState(persisted: unknown): PersistedState {
   };
 }
 
+const HISTORY_LIMIT = 50;
+
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => {
@@ -98,17 +100,32 @@ export const useAppStore = create<AppState>()(
           }),
         recordObjective: (eventId, objectiveId, points) =>
           update(eventId, (p) => {
-            const cur = p.completedObjectives[objectiveId] ?? { count: 0, lastDoneAt: "" };
-            p.completedObjectives[objectiveId] = { count: cur.count + 1, lastDoneAt: new Date().toISOString() };
+            const cur = p.completedObjectives[objectiveId];
+            const history = cur ? [...(cur.history ?? []), cur.lastDoneAt].slice(-HISTORY_LIMIT) : [];
+            p.completedObjectives[objectiveId] = {
+              count: (cur?.count ?? 0) + 1,
+              lastDoneAt: new Date().toISOString(),
+              history,
+            };
             p.tomestones += points;
           }),
         undoObjective: (eventId, objectiveId, points) =>
           update(eventId, (p) => {
             const cur = p.completedObjectives[objectiveId];
-            if (cur && cur.count > 0) {
-              p.completedObjectives[objectiveId] = { ...cur, count: cur.count - 1 };
-              p.tomestones = Math.max(0, p.tomestones - points);
+            // Refuse rather than clamp: tomes already spent on exchanges can't be taken back.
+            if (!cur || cur.count === 0 || p.tomestones < points) return;
+            p.tomestones -= points;
+            if (cur.count === 1) {
+              delete p.completedObjectives[objectiveId];
+              return;
             }
+            const history = cur.history ?? [];
+            p.completedObjectives[objectiveId] = {
+              count: cur.count - 1,
+              // Past the history limit the previous time is unknown; keep the latest.
+              lastDoneAt: history.length > 0 ? history[history.length - 1] : cur.lastDoneAt,
+              history: history.slice(0, -1),
+            };
           }),
         toggleWishlist: (eventId, exchangeId) =>
           update(eventId, (p) => {

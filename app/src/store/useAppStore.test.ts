@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { migratePersistedState, useAppStore } from "./useAppStore";
 
 const E = "2026-03-mogmog-collection";
@@ -79,11 +79,48 @@ describe("objective actions", () => {
     expect(p.tomestones).toBe(20);
   });
 
-  it("undo floors at zero", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("undo with nothing recorded changes nothing", () => {
     useAppStore.getState().undoObjective(E, "obj-x", 10);
     const p = useAppStore.getState().getProgress(E);
-    expect(p.completedObjectives["obj-x"]?.count ?? 0).toBe(0);
+    expect(p.completedObjectives["obj-x"]).toBeUndefined();
     expect(p.tomestones).toBe(0);
+  });
+
+  it("undoing the only clear removes the record entirely", () => {
+    useAppStore.getState().recordObjective(E, "obj-x", 10);
+    useAppStore.getState().undoObjective(E, "obj-x", 10);
+    const p = useAppStore.getState().getProgress(E);
+    expect(p.completedObjectives["obj-x"]).toBeUndefined();
+    expect(p.tomestones).toBe(0);
+  });
+
+  it("undo restores the previous clear time", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-01T00:00:00Z"));
+    useAppStore.getState().recordObjective(E, "obj-x", 10);
+    vi.setSystemTime(new Date("2026-10-08T00:00:00Z"));
+    useAppStore.getState().recordObjective(E, "obj-x", 10);
+    useAppStore.getState().undoObjective(E, "obj-x", 10);
+    const p = useAppStore.getState().getProgress(E);
+    expect(p.completedObjectives["obj-x"]).toEqual({
+      count: 1,
+      lastDoneAt: "2026-10-01T00:00:00.000Z",
+      history: [],
+    });
+    expect(p.tomestones).toBe(10);
+  });
+
+  it("refuses to undo a clear whose tomes were spent", () => {
+    useAppStore.getState().recordObjective(E, "obj-x", 10);
+    useAppStore.getState().addTomestones(E, -4);
+    useAppStore.getState().undoObjective(E, "obj-x", 10);
+    const p = useAppStore.getState().getProgress(E);
+    expect(p.completedObjectives["obj-x"].count).toBe(1);
+    expect(p.tomestones).toBe(6);
   });
 });
 
