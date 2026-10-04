@@ -68,4 +68,24 @@ describe("OverviewPage", () => {
     const page = await screen.findByTestId("overview-page");
     expect(page).toHaveTextContent("This event isn't in Tomelist.");
   });
+
+  it("has no token stepper for an event without a token", async () => {
+    await renderOverview();
+    expect(screen.queryByTestId("token-count")).not.toBeInTheDocument();
+  });
+
+  it("token stepper edits the token balance by hand and floors at 0", async () => {
+    const A = "2026-09-astronomy-first-hunt";
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/overview", params: { eventId: A } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("overview-page");
+    await userEvent.click(screen.getByRole("button", { name: "Add 1 Uolon Horn Token" }));
+    await userEvent.click(screen.getByRole("button", { name: "Add 1 Uolon Horn Token" }));
+    expect(useAppStore.getState().events[A]?.tokens).toBe(2);
+    await userEvent.click(screen.getByRole("button", { name: "Subtract 1 Uolon Horn Token" }));
+    await userEvent.click(screen.getByRole("button", { name: "Subtract 1 Uolon Horn Token" }));
+    await userEvent.click(screen.getByRole("button", { name: "Subtract 1 Uolon Horn Token" }));
+    expect(useAppStore.getState().events[A]?.tokens).toBe(0);
+  });
 });

@@ -78,4 +78,21 @@ describe("ProgressHud", () => {
       event!.tomestone.icon = originalIcon;
     }
   });
+
+  it("shows the token balance only for events with a token", async () => {
+    await renderAt("objectives");
+    expect(screen.queryByTestId("hud-tokens")).not.toBeInTheDocument();
+  });
+
+  it("shows the token balance with the token's full name for screen readers", async () => {
+    const A = "2026-09-astronomy-first-hunt";
+    useAppStore.getState().addTokens(A, 4);
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/objectives", params: { eventId: A } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("objectives-page");
+    const hud = screen.getByTestId("hud-tokens");
+    expect(hud).toHaveTextContent("4 tokens");
+    expect(hud).toHaveAttribute("aria-label", "4 Uolon Horn Tokens");
+  });
 });

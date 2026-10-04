@@ -4,7 +4,7 @@ import { BudgetSummary } from "@/components/BudgetSummary";
 import { FirstRunCard } from "@/components/FirstRunCard";
 import { RunNext } from "@/components/RunNext";
 import { FramedCard } from "@/components/ui/framed-card";
-import { WalletStepper } from "@/components/WalletStepper";
+import { TokenStepper, WalletStepper } from "@/components/WalletStepper";
 import { getEvent } from "@/lib/events";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -22,6 +22,7 @@ export function OverviewPage() {
       <RunNext eventId={eventId} />
       <FramedCard className="flex flex-col gap-3 p-4">
         <WalletStepper eventId={eventId} />
+        {event.token ? <TokenStepper eventId={eventId} name={event.token.name} /> : null}
         <p data-testid="saving-for" className="text-center text-sm text-muted-foreground">
           {wanted.length > 0 ? `Saving for ${savingFor}. ` : "No goal yet. "}
           <Link to="/$eventId/exchanges" params={{ eventId }} className="text-gold underline underline-offset-2">

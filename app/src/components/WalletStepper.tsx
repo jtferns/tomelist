@@ -53,3 +53,38 @@ export function WalletStepper({ eventId }: { eventId: string }) {
     </div>
   );
 }
+
+export function TokenStepper({ eventId, name }: { eventId: string; name: string }) {
+  const tokens = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
+  const addTokens = useAppStore((s) => s.addTokens);
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        className={STEP_BUTTON_CLASS}
+        aria-label={`Subtract 1 ${name}`}
+        onClick={() => addTokens(eventId, -1)}
+      >
+        −1
+      </Button>
+      <div className="flex min-w-20 flex-col items-center">
+        <AnimatedCount
+          data-testid="token-count"
+          value={tokens}
+          className="font-display text-2xl font-bold tabular-nums text-gold"
+        />
+        <span className="text-xs text-muted-foreground">{name}s</span>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className={STEP_BUTTON_CLASS}
+        aria-label={`Add 1 ${name}`}
+        onClick={() => addTokens(eventId, 1)}
+      >
+        +1
+      </Button>
+    </div>
+  );
+}

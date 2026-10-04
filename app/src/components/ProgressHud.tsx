@@ -2,6 +2,7 @@ import { Link, useParams } from "@tanstack/react-router";
 import { AnimatedCount } from "@/components/ui/animated-count";
 import { EventSwitcher } from "@/components/EventSwitcher";
 import { getEvent } from "@/lib/events";
+import { tokenCount } from "@/lib/format";
 import { getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -9,6 +10,7 @@ export function ProgressHud() {
   const { eventId } = useParams({ from: "/$eventId" });
   const event = getEvent(eventId);
   const tomestones = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
+  const tokens = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
   const wishlist = useAppStore((s) => s.events[eventId]?.wishlist);
   if (!event) return null;
   const total = getWishlistTotal(event, wishlist);
@@ -44,6 +46,15 @@ export function ProgressHud() {
             </span>
           ) : null}
         </Link>
+        {event.token ? (
+          <span
+            data-testid="hud-tokens"
+            aria-label={tokenCount(tokens, event.token.name)}
+            className="shrink-0 text-[13px] text-muted-foreground"
+          >
+            <span className="font-bold tabular-nums text-gold">{tokens}</span> {tokens === 1 ? "token" : "tokens"}
+          </span>
+        ) : null}
         {total === 0 ? (
           <Link
             to="/$eventId/exchanges"
