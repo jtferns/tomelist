@@ -14,6 +14,8 @@ export const objectiveSchema = z.object({
   week: z.number().int().positive().optional(),
   // Event-token award per clear, for events that define `token`.
   tokens: z.number().int().positive().optional(),
+  // Clears needed before the reward is paid, e.g. 6 for "Clear Aloalo Island 6 times".
+  clears: z.number().int().min(2).optional(),
 });
 
 export const exchangeSchema = z.object({

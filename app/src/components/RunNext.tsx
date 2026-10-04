@@ -22,6 +22,9 @@ export function RunNext({ eventId }: { eventId: string }) {
   const now = new Date();
   const ranked = rankRunNext(event, eventProgress, now);
   const top3 = ranked.slice(0, 3);
+  const clearCounts = Object.fromEntries(
+    Object.entries(eventProgress.completedObjectives).map(([id, record]) => [id, record.count])
+  );
 
   const report = budgetReport(event, eventProgress, now);
   const mustTier = report.tiers.find((tier) => tier.tier === "must");
@@ -46,6 +49,11 @@ export function RunNext({ eventId }: { eventId: string }) {
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
                     <Badge variant="tome">{tomeCount(objective.points)}</Badge>
                     <Badge variant="gold-outline">{objective.effort}</Badge>
+                    {objective.clears ? (
+                      <Badge variant="gold-outline" data-testid={`clears-${objective.id}`}>
+                        {clearCounts[objective.id] ?? 0} of {objective.clears}
+                      </Badge>
+                    ) : null}
                   </div>
                 </div>
                 <Button

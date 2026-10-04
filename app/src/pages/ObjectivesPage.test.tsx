@@ -138,4 +138,34 @@ describe("ObjectivesPage", () => {
       "1 Uolon Horn Token from this clear already went to exchanges. Undo an exchange first."
     );
   });
+
+  it("counts multi-clear progress and pays only on the last clear", async () => {
+    const A = "2026-09-astronomy-first-hunt";
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/objectives", params: { eventId: A } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("objectives-page");
+    const row = screen.getByTestId("objective-obj-ultimog-aloalo");
+    expect(within(row).getByTestId("objective-clears")).toHaveTextContent("/6");
+
+    const logClear = () => userEvent.click(within(row).getByRole("button", { name: /log clear/i }));
+    await logClear();
+    expect(screen.getByTestId("undo-toast")).toHaveTextContent("1 of 6 clears");
+    for (let i = 0; i < 4; i++) await logClear();
+    let p = useAppStore.getState().events[A]!;
+    expect([p.completedObjectives["obj-ultimog-aloalo"].count, p.tomestones, p.tokens ?? 0]).toEqual([5, 0, 0]);
+
+    await logClear();
+    p = useAppStore.getState().events[A]!;
+    expect([p.tomestones, p.tokens]).toEqual([70, 5]);
+    expect(within(row).getByRole("button", { name: /cleared/i })).toBeDisabled();
+
+    const undo = within(row).getByRole("button", { name: /undo/i });
+    await userEvent.click(undo);
+    p = useAppStore.getState().events[A]!;
+    expect([p.completedObjectives["obj-ultimog-aloalo"].count, p.tomestones, p.tokens]).toEqual([5, 0, 0]);
+    await userEvent.click(undo);
+    p = useAppStore.getState().events[A]!;
+    expect([p.completedObjectives["obj-ultimog-aloalo"].count, p.tomestones]).toEqual([4, 0]);
+  });
 });

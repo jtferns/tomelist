@@ -9,6 +9,7 @@ import { Chip } from "@/components/ui/chip";
 import { FramedCard } from "@/components/ui/framed-card";
 import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionKicker } from "@/components/ui/section-header";
+import { clearReward, clearsNeeded } from "@/lib/clears";
 import { getEvent } from "@/lib/events";
 import { tokenCount, tomeCount, undoClearBlockedReason } from "@/lib/format";
 import { useLogClear } from "@/lib/useLogClear";
@@ -40,9 +41,13 @@ function ObjectiveRow({
   const wallet = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
   const tokenBalance = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
   const tokens = token ? (objective.tokens ?? 0) : 0;
+  // What undoing the latest clear would take back.
+  const lastReward = clearReward(objective, count, Boolean(token));
   const undoBlocked =
-    count > 0 ? undoClearBlockedReason(wallet, objective.points, tokenBalance, tokens, token?.name) : null;
-  const exhausted = objective.repeatable === false && count >= 1;
+    count > 0
+      ? undoClearBlockedReason(wallet, lastReward.points, tokenBalance, lastReward.tokens, token?.name)
+      : null;
+  const exhausted = objective.repeatable === false && count >= clearsNeeded(objective);
   return (
     <ListRow data-testid={`objective-${objective.id}`} className="list-enter">
       <div className="min-w-0 flex-1">
@@ -72,15 +77,18 @@ function ObjectiveRow({
         aria-label={`Undo ${objective.title}`}
         disabled={count === 0 || undoBlocked !== null}
         className="hover:text-gold"
-        onClick={() => undoObjective(eventId, objective.id, objective.points, tokens)}
+        onClick={() => undoObjective(eventId, objective.id, lastReward.points, lastReward.tokens)}
       >
         <RotateCcw className="size-4" />
       </Button>
-      <AnimatedCount
-        data-testid="objective-count"
-        value={count}
-        className="font-display text-lg font-bold text-gold tabular-nums"
-      />
+      <span className="font-display text-lg font-bold text-gold tabular-nums">
+        <AnimatedCount data-testid="objective-count" value={count} />
+        {objective.clears ? (
+          <span data-testid="objective-clears" className="text-sm text-muted-foreground">
+            /{objective.clears}
+          </span>
+        ) : null}
+      </span>
       <Button
         variant="action"
         size="sm"

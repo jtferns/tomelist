@@ -585,3 +585,32 @@ describe("event tokens", () => {
     expect(report.tiers.every((t) => t.tokenCost === 0)).toBe(true);
   });
 });
+
+describe("multi-clear objectives", () => {
+  const ev = event({
+    objectives: [
+      objective({ id: "aloalo", kind: "ultimog", clears: 6, points: 72, effort: "long", tokens: 5 }),
+      objective({ id: "quick", points: 10, effort: "quick" }),
+    ],
+    token: { name: "Horn Token" },
+  });
+  const withCount = (count: number) =>
+    progress({ completedObjectives: { aloalo: { count, lastDoneAt: NOW.toISOString() } } });
+
+  it("stays available and unpaid until the last clear", () => {
+    expect(rankRunNext(ev, withCount(3), NOW).map((r) => r.objective.id)).toContain("aloalo");
+    expect(budgetReport(ev, withCount(3), NOW).oneTimeRemaining).toBe(82);
+    expect(tokensRemaining(ev, withCount(3), NOW)).toBe(5);
+  });
+
+  it("is done after the last clear", () => {
+    expect(rankRunNext(ev, withCount(6), NOW).map((r) => r.objective.id)).not.toContain("aloalo");
+    expect(budgetReport(ev, withCount(6), NOW).oneTimeRemaining).toBe(10);
+    expect(tokensRemaining(ev, withCount(6), NOW)).toBe(0);
+  });
+
+  it("scores per run, not per reward", () => {
+    const aloalo = rankRunNext(ev, progress(), NOW).find((r) => r.objective.id === "aloalo")!;
+    expect(aloalo.score).toBe(72 / 6 / EFFORT_WEIGHTS.long);
+  });
+});

@@ -1,4 +1,5 @@
 import type { EventData, EventProgress, Objective } from "@tomelist/schema";
+import { clearsNeeded } from "@/lib/clears";
 
 /**
  * Optimizer core: pure, deterministic budget/affordability engine.
@@ -11,7 +12,7 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  *   no matching exchange in the event are ignored.
  * - Cumulative tiers: must = sum(must); want = must + sum(want); maybe = want + sum(maybe).
  * - oneTimeRemaining = sum of points of objectives with repeatable === false that are NOT
- *   completed (progress.completedObjectives[id]?.count >= 1 means done). This includes
+ *   completed (count >= objective.clears ?? 1 means done; multi-clear objectives pay on the last). This includes
  *   kind "ultimog" (unclaimed Ultimogs are one-time) but EXCLUDES kind "minimog" — minimogs
  *   are weekly picks by game mechanics and earn only through weeklyRate's top-2 rule.
  * - weeklyRate = sum of points of objectives with repeatable === "weekly" (regardless of
@@ -115,8 +116,8 @@ export type BudgetReport = {
 const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
 const TIER_ORDER = ["must", "want", "maybe"] as const;
 
-function isCompleted(progress: EventProgress, objectiveId: string): boolean {
-  return (progress.completedObjectives[objectiveId]?.count ?? 0) >= 1;
+function isCompleted(progress: EventProgress, objective: Objective): boolean {
+  return (progress.completedObjectives[objective.id]?.count ?? 0) >= clearsNeeded(objective);
 }
 
 function isUnboundedGrind(objective: Objective): boolean {
@@ -132,7 +133,7 @@ function computeOneTimeRemaining(event: EventData, progress: EventProgress, now:
   let total = 0;
   for (const objective of event.objectives) {
     if (isWeekMinimog(objective)) {
-      if (objective.week! >= week && !isCompleted(progress, objective.id)) total += objective.points;
+      if (objective.week! >= week && !isCompleted(progress, objective)) total += objective.points;
       continue;
     }
     if (objective.repeatable !== false) continue;
@@ -140,7 +141,7 @@ function computeOneTimeRemaining(event: EventData, progress: EventProgress, now:
     // flag says — they earn through weeklyRate's top-2 rule, and counting a
     // repeatable:false minimog here too would double its points.
     if (objective.kind === "minimog") continue;
-    if (isCompleted(progress, objective.id)) continue;
+    if (isCompleted(progress, objective)) continue;
     total += objective.points;
   }
   return total;
@@ -207,14 +208,14 @@ export function tokensRemaining(event: EventData, progress: EventProgress, now: 
     const tokens = objective.tokens;
     if (!tokens) continue;
     if (isWeekMinimog(objective)) {
-      if (objective.week! >= week && !isCompleted(progress, objective.id)) total += tokens;
+      if (objective.week! >= week && !isCompleted(progress, objective)) total += tokens;
     } else if (objective.repeatable === true) {
       return null;
     } else if (objective.repeatable === "weekly" || objective.kind === "minimog") {
       if (weeksLeft === null) return null;
       const weeks = weeksLeft - (doneThisWeek(progress, objective.id, now) ? 1 : 0);
       total += tokens * Math.max(0, weeks);
-    } else if (!isCompleted(progress, objective.id)) {
+    } else if (!isCompleted(progress, objective)) {
       total += tokens;
     }
   }
@@ -319,13 +320,17 @@ function isAvailableForRunNext(event: EventData, objective: Objective, progress:
     return lastDoneAt < lastWeeklyReset(now).getTime();
   }
   // repeatable === false
-  return (record?.count ?? 0) === 0;
+  return (record?.count ?? 0) < clearsNeeded(objective);
 }
 
 export function rankRunNext(event: EventData, progress: EventProgress, now: Date): RankedObjective[] {
   const ranked: RankedObjective[] = event.objectives
     .filter((objective) => isAvailableForRunNext(event, objective, progress, now))
-    .map((objective) => ({ objective, score: objective.points / EFFORT_WEIGHTS[objective.effort] }));
+    .map((objective) => ({
+      objective,
+      // Multi-clear objectives pay once for several runs, so score them per run.
+      score: objective.points / clearsNeeded(objective) / EFFORT_WEIGHTS[objective.effort],
+    }));
 
   ranked.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
@@ -348,7 +353,9 @@ export function runsToMustGoal(event: EventData, progress: EventProgress, now: D
   let count = 0;
   for (const { objective } of ranked) {
     sum += objective.points;
-    count += 1;
+    count += objective.clears
+      ? objective.clears - (progress.completedObjectives[objective.id]?.count ?? 0)
+      : 1;
     if (sum >= shortfall) return count;
   }
 
@@ -390,7 +397,7 @@ export function weeklyPlan(event: EventData, progress: EventProgress, now: Date)
     .filter((objective) => {
       if (objective.kind !== "minimog") return false;
       if (isWeekMinimog(objective)) {
-        return objective.week === currentWeek && !isCompleted(progress, objective.id);
+        return objective.week === currentWeek && !isCompleted(progress, objective);
       }
       return !doneThisWeek(progress, objective.id, now);
     })
