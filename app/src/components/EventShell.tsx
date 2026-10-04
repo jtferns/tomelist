@@ -1,4 +1,5 @@
 import { Link, Outlet, useParams } from "@tanstack/react-router";
+import { UndoToast } from "@/components/UndoToast";
 import { CalendarCheck, ListChecks, Home, Settings, ShoppingBag } from "lucide-react";
 import { useEffect } from "react";
 import { ProgressHud } from "@/components/ProgressHud";
@@ -28,6 +29,7 @@ export function EventShell() {
       <main className="flex-1 p-4 pb-20 sm:pb-4">
         <Outlet />
       </main>
+      <UndoToast />
 
       {/* Mobile bottom tab bar (<sm) */}
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-[var(--frame-border)] bg-card/95 backdrop-blur sm:hidden">

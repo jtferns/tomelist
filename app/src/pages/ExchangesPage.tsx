@@ -26,10 +26,12 @@ import { Chip } from "@/components/ui/chip";
 import { FramedCard } from "@/components/ui/framed-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
+import { tomeCount } from "@/lib/format";
 import { useEorzeaTooltips } from "@/lib/useEorzeaTooltips";
 import { cn } from "@/lib/utils";
 import { getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
+import { useUndoToast } from "@/components/UndoToast";
 import type { Exchange } from "@tomelist/schema";
 
 const TYPE_GLYPH: Record<string, LucideIcon> = {
@@ -75,6 +77,8 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
   const adjustWishlistQuantity = useAppStore((s) => s.adjustWishlistQuantity);
   const setWishlistTier = useAppStore((s) => s.setWishlistTier);
   const markExchanged = useAppStore((s) => s.markExchanged);
+  const undoExchanged = useAppStore((s) => s.undoExchanged);
+  const showToast = useUndoToast((s) => s.show);
   const wanted = entry?.status === "wanted";
   const exchanged = entry?.status === "exchanged";
   const quantity = entry?.quantity ?? 1;
@@ -102,7 +106,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
 
   const meta = (
     <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-      <Badge variant="tome">{item.cost} tomes</Badge>
+      <Badge variant="tome">{tomeCount(item.cost)}</Badge>
       <span>{item.type}</span>
       {item.tradeable ? <Badge variant="gold-outline">tradeable</Badge> : null}
       {item.altSources?.length ? (
@@ -203,7 +207,12 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
               size="sm"
               className={cn(short <= 0 && "ml-auto")}
               disabled={wallet < item.cost}
-              onClick={() => markExchanged(eventId, item.id, item.cost)}
+              onClick={() => {
+                markExchanged(eventId, item.id, item.cost);
+                showToast(`Exchanged ${item.name}, −${tomeCount(item.cost)}`, () =>
+                  undoExchanged(eventId, item.id, item.cost)
+                );
+              }}
             >
               Mark exchanged
             </Button>

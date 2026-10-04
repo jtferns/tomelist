@@ -5,6 +5,7 @@ import { FramedCard } from "@/components/ui/framed-card";
 import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionHeader } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
+import { tomeCount } from "@/lib/format";
 import { rankRunNext, runsToMustGoal, budgetReport } from "@/lib/optimizer";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -41,7 +42,7 @@ export function RunNext({ eventId }: { eventId: string }) {
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                    <Badge variant="tome">{objective.points} tomes</Badge>
+                    <Badge variant="tome">{tomeCount(objective.points)}</Badge>
                     <Badge variant="gold-outline">{objective.effort}</Badge>
                   </div>
                 </div>

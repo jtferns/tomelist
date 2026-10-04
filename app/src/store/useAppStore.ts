@@ -27,6 +27,7 @@ type AppState = PersistedState & {
   adjustWishlistQuantity: (eventId: string, exchangeId: string, delta: number) => void;
   setWishlistTier: (eventId: string, exchangeId: string, tier: WishlistEntry["tier"]) => void;
   markExchanged: (eventId: string, exchangeId: string, cost: number) => void;
+  undoExchanged: (eventId: string, exchangeId: string, cost: number) => void;
   getProgress: (eventId: string) => EventProgress;
 };
 
@@ -133,6 +134,16 @@ export const useAppStore = create<AppState>()(
                   ? { ...entry, quantity: entry.quantity - 1 }
                   : { ...entry, status: "exchanged" };
             }
+          }),
+        undoExchanged: (eventId, exchangeId, cost) =>
+          update(eventId, (p) => {
+            const entry = p.wishlist[exchangeId];
+            if (!entry) return;
+            p.tomestones += cost;
+            p.wishlist[exchangeId] =
+              entry.status === "exchanged"
+                ? { ...entry, status: "wanted" }
+                : { ...entry, quantity: entry.quantity + 1 };
           }),
         // Returns a live reference into the store's state (or a fresh empty progress when the
         // event has no entry yet). Callers must treat the result as read-only — do not mutate

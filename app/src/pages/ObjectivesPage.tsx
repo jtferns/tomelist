@@ -9,6 +9,7 @@ import { FramedCard } from "@/components/ui/framed-card";
 import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
+import { tomeCount } from "@/lib/format";
 import { useAppStore } from "@/store/useAppStore";
 import type { Objective } from "@tomelist/schema";
 
@@ -32,7 +33,7 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
       <div className="min-w-0 flex-1">
         <p className="font-medium">{objective.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-          <Badge variant="tome">{objective.points} tomes</Badge>
+          <Badge variant="tome">{tomeCount(objective.points)}</Badge>
           <Badge variant="gold-outline">{objective.effort}</Badge>
           <span>{objective.category}</span>
         </div>

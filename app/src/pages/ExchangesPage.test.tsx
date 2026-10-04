@@ -2,6 +2,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
+import { useUndoToast } from "@/components/UndoToast";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";
 import { ExchangeRow } from "@/pages/ExchangesPage";
@@ -19,6 +20,7 @@ async function renderExchanges() {
 beforeEach(() => {
   localStorage.clear();
   useAppStore.setState({ events: {} });
+  useUndoToast.setState({ toast: null });
 });
 
 describe("ExchangesPage", () => {
@@ -89,6 +91,25 @@ describe("ExchangesPage", () => {
     await userEvent.click(within(row).getByRole("button", { name: /mark exchanged/i }));
     expect(useAppStore.getState().getProgress(E).tomestones).toBe(20);
     expect(within(row).getByText(/exchanged/i)).toBeInTheDocument();
+  });
+
+  it("undo after exchanging puts the tomes and the wanted item back", async () => {
+    useAppStore.getState().addTomestones(E, 60);
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    const row = screen.getByTestId("exchange-fat-cat-parasol");
+    await userEvent.click(within(row).getByRole("button", { name: /mark exchanged/i }));
+    expect(useAppStore.getState().getProgress(E).tomestones).toBe(10);
+    await userEvent.click(within(screen.getByTestId("undo-toast")).getByRole("button", { name: /undo/i }));
+    expect(useAppStore.getState().getProgress(E).tomestones).toBe(60);
+    expect(useAppStore.getState().events[E]?.wishlist["fat-cat-parasol"]?.status).toBe("wanted");
+    expect(screen.queryByTestId("undo-toast")).not.toBeInTheDocument();
+  });
+
+  it("says 1 tome, not 1 tomes", () => {
+    render(<ExchangeRow eventId={E} item={{ id: "one", name: "One", cost: 1, type: "Item" }} wallet={5} />);
+    expect(screen.getByTestId("exchange-one")).toHaveTextContent("1 tome");
+    expect(screen.getByTestId("exchange-one")).not.toHaveTextContent("1 tomes");
   });
 
   it("disables mark exchanged when wallet can't cover one unit", async () => {
