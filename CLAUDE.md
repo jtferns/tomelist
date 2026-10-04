@@ -34,11 +34,12 @@ Run from the repo root unless noted:
 
 Package manager is Yarn 4 (Berry, `nodeLinker: node-modules`, see `.yarnrc.yml`). Node version is
 pinned in `.nvmrc`. CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn test`, and
-`yarn build` on every push/PR, and on `main` additionally deploys `app/dist` to the Cloudflare Pages project `tomelist`
-(`wrangler.jsonc` with `pages_build_output_dir`; Pages' default SPA fallback, so no `404.html` in
-the build) via `cloudflare/wrangler-action` running `pages deploy`. The deploy job needs the
-`CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets and fails without them; nothing in the
-workflow skips it when they are missing. Wrangler is pinned in the root `package.json`.
+`yarn build` on every push/PR, and on `main` additionally deploys `app/dist` to a Cloudflare Worker
+(`wrangler.jsonc`, assets-only, SPA fallback) via `cloudflare/wrangler-action`. The deploy job
+needs the `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets and fails without them; nothing
+in the workflow skips it when they are missing. Wrangler is pinned in the root `package.json`. (Pages was
+tried and dropped: wrangler now routes new Pages projects through Workers and refuses to run that
+at a monorepo root.)
 
 ## Architecture
 

@@ -38,7 +38,7 @@ localStorage, with past and current events side by side.
 
 - Event content is bundled JSON. There is no backend.
 - User progress is stored offline in localStorage (`tomelist:v2`) and kept separately for each event.
-- Installable as a PWA and deployed as a static site on Cloudflare Pages (tomelist.pages.dev).
+- Installable as a PWA and deployed as a static Cloudflare Worker.
 - Undecided: live mode (`/impeccable live`) is deferred until Janoo can use it interactively.
 
 ## Brand Commitments

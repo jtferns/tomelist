@@ -45,7 +45,7 @@ Yarn workspaces monorepo:
   [`scripts/README.md`](scripts/README.md).
 - `docs/`: design specs and implementation plans.
 - `surge-redirect/`: the page that sends visitors from the old `tomelist.surge.sh` to the new site.
-- `wrangler.jsonc`: Cloudflare Pages config for hosting.
+- `wrangler.jsonc`: Cloudflare Worker config for hosting.
 
 ## Getting started
 
@@ -90,27 +90,21 @@ in `data/manifest.json`, download item icons with `scripts/fetch-icons.ts`, then
 
 ## Deployment
 
-The site is hosted on Cloudflare Pages as the `tomelist` project, served from `app/dist`
-(`wrangler.jsonc`). Pages serves `index.html` for any path without a matching file, which the
-router needs, so the build must not output a `404.html`.
+The site is a Cloudflare Worker that serves `app/dist` as static assets, with a single-page-app
+fallback (`wrangler.jsonc`).
 
 CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn test` and `yarn build` on every push
-and pull request to `main`. On a push to `main`, a second job builds again and runs
-`wrangler pages deploy` through `cloudflare/wrangler-action`, using the wrangler version pinned in
-`package.json`. That job needs the `CLOUDFLARE_API_TOKEN` (Cloudflare Pages: Edit) and
-`CLOUDFLARE_ACCOUNT_ID` repository secrets, and fails without them. The Pages project must exist
-before the first deploy:
-
-```sh
-yarn wrangler pages project create tomelist --production-branch=main
-```
+and pull request to `main`. On a push to `main`, a second job builds again and deploys with
+`cloudflare/wrangler-action`, using the wrangler version pinned in `package.json`. That job needs
+the `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID` repository secrets,
+and fails without them. The first deploy creates the `tomelist` Worker.
 
 Workflows from forked pull requests get no secrets and a read-only token, and the deploy job only
 runs on pushes to `main`.
 
 ### Retiring the old Surge site
 
-Tomelist used to live at `tomelist.surge.sh`. Once the Pages URL is live, replace both
+Tomelist used to live at `tomelist.surge.sh`. Once the Worker URL is live, replace both
 `REPLACE_WITH_DEPLOYED_URL` placeholders in `surge-redirect/index.html` with it, then publish the
 redirect page by hand:
 
