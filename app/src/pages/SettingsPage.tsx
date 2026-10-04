@@ -112,7 +112,13 @@ export function SettingsPage() {
           </ul>
         </section>
 
-        <p className="text-xs text-muted-foreground">Tomelist v2.0.0-dev</p>
+        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+          <p>Tomelist v2.0.0-dev</p>
+          <p>
+            FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Item icons come from the game via XIVAPI. Tomelist is a fan
+            project and is not affiliated with Square Enix.
+          </p>
+        </div>
       </FramedCard>
     </div>
   );

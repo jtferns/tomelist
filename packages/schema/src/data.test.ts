@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { eventSchema, manifestSchema } from "./event";
@@ -18,6 +18,17 @@ describe("bundled event data", () => {
       const event = eventSchema.parse(JSON.parse(readFileSync(join(dataDir, "events", f), "utf8")));
       expect(f).toBe(`${event.id}.json`);
       expect(manifest.events.map((e) => e.id)).toContain(event.id);
+    }
+  });
+  it("every icon path points to a file in app/public", () => {
+    const publicDir = join(__dirname, "../../../app/public");
+    const files = readdirSync(join(dataDir, "events")).filter((f) => f.endsWith(".json"));
+    for (const f of files) {
+      const event = eventSchema.parse(JSON.parse(readFileSync(join(dataDir, "events", f), "utf8")));
+      const icons = [event.tomestone.icon, ...event.exchanges.map((e) => e.icon)].filter(
+        (icon): icon is string => Boolean(icon)
+      );
+      for (const icon of icons) expect(existsSync(join(publicDir, icon)), `${f}: ${icon}`).toBe(true);
     }
   });
   it("manifest entries match their event file metadata", () => {

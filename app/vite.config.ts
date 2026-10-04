@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["tomes/*.png"],
+      includeAssets: ["tomes/*.png", "items/*.png"],
       manifest: {
         name: "Tomelist",
         short_name: "Tomelist",
