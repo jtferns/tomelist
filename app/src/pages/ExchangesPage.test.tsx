@@ -203,6 +203,26 @@ describe("ExchangesPage", () => {
     );
   });
 
+  it("search narrows the list by name", async () => {
+    await renderExchanges();
+    await userEvent.type(screen.getByRole("searchbox", { name: /search items/i }), "parasol");
+    const ids = screen.getAllByTestId(/^exchange-/).map((el) => el.getAttribute("data-testid"));
+    expect(ids).toEqual(["exchange-fat-cat-parasol"]);
+  });
+
+  it("the Wanted filter shows only wanted items, and an empty filter says so", async () => {
+    await renderExchanges();
+    const filter = screen.getByTestId("type-filter");
+    await userEvent.click(within(filter).getByRole("button", { name: "Wanted" }));
+    expect(screen.queryAllByTestId(/^exchange-/)).toHaveLength(0);
+    expect(screen.getByText(/no items match/i)).toBeInTheDocument();
+    await userEvent.click(within(filter).getByRole("button", { name: "All" }));
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    await userEvent.click(within(filter).getByRole("button", { name: "Wanted" }));
+    const ids = screen.getAllByTestId(/^exchange-/).map((el) => el.getAttribute("data-testid"));
+    expect(ids).toEqual(["exchange-fat-cat-parasol"]);
+  });
+
   describe("item icon", () => {
     const baseItem: Exchange = {
       id: "test-item",

@@ -222,11 +222,20 @@ export function ExchangesPage() {
   const wallet = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
   const wishlist = useAppStore((s) => s.events[eventId]?.wishlist);
   const [sortKey, setSortKey] = useState<SortKey>("default");
+  const [query, setQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
   useEorzeaTooltips(Boolean(event?.exchanges.some((e) => e.eorzeadbUrl)));
   if (!event) return <div data-testid="exchanges-page">Unknown event.</div>;
   const wantedTotal = getWishlistTotal(event, wishlist);
+  const types = [...new Set(event.exchanges.map((e) => e.type))].sort();
+  const needle = query.trim().toLowerCase();
   const sortedExchanges = event.exchanges
     .map((item, index) => ({ item, index }))
+    .filter(({ item }) => {
+      if (needle && !item.name.toLowerCase().includes(needle)) return false;
+      if (typeFilter === "wanted") return wishlist?.[item.id]?.status === "wanted";
+      return typeFilter === "all" || item.type === typeFilter;
+    })
     .sort((a, b) => {
       switch (sortKey) {
         case "tier": {
@@ -262,6 +271,28 @@ export function ExchangesPage() {
           tomes
         </p>
       </SectionHeader>
+      <input
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={`Search ${event.exchanges.length} items`}
+        aria-label="Search items"
+        className="h-10 w-full rounded-md border border-input bg-surface-2 px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      />
+      <div
+        data-testid="type-filter"
+        className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none]"
+      >
+        {[
+          { key: "all", label: "All" },
+          { key: "wanted", label: "Wanted" },
+          ...types.map((t) => ({ key: t, label: t })),
+        ].map(({ key, label }) => (
+          <Chip key={key} active={typeFilter === key} onClick={() => setTypeFilter(key)}>
+            {label}
+          </Chip>
+        ))}
+      </div>
       <div data-testid="sort-options" className="flex flex-wrap items-center gap-1.5">
         {SORT_OPTIONS.map(({ key, label }) => (
           <Chip
@@ -274,12 +305,17 @@ export function ExchangesPage() {
           </Chip>
         ))}
       </div>
-      {/* Re-key on sort so every row remounts and replays the list-enter fade. */}
-      <div key={sortKey} className="grid gap-3 md:grid-cols-2">
+      {/* Re-key on sort or filter so every row remounts and replays the list-enter fade. */}
+      <div key={`${sortKey}:${typeFilter}`} className="grid gap-3 md:grid-cols-2">
         {sortedExchanges.map((item) => (
           <ExchangeRow key={item.id} eventId={eventId} item={item} wallet={wallet} />
         ))}
       </div>
+      {sortedExchanges.length === 0 ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">
+          No items match. Try another search or pick All.
+        </p>
+      ) : null}
     </div>
   );
 }
