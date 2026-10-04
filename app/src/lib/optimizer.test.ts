@@ -7,6 +7,7 @@ import {
   EFFORT_WEIGHTS,
   lastWeeklyReset,
   rankRunNext,
+  tokensRemaining,
   runsToMustGoal,
   weeklyPlan,
 } from "./optimizer";
@@ -526,5 +527,61 @@ describe("week-tagged minimogs", () => {
   it("suggests nothing once the current week's minimog is done", () => {
     const p = progress({ completedObjectives: { "mm-w2": { count: 1, lastDoneAt: WEEK2.toISOString() } } });
     expect(weeklyPlan(ev, p, WEEK2).suggestedMinimogs).toEqual([]);
+  });
+});
+
+describe("event tokens", () => {
+  const ev = event({
+    token: { name: "Horn Token" },
+    starts: "2026-01-07T08:00:00Z",
+    ends: "2026-02-01T00:00:00Z",
+    objectives: [
+      objective({ id: "mm-w1", kind: "minimog", week: 1, tokens: 1, repeatable: "weekly" }),
+      objective({ id: "mm-w2", kind: "minimog", week: 2, tokens: 1, repeatable: "weekly" }),
+      objective({ id: "mm-w3", kind: "minimog", week: 3, tokens: 1, repeatable: "weekly" }),
+      objective({ id: "ulti", kind: "ultimog", tokens: 5, points: 70 }),
+    ],
+    exchanges: [exchange({ id: "mount", cost: 100, tokenCost: 7 }), exchange({ id: "hat", cost: 50 })],
+  });
+  const WEEK2 = new Date("2026-01-15T00:00:00Z");
+
+  it("tokensRemaining skips past weeks and completed objectives", () => {
+    expect(tokensRemaining(ev, progress(), WEEK2)).toBe(7);
+    const p = progress({ completedObjectives: { ulti: { count: 1, lastDoneAt: WEEK2.toISOString() } } });
+    expect(tokensRemaining(ev, p, WEEK2)).toBe(2);
+  });
+
+  it("tokensRemaining is null when an unbounded grind awards tokens", () => {
+    const grind = event({ objectives: [objective({ id: "g", repeatable: true, tokens: 1 })] });
+    expect(tokensRemaining(grind, progress(), WEEK2)).toBeNull();
+  });
+
+  it("is not affordable now when tomes suffice but tokens don't", () => {
+    const p = progress({
+      tomestones: 200,
+      tokens: 6,
+      wishlist: { mount: { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    const must = budgetReport(ev, p, WEEK2).tiers[0];
+    expect(must.tokenCost).toBe(7);
+    expect(must.affordableNow).toBe(false);
+    expect(must.affordableByEnd).toBe(true);
+  });
+
+  it("is out of reach by the end when tokens can't be earned in time", () => {
+    const p = progress({
+      tomestones: 200,
+      completedObjectives: { ulti: { count: 1, lastDoneAt: WEEK2.toISOString() } },
+      wishlist: { mount: { status: "wanted", tier: "must", quantity: 1 } },
+    });
+    expect(budgetReport(ev, p, WEEK2).tiers[0].affordableByEnd).toBe(false);
+    expect(weeklyPlan(ev, p, WEEK2).mustTokensReachable).toBe(false);
+  });
+
+  it("an event without tokens reports zero token costs", () => {
+    const plain = event();
+    const report = budgetReport(plain, progress(), WEEK2);
+    expect(report.tokens).toBe(0);
+    expect(report.tiers.every((t) => t.tokenCost === 0)).toBe(true);
   });
 });

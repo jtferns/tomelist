@@ -1,7 +1,7 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
 import { emptyEventProgress } from "@tomelist/schema";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";
 
@@ -19,6 +19,10 @@ async function renderOverview() {
 beforeEach(() => {
   localStorage.clear();
   useAppStore.setState({ events: {} });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("BudgetSummary", () => {
@@ -48,10 +52,12 @@ describe("BudgetSummary", () => {
   it("shows a weeks-needed estimate when the wallet can't cover a wanted item yet", async () => {
     // The Astronomy event still has runway (future end date + weekly income), so
     // an unaffordable Must item yields a weeks-needed verdict, not "Out of reach".
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-04T12:00:00Z"));
     const futureEvent = "2026-09-astronomy-first-hunt";
     const progress = emptyEventProgress();
     progress.tomestones = 0;
-    progress.wishlist["uolon-horn"] = { status: "wanted", tier: "must", quantity: 1 };
+    progress.wishlist["mameshiba-neckerchief"] = { status: "wanted", tier: "must", quantity: 1 };
     useAppStore.setState({ events: { [futureEvent]: progress } });
 
     const router = createAppRouter();
@@ -61,5 +67,22 @@ describe("BudgetSummary", () => {
 
     const row = screen.getByTestId("budget-tier-must");
     expect(row).toHaveTextContent(/~\d+ wk/);
+  });
+
+  it("marks a token item out of reach when too few tokens are left to earn", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-04T12:00:00Z"));
+    const futureEvent = "2026-09-astronomy-first-hunt";
+    const progress = emptyEventProgress();
+    progress.tomestones = 500;
+    progress.wishlist["uolon-horn"] = { status: "wanted", tier: "must", quantity: 1 };
+    useAppStore.setState({ events: { [futureEvent]: progress } });
+
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/overview", params: { eventId: futureEvent } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("overview-page");
+
+    expect(screen.getByTestId("budget-tier-must")).toHaveTextContent("Out of reach");
   });
 });

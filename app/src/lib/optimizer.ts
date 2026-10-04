@@ -34,6 +34,19 @@ import type { EventData, EventProgress, Objective } from "@tomelist/schema";
  *   as available); else if weeklyRate > 0 -> ceil(shortfall / weeklyRate); else null.
  * - affordableByEnd = projectedIncome !== null ? projectedIncome >= cumulativeCost : null.
  *
+ * Event tokens (only when the event defines `token`)
+ * ------------------------------------------------
+ * - tokens = progress.tokens ?? 0. Tier token costs cumulate like tome costs, from
+ *   exchange.tokenCost x quantity over wanted entries.
+ * - tokensRemaining: tokens still earnable. Week-tagged minimogs with week >= eventWeek and not
+ *   completed, repeatable: false objectives not completed, and weekly objectives (or untagged
+ *   minimogs) once per week left, minus this week if already done. null when a repeatable:
+ *   true objective awards tokens (no cap).
+ * - affordableNow also needs tokens >= tokenCost. affordableByEnd is false when
+ *   tokensRemaining is a number and tokens + tokensRemaining < tokenCost. weeksNeeded stays
+ *   tome-only.
+ * - weeklyPlan exposes tokens, tokensRemaining, mustTokenCost and mustTokensReachable.
+ *
  * Run-next ranking
  * ----------------
  * - lastWeeklyReset(now): the most recent FFXIV weekly reset (Tuesday 08:00:00.000 UTC) at or
@@ -82,6 +95,7 @@ export const EFFORT_WEIGHTS = { quick: 1, medium: 2, long: 4 } as const;
 export type TierVerdict = {
   tier: "must" | "want" | "maybe";
   cumulativeCost: number;
+  tokenCost: number;
   affordableNow: boolean;
   weeksNeeded: number | null;
   affordableByEnd: boolean | null;
@@ -93,6 +107,8 @@ export type BudgetReport = {
   oneTimeRemaining: number;
   weeksLeft: number | null;
   projectedIncome: number | null;
+  tokens: number;
+  tokensRemaining: number | null;
   tiers: TierVerdict[];
 };
 
@@ -165,6 +181,46 @@ function computeTierCosts(event: EventData, progress: EventProgress): Record<(ty
   return { must, want, maybe };
 }
 
+function computeTierTokenCosts(
+  event: EventData,
+  progress: EventProgress
+): Record<(typeof TIER_ORDER)[number], number> {
+  const exchangesById = new Map(event.exchanges.map((exchange) => [exchange.id, exchange]));
+  const tierSums = { must: 0, want: 0, maybe: 0 };
+  for (const [exchangeId, entry] of Object.entries(progress.wishlist)) {
+    if (entry.status !== "wanted") continue;
+    const tokenCost = exchangesById.get(exchangeId)?.tokenCost;
+    if (!tokenCost) continue;
+    tierSums[entry.tier] += tokenCost * entry.quantity;
+  }
+  const must = tierSums.must;
+  const want = must + tierSums.want;
+  const maybe = want + tierSums.maybe;
+  return { must, want, maybe };
+}
+
+export function tokensRemaining(event: EventData, progress: EventProgress, now: Date): number | null {
+  const week = eventWeek(event, now);
+  const weeksLeft = event.ends === null ? null : weeksUntil(event.ends, now);
+  let total = 0;
+  for (const objective of event.objectives) {
+    const tokens = objective.tokens;
+    if (!tokens) continue;
+    if (isWeekMinimog(objective)) {
+      if (objective.week! >= week && !isCompleted(progress, objective.id)) total += tokens;
+    } else if (objective.repeatable === true) {
+      return null;
+    } else if (objective.repeatable === "weekly" || objective.kind === "minimog") {
+      if (weeksLeft === null) return null;
+      const weeks = weeksLeft - (doneThisWeek(progress, objective.id, now) ? 1 : 0);
+      total += tokens * Math.max(0, weeks);
+    } else if (!isCompleted(progress, objective.id)) {
+      total += tokens;
+    }
+  }
+  return total;
+}
+
 function weeksUntil(ends: string, now: Date): number {
   const diffMs = new Date(ends).getTime() - now.getTime();
   return Math.max(0, Math.ceil(diffMs / MS_PER_WEEK));
@@ -178,10 +234,15 @@ export function budgetReport(event: EventData, progress: EventProgress, now: Dat
   const projectedIncome = weeksLeft === null ? null : wallet + oneTimeRemaining + weeklyRate * weeksLeft;
 
   const cumulativeCosts = computeTierCosts(event, progress);
+  const tokenCosts = computeTierTokenCosts(event, progress);
+  const tokens = progress.tokens ?? 0;
+  const remainingTokens = tokensRemaining(event, progress, now);
 
   const tiers: TierVerdict[] = TIER_ORDER.map((tier) => {
     const cumulativeCost = cumulativeCosts[tier];
-    const affordableNow = wallet >= cumulativeCost;
+    const tokenCost = tokenCosts[tier];
+    const tokensReachable = remainingTokens === null || tokens + remainingTokens >= tokenCost;
+    const affordableNow = wallet >= cumulativeCost && tokens >= tokenCost;
     let weeksNeeded: number | null;
     if (affordableNow) {
       weeksNeeded = 0;
@@ -195,11 +256,24 @@ export function budgetReport(event: EventData, progress: EventProgress, now: Dat
         weeksNeeded = null;
       }
     }
-    const affordableByEnd = projectedIncome !== null ? projectedIncome >= cumulativeCost : null;
-    return { tier, cumulativeCost, affordableNow, weeksNeeded, affordableByEnd };
+    const affordableByEnd = !tokensReachable
+      ? false
+      : projectedIncome !== null
+        ? projectedIncome >= cumulativeCost
+        : null;
+    return { tier, cumulativeCost, tokenCost, affordableNow, weeksNeeded, affordableByEnd };
   });
 
-  return { wallet, weeklyRate, oneTimeRemaining, weeksLeft, projectedIncome, tiers };
+  return {
+    wallet,
+    weeklyRate,
+    oneTimeRemaining,
+    weeksLeft,
+    projectedIncome,
+    tokens,
+    tokensRemaining: remainingTokens,
+    tiers,
+  };
 }
 
 const WEEKLY_RESET_DAY = 2; // Tuesday, per Date#getUTCDay (0 = Sunday)
@@ -296,6 +370,10 @@ export type WeeklyPlan = {
   onPace: boolean | null;
   currentWeek: number;
   minimogWeeks: number | null;
+  tokens: number;
+  tokensRemaining: number | null;
+  mustTokenCost: number;
+  mustTokensReachable: boolean;
 };
 
 function doneThisWeek(progress: EventProgress, objectiveId: string, now: Date): boolean {
@@ -350,5 +428,21 @@ export function weeklyPlan(event: EventData, progress: EventProgress, now: Date)
   const weekTags = event.objectives.filter(isWeekMinimog).map((objective) => objective.week!);
   const minimogWeeks = weekTags.length > 0 ? Math.max(...weekTags) : null;
 
-  return { suggestedMinimogs, weeklies, earnedThisWeek, neededPerWeek, onPace, currentWeek, minimogWeeks };
+  const mustTokenCost = mustTier?.tokenCost ?? 0;
+  const mustTokensReachable =
+    report.tokensRemaining === null || report.tokens + report.tokensRemaining >= mustTokenCost;
+
+  return {
+    suggestedMinimogs,
+    weeklies,
+    earnedThisWeek,
+    neededPerWeek,
+    onPace,
+    currentWeek,
+    minimogWeeks,
+    tokens: report.tokens,
+    tokensRemaining: report.tokensRemaining,
+    mustTokenCost,
+    mustTokensReachable,
+  };
 }
