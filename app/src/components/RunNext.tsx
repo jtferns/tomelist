@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { emptyEventProgress } from "@tomelist/schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,8 +59,16 @@ export function RunNext({ eventId }: { eventId: string }) {
           ))}
         </div>
       )}
+      <Link
+        to="/$eventId/planner"
+        params={{ eventId }}
+        data-testid="see-full-plan"
+        className="text-sm text-gold underline underline-offset-2"
+      >
+        See full plan
+      </Link>
       {showHint && runs !== 0 ? (
-        <p data-testid="runs-to-goal" className="text-xs text-muted-foreground">
+        <p data-testid="runs-to-goal" className="text-sm text-muted-foreground">
           {runs === null
             ? "Weekly income can't reach your Must goal"
             : `~${runs} runs to reach your Must goal`}
