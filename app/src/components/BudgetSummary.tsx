@@ -55,7 +55,7 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
   }
 
   return (
-    <FramedCard corners data-testid="budget-summary" className="flex flex-col gap-3 p-4">
+    <FramedCard data-testid="budget-summary" className="flex flex-col gap-3 p-4">
       <SectionKicker>Budget</SectionKicker>
       <div>
         {visibleTiers.map((tier, index) => (

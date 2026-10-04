@@ -38,4 +38,16 @@ describe("OverviewPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Subtract 1 tomestone" }));
     expect(screen.getByTestId("wallet-count")).toHaveTextContent("10");
   });
+  it("puts Run Next first, with a link to the full plan", async () => {
+    await renderOverview();
+    const page = screen.getByTestId("overview-page");
+    expect(page.firstElementChild).toBe(screen.getByTestId("run-next"));
+    expect(screen.getByTestId("see-full-plan")).toHaveAttribute("href", `/${E}/planner`);
+  });
+  it("says what the wallet is saving for, or points to Exchanges when nothing is wanted", async () => {
+    await renderOverview();
+    expect(screen.getByTestId("saving-for")).toHaveTextContent("No goal yet. Pick items on Exchanges");
+    useAppStore.getState().toggleWishlist(E, "fat-cat-parasol");
+    expect(await screen.findByText(/Saving for Fat Cat Parasol/)).toBeInTheDocument();
+  });
 });
