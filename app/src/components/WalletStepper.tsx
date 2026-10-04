@@ -2,13 +2,13 @@ import { AnimatedCount } from "@/components/ui/animated-count";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/useAppStore";
 
-const STEP_BUTTON_CLASS = "hover:border-primary/60 hover:text-primary";
+const STEP_BUTTON_CLASS = "min-h-11 min-w-11 hover:border-primary/60 hover:text-primary";
 
 export function WalletStepper({ eventId }: { eventId: string }) {
   const tomestones = useAppStore((s) => (s.events[eventId] ?? { tomestones: 0 }).tomestones);
   const addTomestones = useAppStore((s) => s.addTomestones);
   return (
-    <div className="flex items-center justify-center gap-3">
+    <div className="flex items-center justify-center gap-2">
       <Button
         variant="outline"
         size="sm"
@@ -30,7 +30,7 @@ export function WalletStepper({ eventId }: { eventId: string }) {
       <AnimatedCount
         data-testid="wallet-count"
         value={tomestones}
-        className="min-w-24 text-center font-display text-[44px] font-bold tabular-nums text-gold"
+        className="min-w-20 text-center font-display text-4xl font-bold tabular-nums text-gold"
       />
       <Button
         variant="outline"
