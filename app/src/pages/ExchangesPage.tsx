@@ -18,6 +18,7 @@ import {
   Sparkles,
   Spade,
   type LucideIcon,
+  Handshake,
 } from "lucide-react";
 import { useState } from "react";
 import { AnimatedCount } from "@/components/ui/animated-count";
@@ -79,11 +80,15 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
   const toggleWishlist = useAppStore((s) => s.toggleWishlist);
   const adjustWishlistQuantity = useAppStore((s) => s.adjustWishlistQuantity);
   const setWishlistTier = useAppStore((s) => s.setWishlistTier);
+  const setCovering = useAppStore((s) => s.setCovering);
+  const markReceived = useAppStore((s) => s.markReceived);
+  const undoReceived = useAppStore((s) => s.undoReceived);
   const markExchanged = useAppStore((s) => s.markExchanged);
   const undoExchanged = useAppStore((s) => s.undoExchanged);
   const showToast = useUndoToast((s) => s.show);
   const wanted = entry?.status === "wanted";
   const exchanged = entry?.status === "exchanged";
+  const covering = entry?.status === "covering";
   const quantity = entry?.quantity ?? 1;
   const tokenCost = item.tokenCost ?? 0;
   const tokenBalance = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
@@ -124,7 +129,12 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
         {tokenCost > 0 ? ` + ${tokenCount(tokenCost)}` : null}
       </Badge>
       <span>{item.type}</span>
-      {item.tradeable ? <Badge variant="gold-outline">tradeable</Badge> : null}
+      {item.tradeable ? (
+        <Badge variant="gold-outline" data-testid={`tradeable-${item.id}`}>
+          <Handshake aria-hidden="true" className="size-3" />
+          Tradeable
+        </Badge>
+      ) : null}
       {item.altSources?.length ? (
         <Badge
           variant="gold-outline"
@@ -158,6 +168,38 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
             {meta}
           </div>
           <Badge variant="gold-outline">Exchanged</Badge>
+        </div>
+      </FramedCard>
+    );
+  }
+
+  if (covering) {
+    return (
+      <FramedCard data-testid={`exchange-${item.id}`} className="list-enter border-gold">
+        <div className="flex items-center gap-3 px-3 pt-3">
+          {icon}
+          <div className="min-w-0 flex-1">
+            <p className="line-clamp-2 font-medium leading-snug">{item.name}</p>
+            {meta}
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-1 px-3 pt-2 pb-3">
+          <Badge variant="tome" data-testid={`covering-${item.id}`}>
+            Friend covering{quantity > 1 ? ` ×${quantity}` : ""}
+          </Badge>
+          <Button variant="outline" size="sm" className="ml-auto" onClick={() => setCovering(eventId, item.id, false)}>
+            Not covered
+          </Button>
+          <Button
+            variant="action"
+            size="sm"
+            onClick={() => {
+              markReceived(eventId, item.id);
+              showToast(`Received ${item.name} from a friend`, () => undoReceived(eventId, item.id));
+            }}
+          >
+            Received
+          </Button>
         </div>
       </FramedCard>
     );
@@ -217,6 +259,11 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
             >
               +
             </Button>
+            {item.tradeable ? (
+              <Button variant="outline" size="sm" onClick={() => setCovering(eventId, item.id, true)}>
+                Friend's covering this
+              </Button>
+            ) : null}
             {shortNote}
             <Button
               variant="action"
@@ -260,7 +307,9 @@ export function ExchangesPage() {
     .map((item, index) => ({ item, index }))
     .filter(({ item }) => {
       if (needle && !item.name.toLowerCase().includes(needle)) return false;
-      if (typeFilter === "wanted") return wishlist?.[item.id]?.status === "wanted";
+      const status = wishlist?.[item.id]?.status;
+      if (typeFilter === "wanted") return status === "wanted" || status === "covering";
+      if (typeFilter === "tradeable") return item.tradeable === true;
       return typeFilter === "all" || item.type === typeFilter;
     })
     .sort((a, b) => {
@@ -327,6 +376,7 @@ export function ExchangesPage() {
         {[
           { key: "all", label: "All" },
           { key: "wanted", label: "Wanted" },
+          ...(event.exchanges.some((e) => e.tradeable) ? [{ key: "tradeable", label: "Tradeable" }] : []),
           ...types.map((t) => ({ key: t, label: t })),
         ].map(({ key, label }) => (
           <Chip key={key} active={typeFilter === key} onClick={() => setTypeFilter(key)}>

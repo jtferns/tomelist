@@ -348,4 +348,61 @@ describe("ExchangesPage", () => {
     await renderExchanges();
     expect(screen.queryByTestId("wanted-token-total")).not.toBeInTheDocument();
   });
+
+  async function renderAstronomyExchanges() {
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/exchanges", params: { eventId: "2026-09-astronomy-first-hunt" } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("exchanges-page");
+  }
+
+  it("marks tradeable items only, and filters to them", async () => {
+    await renderAstronomyExchanges();
+    expect(screen.getByTestId("tradeable-domakin")).toHaveTextContent("Tradeable");
+    expect(screen.queryByTestId("tradeable-uolon-horn")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Tradeable" }));
+    expect(screen.getByTestId("exchange-domakin")).toBeInTheDocument();
+    expect(screen.queryByTestId("exchange-uolon-horn")).not.toBeInTheDocument();
+  });
+
+  it("a friend can cover a wanted tradeable item, which is then received without spending tomes", async () => {
+    const A = "2026-09-astronomy-first-hunt";
+    useAppStore.setState({
+      events: {
+        [A]: {
+          ...emptyEventProgress(),
+          tomestones: 20,
+          wishlist: { domakin: { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    await renderAstronomyExchanges();
+    const row = screen.getByTestId("exchange-domakin");
+    await userEvent.click(within(row).getByRole("button", { name: "Friend's covering this" }));
+    expect(within(row).getByTestId("covering-domakin")).toHaveTextContent("Friend covering");
+    expect(screen.getByTestId("wanted-total")).toHaveTextContent("0");
+
+    await userEvent.click(within(row).getByRole("button", { name: "Received" }));
+    expect(useAppStore.getState().events[A]!.wishlist.domakin.status).toBe("exchanged");
+    expect(useAppStore.getState().events[A]!.tomestones).toBe(20);
+    await userEvent.click(within(screen.getByTestId("undo-toast")).getByRole("button", { name: "Undo" }));
+    expect(useAppStore.getState().events[A]!.wishlist.domakin.status).toBe("covering");
+
+    await userEvent.click(within(screen.getByTestId("exchange-domakin")).getByRole("button", { name: "Not covered" }));
+    expect(useAppStore.getState().events[A]!.wishlist.domakin.status).toBe("wanted");
+  });
+
+  it("offers no friend cover on untradeable items", async () => {
+    useAppStore.setState({
+      events: {
+        "2026-09-astronomy-first-hunt": {
+          ...emptyEventProgress(),
+          wishlist: { "uolon-horn": { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    await renderAstronomyExchanges();
+    const row = screen.getByTestId("exchange-uolon-horn");
+    expect(within(row).queryByRole("button", { name: "Friend's covering this" })).not.toBeInTheDocument();
+  });
 });
