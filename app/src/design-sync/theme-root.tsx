@@ -21,7 +21,7 @@ export function ThemeRoot({
   children,
 }: {
   theme?: "dark" | "light";
-  palette?: "maelstrom" | "adder" | "flames";
+  palette?: "maelstrom" | "adder" | "flames" | "ishgard" | "crystarium";
   children?: ReactNode;
 }) {
   useLayoutEffect(() => {

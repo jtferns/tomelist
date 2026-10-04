@@ -135,4 +135,10 @@ describe("SettingsPage", () => {
     await renderSettings();
     expect(screen.getByText(/Tomelist v2\.0\.0-dev/)).toBeInTheDocument();
   });
+  it("offers the city palettes and applies one", async () => {
+    await renderSettings();
+    await userEvent.click(screen.getByRole("button", { name: "The Crystarium" }));
+    expect(useAppStore.getState().settings.theme.palette).toBe("crystarium");
+    expect(document.documentElement.dataset.palette).toBe("crystarium");
+  });
 });

@@ -14,6 +14,11 @@ const palettes = [
   { id: "flames", label: "Immortal Flames", hoverClass: "hover:border-[oklch(0.7_0.15_60)]" },
 ] as const;
 
+const cityPalettes = [
+  { id: "ishgard", label: "Ishgard", hoverClass: "hover:border-[oklch(0.74_0.09_240)]" },
+  { id: "crystarium", label: "The Crystarium", hoverClass: "hover:border-[oklch(0.74_0.13_295)]" },
+] as const;
+
 const modes = [
   { id: "dark", label: "Dark" },
   { id: "light", label: "Light" },
@@ -41,24 +46,29 @@ export function SettingsPage() {
   return (
     <div data-testid="settings-page" className="flex flex-col gap-6">
       <FramedCard corners className="flex flex-col gap-6 p-4">
-        <section className="flex flex-col gap-2">
-          <SectionKicker as="h2">Grand Company</SectionKicker>
-          <div className="flex flex-wrap gap-2">
-            {palettes.map((p) => {
-              const active = theme.palette === p.id;
-              return (
-                <Chip
-                  key={p.id}
-                  active={active}
-                  className={active ? undefined : p.hoverClass}
-                  onClick={() => setPalette(p.id)}
-                >
-                  {p.label}
-                </Chip>
-              );
-            })}
-          </div>
-        </section>
+        {[
+          { title: "Grand Company", options: palettes },
+          { title: "City", options: cityPalettes },
+        ].map(({ title, options }) => (
+          <section key={title} className="flex flex-col gap-2">
+            <SectionKicker as="h2">{title}</SectionKicker>
+            <div className="flex flex-wrap gap-2">
+              {options.map((p) => {
+                const active = theme.palette === p.id;
+                return (
+                  <Chip
+                    key={p.id}
+                    active={active}
+                    className={active ? undefined : p.hoverClass}
+                    onClick={() => setPalette(p.id)}
+                  >
+                    {p.label}
+                  </Chip>
+                );
+              })}
+            </div>
+          </section>
+        ))}
 
         <section className="flex flex-col gap-2">
           <SectionKicker as="h2">Mode</SectionKicker>

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const themeSettingsSchema = z.object({
-  palette: z.enum(["maelstrom", "adder", "flames"]),
+  palette: z.enum(["maelstrom", "adder", "flames", "ishgard", "crystarium"]),
   mode: z.enum(["dark", "light"]),
   ornament: z.enum(["full", "reduced", "minimal"]),
   density: z.enum(["comfy", "compact"]),

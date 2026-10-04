@@ -101,7 +101,7 @@ const modeBlocks = {
   light: parseBlock(':root[data-theme="light"]'),
 };
 
-const palettes = ["maelstrom", "adder", "flames"] as const;
+const palettes = ["maelstrom", "adder", "flames", "ishgard", "crystarium"] as const;
 const modes = ["dark", "light"] as const;
 
 function resolveCombo(palette: (typeof palettes)[number], mode: (typeof modes)[number]): Record<TokenName, string> {

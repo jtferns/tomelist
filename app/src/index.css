@@ -94,6 +94,36 @@
   --ring: oklch(0.55 0.12 80);
 }
 
+/* City palettes, same override shape as the Grand Companies. */
+:root[data-palette="ishgard"][data-theme="dark"] {
+  --primary: oklch(0.74 0.09 240);
+  --primary-foreground: oklch(0.18 0.03 240);
+  --accent: oklch(0.3 0.04 240);
+  --accent-foreground: oklch(0.95 0.01 240);
+  --ring: oklch(0.74 0.09 240);
+}
+:root[data-palette="ishgard"][data-theme="light"] {
+  --primary: oklch(0.47 0.1 245);
+  --primary-foreground: oklch(0.98 0 0);
+  --accent: oklch(0.93 0.02 240);
+  --accent-foreground: oklch(0.25 0.05 240);
+  --ring: oklch(0.47 0.1 245);
+}
+:root[data-palette="crystarium"][data-theme="dark"] {
+  --primary: oklch(0.74 0.13 295);
+  --primary-foreground: oklch(0.18 0.04 295);
+  --accent: oklch(0.31 0.06 295);
+  --accent-foreground: oklch(0.95 0.01 295);
+  --ring: oklch(0.74 0.13 295);
+}
+:root[data-palette="crystarium"][data-theme="light"] {
+  --primary: oklch(0.48 0.16 295);
+  --primary-foreground: oklch(0.98 0 0);
+  --accent: oklch(0.93 0.03 295);
+  --accent-foreground: oklch(0.25 0.05 295);
+  --ring: oklch(0.48 0.16 295);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
