@@ -1,5 +1,5 @@
 import { RouterProvider } from "@tanstack/react-router";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useAppStore } from "@/store/useAppStore";
@@ -140,5 +140,12 @@ describe("SettingsPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "The Crystarium" }));
     expect(useAppStore.getState().settings.theme.palette).toBe("crystarium");
     expect(document.documentElement.dataset.palette).toBe("crystarium");
+  });
+
+  it("discloses AI assistance and links the author's GitHub", async () => {
+    await renderSettings();
+    const note = screen.getByTestId("ai-disclosure");
+    expect(note).toHaveTextContent("v2 was rebuilt with Claude, an AI coding assistant.");
+    expect(within(note).getByRole("link", { name: "jtferns" })).toHaveAttribute("href", "https://github.com/jtferns");
   });
 });

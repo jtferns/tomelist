@@ -128,6 +128,19 @@ export function SettingsPage() {
 
         <div className="flex flex-col gap-1 text-xs text-muted-foreground">
           <p>Tomelist v2.0.0-dev</p>
+          <p data-testid="ai-disclosure">
+            v1 (2021) was built by hand by{" "}
+            <a
+              href="https://github.com/jtferns"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gold underline underline-offset-2 outline-none hover:text-gold-soft focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            >
+              jtferns
+            </a>
+            . v2 was rebuilt with Claude, an AI coding assistant. Claude wrote most of the code and drafted the event
+            data from the wiki; jtferns directed the design, decisions and review.
+          </p>
           <p>
             FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Item icons come from the game via XIVAPI. Tomelist is a fan
             project and is not affiliated with Square Enix.

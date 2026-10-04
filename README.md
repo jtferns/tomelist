@@ -1,58 +1,118 @@
 # Tomelist
 
-Tomelist is a web app that helps FFXIV (Final Fantasy XIV) players track tomestone farming
-progress during seasonal "Moogle Treasure Trove" events. Pick the event, log the duties you've
-cleared and the items you want to exchange for, and Tomelist tracks your running tomestone totals
-against event goals. Progress is saved to `localStorage`, and the app supports multiple events
-(past and current) side by side — each event's progress is tracked independently.
+Tomelist helps FFXIV players plan tomestone farming during Moogle Treasure Trove events. Log the
+duties you clear and wishlist the items you want, and it tells you what to run next and whether
+you'll afford everything before the event ends.
 
-## Workspace layout
+There are no accounts and no backend. Progress stays in your browser (`localStorage`), each event
+keeps its own progress, and the app installs as an offline-capable PWA.
 
-This is a Yarn workspaces monorepo:
+## What it does
 
-- `app/` — the Vite + React PWA (TanStack Router, Zustand, Tailwind). This is what gets deployed.
-- `packages/schema/` (`@tomelist/schema`) — Zod schemas shared between the app and the data
-  authoring tooling, plus the tests that validate `data/`.
-- `data/` — event content: `manifest.json` (list of known events) and `data/events/*.json` (one
-  file per event: objectives, exchange items, start/end dates). This is bundled into the app at
-  build time — see `app/src/lib/events.ts`.
-- `scripts/` — authoring aids for producing event JSON (not part of the built app or CI). See
-  [`scripts/README.md`](scripts/README.md) for the event authoring flow.
+- **Overview**: your tomestone wallet, a Run Next list ranked by tomes per effort, and a budget
+  verdict for each wishlist tier (Must, Nice, Maybe).
+- **Objectives**: log clears with undo. Weekly Minimogs are tied to their event week, and
+  multi-clear objectives such as "Clear Aloalo Island 6 times" count up to their reward.
+- **Planner**: this week's Minimog and weeklies, plus a pace line against your Must-haves.
+- **Exchanges**: search and filter the event's items, wishlist them by tier and quantity, and log
+  exchanges with undo.
+- **Settings**: five palettes (three Grand Companies, Ishgard, the Crystarium) in dark and light,
+  ornament and density options, and progress export, import and reset.
 
-## Commands
+Events with a second currency, such as the Uolon Horn Tokens in The First Hunt for Astronomy, get a
+token balance and token costs alongside tomes.
 
-Run these from the repo root.
+## How this was built
 
-- `yarn workspace @tomelist/app run dev` — run the app's Vite dev server
-- `yarn tsc` — typecheck all workspaces
-- `yarn test` — run all workspace test suites (Vitest)
-- `yarn build` — production build (outputs `app/dist`)
-- `yarn validate:data` — validate every file under `data/` against the `@tomelist/schema` schemas
+[jtferns](https://github.com/jtferns) built v1 by hand in 2021 (Create React App). v2, the current
+codebase, was rebuilt in 2026 with Claude, an AI coding assistant. Claude wrote most of the code,
+tests and docs, and drafted the event data from the wiki. jtferns directed the work: product and
+design decisions, scope, and review. Every change is typechecked, tested and built before it is
+committed.
 
-Package manager is Yarn 4 (Berry, `nodeLinker: node-modules`, see `.yarnrc.yml`). Node version is
-pinned in `.nvmrc`.
+## Repo layout
 
-## Adding or updating an event
+Yarn workspaces monorepo:
 
-See [`scripts/README.md`](scripts/README.md) for the full authoring flow: drafting exchange data
-with `scripts/fetch-rewards.ts`, transcribing objectives, adding a new `data/events/<id>.json`, and
-registering it in `data/manifest.json`. Run `yarn validate:data` before opening a PR.
+- `app/` (`@tomelist/app`): the Vite + React 19 PWA. TanStack Router for routes, Zustand for
+  state, Tailwind CSS 4 and Radix UI for the interface, Vitest and Testing Library for tests.
+  This is what gets deployed.
+- `packages/schema/` (`@tomelist/schema`): Zod schemas for event content and saved progress,
+  shared by the app and the data tests.
+- `data/`: event content. `manifest.json` lists the events, and each event lives in
+  `data/events/<id>.json`. It is bundled into the app at build time (`app/src/lib/events.ts`).
+- `scripts/`: authoring aids for new events. Not part of the build or CI. See
+  [`scripts/README.md`](scripts/README.md).
+- `docs/`: design specs and implementation plans.
+- `surge-redirect/`: the page that sends visitors from the old `tomelist.surge.sh` to the new site.
+- `wrangler.jsonc`: Cloudflare Worker config for hosting.
+
+## Getting started
+
+Requirements: Node 22.14.0 (pinned in `.nvmrc`) and any `yarn` on your PATH. The repo checks in
+Yarn 4.17.1 under `.yarn/releases/` and points to it with `yarnPath` in `.yarnrc.yml`, so every
+`yarn` command runs that version.
+
+```sh
+yarn install
+yarn dev
+```
+
+Commands, run from the repo root:
+
+| Command | What it does |
+| --- | --- |
+| `yarn dev` | Vite dev server for the app |
+| `yarn tsc` | Typecheck every workspace |
+| `yarn test` | Run every workspace's Vitest suite, including the data tests |
+| `yarn build` | Production build into `app/dist` |
+| `yarn validate:data` | Only the tests that validate `data/` |
+
+To try the production build locally, run `yarn build`, then `yarn vite preview` inside `app/`.
+
+## How the app fits together
+
+1. `app/src/lib/events.ts` loads every `data/events/*.json` file, validates it against the event
+   schema, and finds the active event.
+2. `app/src/router.tsx` sends `/` to the active event and serves each event at
+   `/<eventId>/overview`, `/objectives`, `/planner`, `/exchanges` and `/settings`.
+3. `app/src/store/useAppStore.ts` holds all user progress, per event, and saves it to
+   `localStorage` under `tomelist:v2`. Event content is never edited at runtime.
+4. `app/src/lib/optimizer.ts` is the pure planning logic behind Run Next, the budget verdicts and
+   the Planner.
+
+## Adding an event
+
+[`scripts/README.md`](scripts/README.md) has the full flow: draft the exchange list with
+`scripts/fetch-rewards.ts`, transcribe the objectives, add `data/events/<id>.json`, register it
+in `data/manifest.json`, download item icons with `scripts/fetch-icons.ts`, then run
+`yarn validate:data`.
 
 ## Deployment
 
-The app is a Cloudflare Worker serving static assets (see `wrangler.jsonc`). CI
-(`.github/workflows/node.js.yml`) runs typecheck, tests, and build on every push and PR; on pushes
-to `main`, after those checks pass, it builds again and deploys to Cloudflare via
-`cloudflare/wrangler-action`. Deploying requires the `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID` repository secrets to be configured.
+The site is a Cloudflare Worker that serves `app/dist` as static assets, with a single-page-app
+fallback (`wrangler.jsonc`).
 
-### Retiring the old Surge deployment
+CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn test` and `yarn build` on every push
+and pull request to `main`. On a push to `main`, a second job builds again and deploys with
+`cloudflare/wrangler-action`. That job needs the `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` repository secrets, and fails without them.
 
-Tomelist previously deployed to `tomelist.surge.sh`. That deployment isn't torn down automatically
-— once the Cloudflare Worker URL is live, manually point the old Surge site at a redirect page.
-`surge-redirect/index.html` is a small HTML page that redirects visitors to the new deployed URL;
-replace the `REPLACE_WITH_DEPLOYED_URL` placeholders in it with the real URL, then run:
+### Retiring the old Surge site
 
-```
+Tomelist used to live at `tomelist.surge.sh`. Once the Worker URL is live, replace both
+`REPLACE_WITH_DEPLOYED_URL` placeholders in `surge-redirect/index.html` with it, then publish the
+redirect page by hand:
+
+```sh
 cp surge-redirect/index.html surge-redirect/200.html && npx surge ./surge-redirect https://tomelist.surge.sh
 ```
+
+Progress saved on the old site stays there: browsers keep `localStorage` per domain.
+
+## License and credits
+
+MIT, see [`LICENSE`](LICENSE).
+
+FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Item icons come from the game via XIVAPI. Tomelist is a
+fan project and is not affiliated with Square Enix.
