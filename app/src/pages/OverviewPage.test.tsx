@@ -38,11 +38,22 @@ describe("OverviewPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Subtract 1 tomestone" }));
     expect(screen.getByTestId("wallet-count")).toHaveTextContent("10");
   });
-  it("puts Run Next first, with a link to the full plan", async () => {
+  it("puts Run Next first once getting started is done, with a link to the full plan", async () => {
+    useAppStore.getState().addTomestones(E, 10);
+    useAppStore.getState().toggleWishlist(E, "fat-cat-parasol");
+    useAppStore.getState().recordObjective(E, "obj-ultimog-msq", 50);
     await renderOverview();
+    expect(screen.queryByTestId("first-run")).not.toBeInTheDocument();
     const page = screen.getByTestId("overview-page");
     expect(page.firstElementChild).toBe(screen.getByTestId("run-next"));
     expect(screen.getByTestId("see-full-plan")).toHaveAttribute("href", `/${E}/planner`);
+  });
+  it("shows a getting-started card to a new player and ticks steps off as they happen", async () => {
+    await renderOverview();
+    const card = screen.getByTestId("first-run");
+    expect(card.querySelectorAll('[data-done="true"]')).toHaveLength(0);
+    await userEvent.click(screen.getByRole("button", { name: "Add 10 tomestones" }));
+    expect(card.querySelectorAll('[data-done="true"]')).toHaveLength(1);
   });
   it("says what the wallet is saving for, or points to Exchanges when nothing is wanted", async () => {
     await renderOverview();

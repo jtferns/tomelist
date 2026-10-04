@@ -1,5 +1,6 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { BudgetSummary } from "@/components/BudgetSummary";
+import { FirstRunCard } from "@/components/FirstRunCard";
 import { RunNext } from "@/components/RunNext";
 import { FramedCard } from "@/components/ui/framed-card";
 import { WalletStepper } from "@/components/WalletStepper";
@@ -16,6 +17,7 @@ export function OverviewPage() {
     wanted.length <= 2 ? wanted.join(" and ") : `${wanted.slice(0, 2).join(", ")} and ${wanted.length - 2} more`;
   return (
     <div data-testid="overview-page" className="flex flex-col gap-4">
+      <FirstRunCard eventId={eventId} />
       <RunNext eventId={eventId} />
       <FramedCard className="flex flex-col gap-3 p-4">
         <WalletStepper eventId={eventId} />
