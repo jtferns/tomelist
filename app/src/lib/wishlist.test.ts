@@ -18,4 +18,12 @@ describe("getWishlistTotal", () => {
       })
     ).toBe(120);
   });
+  it("leaves out items a friend is covering", () => {
+    expect(
+      getWishlistTotal(event, {
+        "fat-cat-parasol": { status: "covering", tier: "must", quantity: 1 },
+        "miners-earring": { status: "wanted", tier: "want", quantity: 1 },
+      })
+    ).toBe(getWishlistTotal(event, { "miners-earring": { status: "wanted", tier: "want", quantity: 1 } }));
+  });
 });

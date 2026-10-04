@@ -614,3 +614,21 @@ describe("multi-clear objectives", () => {
     expect(aloalo.score).toBe(72 / 6 / EFFORT_WEIGHTS.long);
   });
 });
+
+describe("friend-covered items", () => {
+  it("drop out of tier tome and token costs", () => {
+    const ev = event({
+      token: { name: "Horn Token" },
+      exchanges: [exchange({ id: "gift", cost: 100, tokenCost: 5 }), exchange({ id: "mine", cost: 40 })],
+    });
+    const p = progress({
+      wishlist: {
+        gift: { status: "covering", tier: "must", quantity: 1 },
+        mine: { status: "wanted", tier: "must", quantity: 1 },
+      },
+    });
+    const must = budgetReport(ev, p, NOW).tiers[0];
+    expect(must.cumulativeCost).toBe(40);
+    expect(must.tokenCost).toBe(0);
+  });
+});

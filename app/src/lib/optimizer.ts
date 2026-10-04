@@ -8,7 +8,8 @@ import { clearsNeeded } from "@/lib/clears";
  * ------------
  * - wallet = progress.tomestones.
  * - Wishlist cost of an entry = exchange.cost x entry.quantity, counted ONLY while
- *   entry.status === "wanted" (exchanged items are already paid for). Entries whose id has
+ *   entry.status === "wanted" (exchanged items are already paid for; "covering" items are a
+ *   friend's to buy). Entries whose id has
  *   no matching exchange in the event are ignored.
  * - Cumulative tiers: must = sum(must); want = must + sum(want); maybe = want + sum(maybe).
  * - oneTimeRemaining = sum of points of objectives with repeatable === false that are NOT
