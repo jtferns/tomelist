@@ -30,7 +30,7 @@ import { getEvent } from "@/lib/events";
 import { tokenCount, tomeCount } from "@/lib/format";
 import { useEorzeaTooltips } from "@/lib/useEorzeaTooltips";
 import { cn } from "@/lib/utils";
-import { getWishlistTotal } from "@/lib/wishlist";
+import { getWishlistTokenTotal, getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 import { useUndoToast } from "@/components/UndoToast";
 import type { Exchange } from "@tomelist/schema";
@@ -251,6 +251,7 @@ export function ExchangesPage() {
   useEorzeaTooltips(Boolean(event?.exchanges.some((e) => e.eorzeadbUrl)));
   if (!event) return <UnknownEvent testId="exchanges-page" />;
   const wantedTotal = getWishlistTotal(event, wishlist);
+  const wantedTokenTotal = event.token ? getWishlistTokenTotal(event, wishlist) : 0;
   const types = [...new Set(event.exchanges.map((e) => e.type))].sort();
   const needle = query.trim().toLowerCase();
   const sortedExchanges = event.exchanges
@@ -284,15 +285,29 @@ export function ExchangesPage() {
   return (
     <div data-testid="exchanges-page" className="flex flex-col gap-3">
       <SectionHeader title="Exchanges">
-        <p className="text-sm whitespace-nowrap text-muted-foreground">
+        <p
+          className={cn(
+            "text-sm text-muted-foreground",
+            wantedTokenTotal > 0 ? "min-w-0 text-right" : "whitespace-nowrap"
+          )}
+        >
           Wishlist total{" "}
-          <AnimatedCount
-            data-testid="wanted-total"
-            value={wantedTotal}
-            format={(n) => n.toLocaleString()}
-            className="font-bold text-gold tabular-nums"
-          />{" "}
-          tomes
+          <span className="whitespace-nowrap">
+            <AnimatedCount
+              data-testid="wanted-total"
+              value={wantedTotal}
+              format={(n) => n.toLocaleString()}
+              className="font-bold text-gold tabular-nums"
+            />{" "}
+            tomes
+          </span>
+          {wantedTokenTotal > 0 ? (
+            <span data-testid="wanted-token-total" className="whitespace-nowrap">
+              {" + "}
+              <span className="font-bold text-gold tabular-nums">{wantedTokenTotal}</span>{" "}
+              {wantedTokenTotal === 1 ? "token" : "tokens"}
+            </span>
+          ) : null}
         </p>
       </SectionHeader>
       <input

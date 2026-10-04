@@ -3,7 +3,7 @@ import { AnimatedCount } from "@/components/ui/animated-count";
 import { EventSwitcher } from "@/components/EventSwitcher";
 import { getEvent } from "@/lib/events";
 import { tokenCount } from "@/lib/format";
-import { getWishlistTotal } from "@/lib/wishlist";
+import { getWishlistTokenTotal, getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 
 export function ProgressHud() {
@@ -14,10 +14,13 @@ export function ProgressHud() {
   const wishlist = useAppStore((s) => s.events[eventId]?.wishlist);
   if (!event) return null;
   const total = getWishlistTotal(event, wishlist);
-  const pct = total > 0 ? Math.min(100, (tomestones / total) * 100) : 0;
+  const tokenTotal = event.token ? getWishlistTokenTotal(event, wishlist) : 0;
+  // The bar tracks whichever currency is further from the goal.
+  const tomePct = total > 0 ? Math.min(100, (tomestones / total) * 100) : 0;
+  const pct = tokenTotal > 0 ? Math.min(tomePct, Math.min(100, (tokens / tokenTotal) * 100)) : tomePct;
   return (
     <div className="sticky top-0 z-10 border-b border-[var(--frame-border)] bg-card/95 backdrop-blur sm:top-14">
-      <div className="mx-auto flex max-w-[960px] items-center gap-3 px-4 py-2">
+      <div className="mx-auto flex max-w-[960px] items-center gap-2 px-4 py-2 sm:gap-3">
         <div className="min-w-0 max-w-[50%]">
           <EventSwitcher eventId={eventId} />
         </div>
@@ -49,10 +52,18 @@ export function ProgressHud() {
         {event.token ? (
           <span
             data-testid="hud-tokens"
-            aria-label={tokenCount(tokens, event.token.name)}
-            className="shrink-0 text-[13px] text-muted-foreground"
+            aria-label={
+              tokenTotal > 0
+                ? `${tokenCount(tokens, event.token.name)} of ${tokenTotal}`
+                : tokenCount(tokens, event.token.name)
+            }
+            className="flex shrink-0 flex-col items-center text-[13px] leading-tight text-muted-foreground sm:flex-row sm:gap-1"
           >
-            <span className="font-bold tabular-nums text-gold">{tokens}</span> {tokens === 1 ? "token" : "tokens"}
+            <span>
+              <span className="font-bold tabular-nums text-gold">{tokens}</span>
+              {tokenTotal > 0 ? `/${tokenTotal}` : null}
+            </span>{" "}
+            <span className="text-[10px] sm:text-[13px]">{tokens === 1 && tokenTotal === 0 ? "token" : "tokens"}</span>
           </span>
         ) : null}
         {total === 0 ? (

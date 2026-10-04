@@ -333,4 +333,19 @@ describe("ExchangesPage", () => {
     expect([p.tomestones, p.tokens]).toEqual([20, 0]);
     expect(screen.getByTestId("undo-toast")).toHaveTextContent("−100 tomes, −10 tokens");
   });
+
+  it("adds the token total to the wishlist total in the header", async () => {
+    const A = "2026-09-astronomy-first-hunt";
+    useAppStore.getState().toggleWishlist(A, "uolon-horn");
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/exchanges", params: { eventId: A } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("exchanges-page");
+    expect(screen.getByTestId("wanted-token-total")).toHaveTextContent("+ 10 tokens");
+  });
+
+  it("has no token total for an event without a token", async () => {
+    await renderExchanges();
+    expect(screen.queryByTestId("wanted-token-total")).not.toBeInTheDocument();
+  });
 });

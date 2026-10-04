@@ -15,9 +15,13 @@ const TIER_LABELS: Record<TierVerdict["tier"], string> = {
   maybe: "Maybe",
 };
 
-function TierVerdictBadge({ tier }: { tier: TierVerdict }) {
+function TierVerdictBadge({ tier, tokens }: { tier: TierVerdict; tokens: number }) {
   if (tier.affordableNow) {
     return <Badge variant="tome">Affordable now</Badge>;
+  }
+  // Tomes are in hand or due from one-time clears; only tokens are missing.
+  if (tier.weeksNeeded === 0 && tier.affordableByEnd !== false && tokens < tier.tokenCost) {
+    return <Badge variant="gold-outline">{tier.tokenCost - tokens} tokens to go</Badge>;
   }
   if (tier.weeksNeeded !== null && tier.affordableByEnd !== false) {
     return <Badge variant="gold-outline">~{tier.weeksNeeded} wk</Badge>;
@@ -63,12 +67,16 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
             {index > 0 ? <ListRowDivider /> : null}
             <ListRow data-testid={`budget-tier-${tier.tier}`} className="justify-between">
               <span className="text-sm font-medium">{TIER_LABELS[tier.tier]}</span>
-              <AnimatedCount
-                value={tier.cumulativeCost}
-                format={(n) => n.toLocaleString()}
-                className="text-sm text-gold tabular-nums"
-              />
-              <TierVerdictBadge tier={tier} />
+              <span className="text-sm text-gold tabular-nums">
+                <AnimatedCount value={tier.cumulativeCost} format={(n) => n.toLocaleString()} />
+                {tier.tokenCost > 0 ? (
+                  <span data-testid={`budget-tokens-${tier.tier}`} className="text-muted-foreground">
+                    {" "}
+                    + {tier.tokenCost} tokens
+                  </span>
+                ) : null}
+              </span>
+              <TierVerdictBadge tier={tier} tokens={report.tokens} />
             </ListRow>
           </div>
         ))}

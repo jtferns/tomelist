@@ -95,4 +95,18 @@ describe("ProgressHud", () => {
     expect(hud).toHaveTextContent("4 tokens");
     expect(hud).toHaveAttribute("aria-label", "4 Uolon Horn Tokens");
   });
+
+  it("shows the token goal and holds the bar back while tokens are short", async () => {
+    const A = "2026-09-astronomy-first-hunt";
+    useAppStore.getState().addTomestones(A, 120);
+    useAppStore.getState().addTokens(A, 4);
+    useAppStore.getState().toggleWishlist(A, "uolon-horn");
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/objectives", params: { eventId: A } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("objectives-page");
+    expect(screen.getByTestId("hud-tokens")).toHaveTextContent("4/10 tokens");
+    expect(screen.getByTestId("hud-tokens")).toHaveAttribute("aria-label", "4 Uolon Horn Tokens of 10");
+    expect(screen.getByTestId("hud-bar").style.transform).toBe("scaleX(0.4)");
+  });
 });

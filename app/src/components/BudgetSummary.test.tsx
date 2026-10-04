@@ -85,4 +85,23 @@ describe("BudgetSummary", () => {
 
     expect(screen.getByTestId("budget-tier-must")).toHaveTextContent("Out of reach");
   });
+
+  it("shows the tier's token cost and how many tokens are still needed", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-04T12:00:00Z"));
+    const futureEvent = "2026-09-astronomy-first-hunt";
+    const progress = emptyEventProgress();
+    progress.tomestones = 120;
+    progress.tokens = 4;
+    progress.wishlist["uolon-horn"] = { status: "wanted", tier: "must", quantity: 1 };
+    useAppStore.setState({ events: { [futureEvent]: progress } });
+
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/overview", params: { eventId: futureEvent } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("overview-page");
+
+    expect(screen.getByTestId("budget-tokens-must")).toHaveTextContent("+ 10 tokens");
+    expect(screen.getByTestId("budget-tier-must")).toHaveTextContent("6 tokens to go");
+  });
 });
