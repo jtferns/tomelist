@@ -1,4 +1,5 @@
 import { useParams } from "@tanstack/react-router";
+import { UnknownEvent } from "@/components/UnknownEvent";
 import { emptyEventProgress } from "@tomelist/schema";
 import { Fragment } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,7 @@ export function PlannerPage() {
   const progress = useAppStore((s) => s.events[eventId]);
   const logClear = useLogClear(eventId);
 
-  if (!event) return <div data-testid="planner-page">Unknown event.</div>;
+  if (!event) return <UnknownEvent testId="planner-page" />;
 
   const eventProgress = progress ?? emptyEventProgress();
   const now = new Date();
@@ -46,7 +47,7 @@ export function PlannerPage() {
         <FramedCard corners>
           {plan.suggestedMinimogs.length === 0 ? (
             <p className="p-4 text-center text-sm text-muted-foreground">
-              Both picks used this week.
+              Both picks used this week. New picks open at the weekly reset.
             </p>
           ) : (
             plan.suggestedMinimogs.map(({ objective }, index) => (

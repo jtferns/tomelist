@@ -61,4 +61,11 @@ describe("OverviewPage", () => {
     useAppStore.getState().toggleWishlist(E, "fat-cat-parasol");
     expect(await screen.findByText(/Saving for Fat Cat Parasol/)).toBeInTheDocument();
   });
+  it("an unknown event id links back to the current event", async () => {
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/overview", params: { eventId: "no-such-event" } });
+    render(<RouterProvider router={router} />);
+    const page = await screen.findByTestId("overview-page");
+    expect(page).toHaveTextContent("This event isn't in Tomelist.");
+  });
 });

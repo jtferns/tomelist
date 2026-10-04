@@ -47,7 +47,7 @@ describe("PlannerPage", () => {
     await userEvent.click(within(pick).getByRole("button", { name: "Log clear" }));
     expect(useAppStore.getState().events[E]?.tomestones).toBe(20);
     expect(screen.queryByTestId("pick-obj-minimog-fishing")).not.toBeInTheDocument();
-    expect(screen.getByText("Both picks used this week.")).toBeInTheDocument();
+    expect(screen.getByText(/Both picks used this week/)).toBeInTheDocument();
   });
 
   it("shows the no-target pace message for this event", async () => {

@@ -1,4 +1,5 @@
 import { Link, useParams } from "@tanstack/react-router";
+import { UnknownEvent } from "@/components/UnknownEvent";
 import { BudgetSummary } from "@/components/BudgetSummary";
 import { FirstRunCard } from "@/components/FirstRunCard";
 import { RunNext } from "@/components/RunNext";
@@ -11,7 +12,7 @@ export function OverviewPage() {
   const { eventId } = useParams({ from: "/$eventId" });
   const event = getEvent(eventId);
   const wishlist = useAppStore((s) => s.events[eventId]?.wishlist);
-  if (!event) return <div data-testid="overview-page">Unknown event.</div>;
+  if (!event) return <UnknownEvent testId="overview-page" />;
   const wanted = event.exchanges.filter((e) => wishlist?.[e.id]?.status === "wanted").map((e) => e.name);
   const savingFor =
     wanted.length <= 2 ? wanted.join(" and ") : `${wanted.slice(0, 2).join(", ")} and ${wanted.length - 2} more`;

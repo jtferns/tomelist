@@ -1,4 +1,5 @@
 import { useParams } from "@tanstack/react-router";
+import { UnknownEvent } from "@/components/UnknownEvent";
 import { RotateCcw } from "lucide-react";
 import { Fragment, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -73,7 +74,7 @@ export function ObjectivesPage() {
   const { eventId } = useParams({ from: "/$eventId" });
   const event = getEvent(eventId);
   const [category, setCategory] = useState<string | null>(null);
-  if (!event) return <div data-testid="objectives-page">Unknown event.</div>;
+  if (!event) return <UnknownEvent testId="objectives-page" />;
   const categories = Array.from(new Set(event.objectives.map((o) => o.category)));
   const visibleObjectives = category
     ? event.objectives.filter((o) => o.category === category)

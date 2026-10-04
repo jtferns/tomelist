@@ -1,4 +1,5 @@
 import { useParams } from "@tanstack/react-router";
+import { UnknownEvent } from "@/components/UnknownEvent";
 import {
   BookOpen,
   Cat,
@@ -234,7 +235,7 @@ export function ExchangesPage() {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   useEorzeaTooltips(Boolean(event?.exchanges.some((e) => e.eorzeadbUrl)));
-  if (!event) return <div data-testid="exchanges-page">Unknown event.</div>;
+  if (!event) return <UnknownEvent testId="exchanges-page" />;
   const wantedTotal = getWishlistTotal(event, wishlist);
   const types = [...new Set(event.exchanges.map((e) => e.type))].sort();
   const needle = query.trim().toLowerCase();
