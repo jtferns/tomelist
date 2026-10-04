@@ -1,4 +1,23 @@
 import { useParams } from "@tanstack/react-router";
+import {
+  BookOpen,
+  Cat,
+  Gem,
+  Guitar,
+  HardHat,
+  Layers,
+  Map as MapIcon,
+  Music,
+  Package,
+  Rabbit,
+  Scissors,
+  Shield,
+  Shirt,
+  Sofa,
+  Sparkles,
+  Spade,
+  type LucideIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { AnimatedCount } from "@/components/ui/animated-count";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +31,24 @@ import { cn } from "@/lib/utils";
 import { getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 import type { Exchange } from "@tomelist/schema";
+
+const TYPE_GLYPH: Record<string, LucideIcon> = {
+  Mount: Rabbit,
+  Minion: Cat,
+  Armor: Shirt,
+  "Head Gear": HardHat,
+  Accessory: Gem,
+  Furnishing: Sofa,
+  Book: BookOpen,
+  Map: MapIcon,
+  Music: Music,
+  Instrument: Guitar,
+  "Mount Equipment": Shield,
+  Collectible: Layers,
+  Hairstyle: Scissors,
+  Cosmetic: Sparkles,
+  Item: Spade,
+};
 
 const TIER_CYCLE = { must: "want", want: "maybe", maybe: "must" } as const;
 const TIER_LABEL = { must: "Must", want: "Nice", maybe: "Maybe" } as const;
@@ -45,9 +82,23 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
   const tier = entry?.tier ?? "want";
   const tierLabel = TIER_LABEL[tier];
 
-  const icon = item.icon ? (
-    <img src={item.icon} alt="" className="size-10 shrink-0 rounded-[4px]" />
-  ) : null;
+  const Glyph = TYPE_GLYPH[item.type] ?? Package;
+  const icon = (
+    <div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-md border border-border bg-muted text-gold-soft">
+      {item.icon ? (
+        <img src={item.icon} alt="" className="size-full" />
+      ) : (
+        <Glyph aria-hidden="true" data-testid={`glyph-${item.id}`} className="size-6" />
+      )}
+    </div>
+  );
+  const short = item.cost * quantity - wallet;
+  const shortNote =
+    short > 0 ? (
+      <span data-testid={`short-${item.id}`} className="ml-auto text-sm text-muted-foreground">
+        {short} short
+      </span>
+    ) : null;
 
   const meta = (
     <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -146,17 +197,20 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
             >
               +
             </Button>
+            {shortNote}
             <Button
               variant="action"
               size="sm"
-              className="ml-auto"
+              className={cn(short <= 0 && "ml-auto")}
               disabled={wallet < item.cost}
               onClick={() => markExchanged(eventId, item.id, item.cost)}
             >
               Mark exchanged
             </Button>
           </>
-        ) : null}
+        ) : (
+          shortNote
+        )}
       </div>
     </FramedCard>
   );
@@ -221,7 +275,7 @@ export function ExchangesPage() {
         ))}
       </div>
       {/* Re-key on sort so every row remounts and replays the list-enter fade. */}
-      <div key={sortKey} className="flex flex-col gap-3">
+      <div key={sortKey} className="grid gap-3 md:grid-cols-2">
         {sortedExchanges.map((item) => (
           <ExchangeRow key={item.id} eventId={eventId} item={item} wallet={wallet} />
         ))}

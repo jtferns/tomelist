@@ -217,6 +217,11 @@ describe("ExchangesPage", () => {
       expect(within(row).queryByRole("img")).not.toBeInTheDocument();
     });
 
+    it("shows a type glyph when item.icon is absent", () => {
+      render(<ExchangeRow eventId={E} item={baseItem} wallet={0} />);
+      expect(screen.getByTestId("glyph-test-item")).toBeInTheDocument();
+    });
+
     it("renders an img with empty alt when item.icon is present", () => {
       render(
         <ExchangeRow eventId={E} item={{ ...baseItem, icon: "/icons/test-item.png" }} wallet={0} />
@@ -226,6 +231,14 @@ describe("ExchangesPage", () => {
       expect(img).toHaveAttribute("src", "/icons/test-item.png");
       expect(img).toHaveAttribute("alt", "");
     });
+  });
+
+  it("shows how many tomes short the wallet is, and nothing once it can pay", () => {
+    const item: Exchange = { id: "short-item", name: "Short Item", cost: 30, type: "Mount" };
+    const { rerender } = render(<ExchangeRow eventId={E} item={item} wallet={12} />);
+    expect(screen.getByTestId("short-short-item")).toHaveTextContent("18 short");
+    rerender(<ExchangeRow eventId={E} item={item} wallet={30} />);
+    expect(screen.queryByTestId("short-short-item")).not.toBeInTheDocument();
   });
 
   it("renders the tome cost once per row", () => {
