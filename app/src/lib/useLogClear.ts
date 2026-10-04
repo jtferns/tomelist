@@ -1,6 +1,7 @@
 import type { Objective } from "@tomelist/schema";
 import { useUndoToast } from "@/components/UndoToast";
-import { tomeCount, undoClearBlockedReason } from "@/lib/format";
+import { getEvent } from "@/lib/events";
+import { tokenCount, tomeCount, undoClearBlockedReason } from "@/lib/format";
 import { useAppStore } from "@/store/useAppStore";
 
 export function useLogClear(eventId: string) {
@@ -8,12 +9,17 @@ export function useLogClear(eventId: string) {
   const undoObjective = useAppStore((s) => s.undoObjective);
   const showToast = useUndoToast((s) => s.show);
   return (objective: Objective) => {
-    recordObjective(eventId, objective.id, objective.points);
+    const token = getEvent(eventId)?.token;
+    const tokens = token ? (objective.tokens ?? 0) : 0;
+    recordObjective(eventId, objective.id, objective.points, tokens);
+    const earned = tokens > 0 ? `+${tomeCount(objective.points)}, +${tokenCount(tokens)}` : `+${tomeCount(objective.points)}`;
     showToast(
-      `+${tomeCount(objective.points)} · ${objective.title}`,
-      () => undoObjective(eventId, objective.id, objective.points),
-      () =>
-        undoClearBlockedReason(useAppStore.getState().events[eventId]?.tomestones ?? 0, objective.points)
+      `${earned} · ${objective.title}`,
+      () => undoObjective(eventId, objective.id, objective.points, tokens),
+      () => {
+        const p = useAppStore.getState().events[eventId];
+        return undoClearBlockedReason(p?.tomestones ?? 0, objective.points, p?.tokens ?? 0, tokens, token?.name);
+      }
     );
   };
 }

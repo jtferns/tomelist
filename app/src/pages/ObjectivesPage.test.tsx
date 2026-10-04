@@ -117,4 +117,25 @@ describe("ObjectivesPage", () => {
     );
     expect(within(row).getByRole("button", { name: /undo/i })).toBeDisabled();
   });
+
+  it("shows token awards, logs tokens with a clear, and names spent tokens when undo is blocked", async () => {
+    const A = "2026-09-astronomy-first-hunt";
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/objectives", params: { eventId: A } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("objectives-page");
+
+    const row = screen.getByTestId("objective-obj-minimog-w4");
+    expect(within(row).getByTestId("token-award")).toHaveTextContent("+1 token");
+    expect(within(screen.getByTestId("objective-obj-dungeons")).queryByTestId("token-award")).not.toBeInTheDocument();
+
+    await userEvent.click(within(row).getByRole("button", { name: /log clear/i }));
+    expect(useAppStore.getState().events[A]?.tokens).toBe(1);
+    expect(screen.getByTestId("undo-toast")).toHaveTextContent("+10 tomes, +1 token");
+
+    useAppStore.getState().addTokens(A, -1);
+    expect(await within(row).findByTestId("undo-blocked")).toHaveTextContent(
+      "1 Uolon Horn Token from this clear already went to exchanges. Undo an exchange first."
+    );
+  });
 });

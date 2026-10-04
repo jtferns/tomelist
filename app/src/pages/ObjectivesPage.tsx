@@ -10,10 +10,10 @@ import { FramedCard } from "@/components/ui/framed-card";
 import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionKicker } from "@/components/ui/section-header";
 import { getEvent } from "@/lib/events";
-import { tomeCount, undoClearBlockedReason } from "@/lib/format";
+import { tokenCount, tomeCount, undoClearBlockedReason } from "@/lib/format";
 import { useLogClear } from "@/lib/useLogClear";
 import { useAppStore } from "@/store/useAppStore";
-import type { Objective } from "@tomelist/schema";
+import type { EventData, Objective } from "@tomelist/schema";
 
 const kindOrder = ["standard", "weekly", "minimog", "ultimog"] as const;
 const kindLabels: Record<(typeof kindOrder)[number], string> = {
@@ -23,14 +23,25 @@ const kindLabels: Record<(typeof kindOrder)[number], string> = {
   ultimog: "Ultimog Challenges",
 };
 
-function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Objective }) {
+function ObjectiveRow({
+  eventId,
+  objective,
+  token,
+}: {
+  eventId: string;
+  objective: Objective;
+  token: EventData["token"];
+}) {
   const count = useAppStore(
     (s) => s.events[eventId]?.completedObjectives[objective.id]?.count ?? 0
   );
   const logClear = useLogClear(eventId);
   const undoObjective = useAppStore((s) => s.undoObjective);
   const wallet = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
-  const undoBlocked = count > 0 ? undoClearBlockedReason(wallet, objective.points) : null;
+  const tokenBalance = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
+  const tokens = token ? (objective.tokens ?? 0) : 0;
+  const undoBlocked =
+    count > 0 ? undoClearBlockedReason(wallet, objective.points, tokenBalance, tokens, token?.name) : null;
   const exhausted = objective.repeatable === false && count >= 1;
   return (
     <ListRow data-testid={`objective-${objective.id}`} className="list-enter">
@@ -38,6 +49,11 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
         <p className="font-medium">{objective.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <Badge variant="tome">{tomeCount(objective.points)}</Badge>
+          {tokens > 0 ? (
+            <Badge variant="gold-outline" data-testid="token-award" title={`+${tokenCount(tokens, token!.name)}`}>
+              +{tokenCount(tokens)}
+            </Badge>
+          ) : null}
           <Badge variant="gold-outline">{objective.effort}</Badge>
           <span>{objective.category}</span>
         </div>
@@ -56,7 +72,7 @@ function ObjectiveRow({ eventId, objective }: { eventId: string; objective: Obje
         aria-label={`Undo ${objective.title}`}
         disabled={count === 0 || undoBlocked !== null}
         className="hover:text-gold"
-        onClick={() => undoObjective(eventId, objective.id, objective.points)}
+        onClick={() => undoObjective(eventId, objective.id, objective.points, tokens)}
       >
         <RotateCcw className="size-4" />
       </Button>
@@ -122,7 +138,7 @@ export function ObjectivesPage() {
               {group.map((o, index) => (
                 <Fragment key={o.id}>
                   {index > 0 ? <ListRowDivider /> : null}
-                  <ObjectiveRow eventId={eventId} objective={o} />
+                  <ObjectiveRow eventId={eventId} objective={o} token={event.token} />
                 </Fragment>
               ))}
             </FramedCard>
