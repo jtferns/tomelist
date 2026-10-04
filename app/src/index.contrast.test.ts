@@ -125,9 +125,10 @@ describe("palette x mode contrast (WCAG)", () => {
           const ratio = contrastRatio(combo.gold, combo["surface-2"]);
           expect(ratio).toBeGreaterThanOrEqual(3);
         });
-        it("primary-foreground on primary is >= 3:1", () => {
+        // Button labels are 14px bold, below the large-text size, so they need 4.5:1.
+        it("primary-foreground on primary is >= 4.5:1", () => {
           const ratio = contrastRatio(combo["primary-foreground"], combo.primary);
-          expect(ratio).toBeGreaterThanOrEqual(3);
+          expect(ratio).toBeGreaterThanOrEqual(4.5);
         });
       });
     }
