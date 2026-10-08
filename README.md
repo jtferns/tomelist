@@ -49,7 +49,7 @@ Yarn workspaces monorepo:
 
 ## Getting started
 
-Requirements: Node 22.14.0 (pinned in `.nvmrc`) and any `yarn` on your PATH. The repo checks in
+Requirements: Node 24.21.0 (pinned in `.nvmrc`) and any `yarn` on your PATH. The repo checks in
 Yarn 4.17.1 under `.yarn/releases/` and points to it with `yarnPath` in `.yarnrc.yml`, so every
 `yarn` command runs that version.
 
