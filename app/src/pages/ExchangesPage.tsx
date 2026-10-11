@@ -19,6 +19,7 @@ import {
   Spade,
   type LucideIcon,
   Handshake,
+  Check,
 } from "lucide-react";
 import { useState } from "react";
 import { AnimatedCount } from "@/components/ui/animated-count";
@@ -33,6 +34,8 @@ import { useEorzeaTooltips } from "@/lib/useEorzeaTooltips";
 import { cn } from "@/lib/utils";
 import { getWishlistTokenTotal, getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
+import { useCollectStore } from "@/store/useCollectStore";
+import { ownedKey } from "@/lib/collect";
 import { useUndoToast } from "@/components/UndoToast";
 import { AskFriendPanel } from "@/components/AskFriendPanel";
 import type { Exchange, WishlistEntry } from "@tomelist/schema";
@@ -87,6 +90,9 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
   const markExchanged = useAppStore((s) => s.markExchanged);
   const undoExchanged = useAppStore((s) => s.undoExchanged);
   const showToast = useUndoToast((s) => s.show);
+  const owned = useCollectStore((s) =>
+    Boolean(item.collect && s.imported?.owned.includes(ownedKey(item.collect)))
+  );
   const wanted = entry?.status === "wanted";
   const exchanged = entry?.status === "exchanged";
   const covering = entry?.status === "covering";
@@ -124,12 +130,18 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
   const canExchangeOne = wallet >= item.cost && tokenBalance >= tokenCost;
 
   const meta = (
-    <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
       <Badge variant="tome">
         {tomeCount(item.cost)}
         {tokenCost > 0 ? ` + ${tokenCount(tokenCost)}` : null}
       </Badge>
       <span>{item.type}</span>
+      {owned ? (
+        <Badge variant="gold-outline" data-testid={`owned-${item.id}`} title="Your character has this, per FFXIV Collect">
+          <Check aria-hidden="true" className="size-3" />
+          Owned
+        </Badge>
+      ) : null}
       {item.tradeable ? (
         <Badge variant="gold-outline" data-testid={`tradeable-${item.id}`}>
           <Handshake aria-hidden="true" className="size-3" />
@@ -210,7 +222,8 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
     <FramedCard
       data-testid={`exchange-${item.id}`}
       data-insufficient={insufficient ? "true" : undefined}
-      className={cn("list-enter", wanted && "border-gold")}
+      data-owned={owned ? "true" : undefined}
+      className={cn("list-enter", wanted && "border-gold", owned && !wanted && "opacity-70")}
     >
       <div className="flex items-center gap-3 px-3 pt-3">
         {icon}

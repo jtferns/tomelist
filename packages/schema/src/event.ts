@@ -18,6 +18,9 @@ export const objectiveSchema = z.object({
   clears: z.number().int().min(2).optional(),
 });
 
+// FFXIV Collect collections that have a per-character "owned" endpoint.
+export const collectKindSchema = z.enum(["mount", "minion", "orchestrion", "barding", "hairstyle"]);
+
 export const exchangeSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -25,7 +28,9 @@ export const exchangeSchema = z.object({
   type: z.string().min(1),
   tradeable: z.boolean().optional(),
   altSources: z.array(z.object({ type: z.string(), text: z.string() })).optional(),
-  collectId: z.number().int().optional(),
+  // The FFXIV Collect collectable this item gives, for the character import. Audited by hand:
+  // item and collectable names differ ("Dhalmel Whistle" gives mount "Dhalmel").
+  collect: z.object({ kind: collectKindSchema, id: z.number().int().positive() }).optional(),
   limited: z.boolean().optional(),
   icon: z.string().optional(),
   notes: z.string().optional(),
@@ -60,5 +65,6 @@ export const manifestSchema = z.object({
 
 export type Objective = z.infer<typeof objectiveSchema>;
 export type Exchange = z.infer<typeof exchangeSchema>;
+export type CollectKind = z.infer<typeof collectKindSchema>;
 export type EventData = z.infer<typeof eventSchema>;
 export type EventManifest = z.infer<typeof manifestSchema>;

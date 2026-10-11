@@ -49,6 +49,16 @@ describe("eventSchema", () => {
     bad.objectives[0].kind = "bogus";
     expect(() => eventSchema.parse(bad)).toThrow();
   });
+  it("accepts an FFXIV Collect reference on an exchange", () => {
+    const e = { ...validEvent, exchanges: [{ ...validEvent.exchanges[0], collect: { kind: "mount", id: 208 } }] };
+    expect(eventSchema.parse(e).exchanges[0].collect).toEqual({ kind: "mount", id: 208 });
+  });
+
+  it("rejects an unsupported FFXIV Collect kind", () => {
+    const e = { ...validEvent, exchanges: [{ ...validEvent.exchanges[0], collect: { kind: "emote", id: 1 } }] };
+    expect(eventSchema.safeParse(e).success).toBe(false);
+  });
+
   it("rejects negative cost", () => {
     const bad = structuredClone(validEvent);
     bad.exchanges[0].cost = -1;

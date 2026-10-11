@@ -1,6 +1,7 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { ProgressBackup } from "@/components/ProgressBackup";
 import { SyncSettings } from "@/components/SyncSettings";
+import { CharacterImport } from "@/components/CharacterImport";
 import { Badge } from "@/components/ui/badge";
 import { Chip } from "@/components/ui/chip";
 import { FramedCard } from "@/components/ui/framed-card";
@@ -124,6 +125,8 @@ export function SettingsPage() {
             ))}
           </ul>
         </section>
+
+        <CharacterImport />
 
         <SyncSettings />
 

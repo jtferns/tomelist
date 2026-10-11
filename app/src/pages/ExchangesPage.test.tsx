@@ -1,9 +1,10 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useUndoToast } from "@/components/UndoToast";
 import { useAppStore } from "@/store/useAppStore";
+import { useCollectStore } from "@/store/useCollectStore";
 import { createAppRouter } from "@/router";
 import { ExchangeRow } from "@/pages/ExchangesPage";
 import { emptyEventProgress, type Exchange } from "@tomelist/schema";
@@ -467,5 +468,40 @@ describe("ExchangesPage", () => {
   it("has no Ask a friend button for an event without tradeable data", async () => {
     await renderExchanges();
     expect(screen.queryByRole("button", { name: "Ask a friend" })).not.toBeInTheDocument();
+  });
+});
+
+describe("ExchangeRow owned items", () => {
+  const item = {
+    id: "dhalmel-whistle",
+    name: "Dhalmel Whistle",
+    cost: 7,
+    type: "Mount",
+    collect: { kind: "mount" as const, id: 208 },
+  };
+  const imported = {
+    characterId: "42",
+    name: "Tome Lister",
+    server: "Aegis",
+    owned: ["mount:208"],
+    fetchedAt: "2026-10-11T12:00:00.000Z",
+  };
+
+  afterEach(() => useCollectStore.setState({ imported: null }));
+
+  it("marks an item the imported character owns", () => {
+    useCollectStore.setState({ imported });
+    render(<ExchangeRow eventId={E} item={item} wallet={0} />);
+    expect(screen.getByTestId("owned-dhalmel-whistle")).toHaveTextContent(/owned/i);
+    expect(screen.getByTestId("exchange-dhalmel-whistle")).toHaveAttribute("data-owned", "true");
+  });
+
+  it("shows nothing without an import or when not owned", () => {
+    const { unmount } = render(<ExchangeRow eventId={E} item={item} wallet={0} />);
+    expect(screen.queryByTestId("owned-dhalmel-whistle")).toBeNull();
+    unmount();
+    useCollectStore.setState({ imported: { ...imported, owned: ["mount:1"] } });
+    render(<ExchangeRow eventId={E} item={item} wallet={0} />);
+    expect(screen.queryByTestId("owned-dhalmel-whistle")).toBeNull();
   });
 });

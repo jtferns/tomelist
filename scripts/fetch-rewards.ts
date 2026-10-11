@@ -13,6 +13,15 @@ type CollectRow = {
   sources: { type: string; text: string }[];
 };
 
+// FFXIV Collect reward types whose id is a collectable the character import can check.
+const collectKinds: Record<string, string> = {
+  Mount: "mount",
+  Minion: "minion",
+  Orchestrion: "orchestrion",
+  Barding: "barding",
+  Hairstyle: "hairstyle",
+};
+
 (async () => {
   const tomestone = process.argv[2];
   if (!tomestone) {
@@ -40,7 +49,7 @@ type CollectRow = {
       ...(r.sources.filter((s) => s.type !== "Event").length > 0
         ? { altSources: r.sources.filter((s) => s.type !== "Event").map(({ type, text }) => ({ type, text })) }
         : {}),
-      collectId: r.id,
+      ...(collectKinds[r.type] ? { collect: { kind: collectKinds[r.type], id: r.id } } : {}),
       notes: "DRAFT — audit against in-game shop",
     }));
 
