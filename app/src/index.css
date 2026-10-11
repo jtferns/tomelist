@@ -269,8 +269,8 @@ body {
   animation: value-pop var(--dur-slow) var(--ease-pop);
 }
 
-/* The Must-haves just became affordable: the HUD bar swells and a light sheen
-   crosses it once. Remount (key) to replay. */
+/* Wallet crosses into covering the Must-haves: the HUD bar swells and a light
+   sheen crosses it once. Remount (key) to replay. */
 @keyframes goal-reached {
   0% {
     transform: scaleY(1);
