@@ -21,7 +21,7 @@
   --gold-soft: oklch(0.78 0.06 85);
   --surface-1: oklch(0.21 0.02 280);
   --surface-2: oklch(0.23 0.02 280);
-  --frame-border: color-mix(in oklch, var(--gold) 40%, var(--border));
+  --frame-border: color-mix(in oklab, var(--gold) 40%, var(--border));
   --frame-inset: inset 0 0 0 1px oklch(0.78 0.12 85 / 0.1);
 }
 
@@ -46,7 +46,7 @@
   --gold-soft: oklch(0.55 0.05 85);
   --surface-1: oklch(0.97 0.005 280);
   --surface-2: oklch(1 0 0);
-  --frame-border: color-mix(in oklch, var(--gold) 40%, var(--border));
+  --frame-border: color-mix(in oklab, var(--gold) 40%, var(--border));
   --frame-inset: inset 0 0 0 1px oklch(0.55 0.1 85 / 0.15);
 }
 
