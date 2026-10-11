@@ -44,7 +44,7 @@ export function ProgressBackup({ eventId }: { eventId: string }) {
 
   return (
     <section className="flex flex-col gap-2">
-      <SectionKicker as="h2">Your progress</SectionKicker>
+      <SectionKicker as="h3">Your progress</SectionKicker>
       <p className="text-sm text-muted-foreground">
         {synced
           ? "Synced with your paired devices. Export a backup to keep a copy safe."

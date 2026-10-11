@@ -5,7 +5,7 @@ import { CharacterImport } from "@/components/CharacterImport";
 import { Badge } from "@/components/ui/badge";
 import { Chip } from "@/components/ui/chip";
 import { FramedCard } from "@/components/ui/framed-card";
-import { SectionKicker } from "@/components/ui/section-header";
+import { SectionHeader, SectionKicker } from "@/components/ui/section-header";
 import { getAllEvents, isEventEnded } from "@/lib/events";
 import { useAppStore } from "@/store/useAppStore";
 import type { ThemeSettings } from "@tomelist/schema";
@@ -53,6 +53,7 @@ export function SettingsPage() {
   const now = new Date();
   return (
     <div data-testid="settings-page" className="flex flex-col gap-6">
+      <SectionHeader title="Appearance" />
       <FramedCard corners className="flex flex-col gap-6 p-4">
         {[
           { title: "Grand Company", options: palettes },
@@ -60,7 +61,7 @@ export function SettingsPage() {
           { title: "Expansion", options: expansionPalettes },
         ].map(({ title, options }) => (
           <section key={title} className="flex flex-col gap-2">
-            <SectionKicker as="h2">{title}</SectionKicker>
+            <SectionKicker as="h3">{title}</SectionKicker>
             <div className="flex flex-wrap gap-2">
               {options.map((p) => {
                 const active = theme.palette === p.id;
@@ -81,7 +82,7 @@ export function SettingsPage() {
         ))}
 
         <section className="flex flex-col gap-2">
-          <SectionKicker as="h2">Mode</SectionKicker>
+          <SectionKicker as="h3">Mode</SectionKicker>
           <div className="flex gap-2">
             {modes.map((m) => {
               const active = theme.mode === m.id;
@@ -95,7 +96,7 @@ export function SettingsPage() {
         </section>
 
         <section className="flex flex-col gap-2">
-          <SectionKicker as="h2">Ornament</SectionKicker>
+          <SectionKicker as="h3">Ornament</SectionKicker>
           <div className="flex flex-wrap gap-2">
             {ornaments.map((o) => (
               <Chip key={o.id} active={theme.ornament === o.id} onClick={() => setOrnament(o.id)}>
@@ -106,7 +107,7 @@ export function SettingsPage() {
         </section>
 
         <section className="flex flex-col gap-2">
-          <SectionKicker as="h2">Density</SectionKicker>
+          <SectionKicker as="h3">Density</SectionKicker>
           <div className="flex gap-2">
             {densities.map((d) => (
               <Chip key={d.id} active={theme.density === d.id} onClick={() => setDensity(d.id)}>
@@ -115,52 +116,55 @@ export function SettingsPage() {
             ))}
           </div>
         </section>
+      </FramedCard>
 
-        <section className="flex flex-col gap-2">
-          <SectionKicker as="h2">Events</SectionKicker>
-          <ul className="flex flex-col gap-1">
-            {getAllEvents().map((e) => (
-              <li key={e.id} className="flex items-center gap-2">
-                <Link
-                  to="/$eventId/overview"
-                  params={{ eventId: e.id }}
-                  className="rounded-sm text-gold underline-offset-2 outline-none hover:text-gold-soft hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 pointer-coarse:py-2.5"
-                >
-                  {e.name}
-                </Link>
-                {isEventEnded(e, now) ? <Badge variant="gold-outline">Ended</Badge> : null}
-              </li>
-            ))}
-          </ul>
-        </section>
+      <SectionHeader title="Events" />
+      <FramedCard corners className="p-4">
+        <ul className="flex flex-col gap-1">
+          {getAllEvents().map((e) => (
+            <li key={e.id} className="flex items-center gap-2">
+              <Link
+                to="/$eventId/overview"
+                params={{ eventId: e.id }}
+                className="rounded-sm text-gold underline-offset-2 outline-none hover:text-gold-soft hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 pointer-coarse:py-2.5"
+              >
+                {e.name}
+              </Link>
+              {isEventEnded(e, now) ? <Badge variant="gold-outline">Ended</Badge> : null}
+            </li>
+          ))}
+        </ul>
+      </FramedCard>
 
+      <SectionHeader title="Your data" />
+      <FramedCard corners className="flex flex-col gap-6 p-4">
         <CharacterImport />
 
         <SyncSettings />
 
         <ProgressBackup eventId={eventId} />
-
-        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-          <p>Tomelist v2.0.0-dev</p>
-          <p data-testid="ai-disclosure">
-            v1 (2021) was built by hand by{" "}
-            <a
-              href="https://github.com/jtferns"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gold underline underline-offset-2 outline-none hover:text-gold-soft focus-visible:ring-[3px] focus-visible:ring-ring/50"
-            >
-              jtferns
-            </a>
-            . v2 was rebuilt with Claude, an AI coding assistant. Claude wrote most of the code and drafted the event
-            data from the wiki; jtferns directed the design, decisions and review.
-          </p>
-          <p>
-            FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Item icons come from the game via XIVAPI. Tomelist is a fan
-            project and is not affiliated with Square Enix.
-          </p>
-        </div>
       </FramedCard>
+
+      <footer className="flex flex-col gap-1 px-1 text-xs text-muted-foreground">
+        <p>Tomelist v2.0.0-dev</p>
+        <p data-testid="ai-disclosure">
+          v1 (2021) was built by hand by{" "}
+          <a
+            href="https://github.com/jtferns"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gold underline underline-offset-2 outline-none hover:text-gold-soft focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          >
+            jtferns
+          </a>
+          . v2 was rebuilt with Claude, an AI coding assistant. Claude wrote most of the code and drafted the event
+          data from the wiki; jtferns directed the design, decisions and review.
+        </p>
+        <p>
+          FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Item icons come from the game via XIVAPI. Tomelist is a fan
+          project and is not affiliated with Square Enix.
+        </p>
+      </footer>
     </div>
   );
 }

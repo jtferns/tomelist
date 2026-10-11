@@ -24,7 +24,7 @@ export function SyncSettings() {
   if (!token) {
     return (
       <section className="flex flex-col gap-2">
-        <SectionKicker as="h2">Sync</SectionKicker>
+        <SectionKicker as="h3">Sync</SectionKicker>
         <p className="text-sm text-muted-foreground">
           Keep progress the same on your phone and computer. No account needed.
         </p>
@@ -40,7 +40,7 @@ export function SyncSettings() {
   const link = pairingUrl(location.origin, token);
   return (
     <section className="flex flex-col gap-2">
-      <SectionKicker as="h2">Sync</SectionKicker>
+      <SectionKicker as="h3">Sync</SectionKicker>
       <p data-testid="sync-status" className="text-sm text-muted-foreground">
         {statusText[status]}
       </p>

@@ -33,7 +33,7 @@ export function CharacterImport() {
 
   return (
     <section className="flex flex-col gap-2">
-      <SectionKicker as="h2">Character</SectionKicker>
+      <SectionKicker as="h3">Character</SectionKicker>
       {imported ? (
         <>
           <p className="text-sm text-muted-foreground">

@@ -31,7 +31,7 @@ function SectionKicker({
 }: {
   children?: React.ReactNode
   className?: string
-  as?: "h2" | "span"
+  as?: "h2" | "h3" | "span"
 }) {
   return (
     <Tag
