@@ -24,7 +24,15 @@ export function ProgressHud() {
         <div className="min-w-0 max-w-[50%]">
           <EventSwitcher eventId={eventId} />
         </div>
-        <div className="h-1.5 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary">
+        <div
+          role="progressbar"
+          aria-label="Wishlist goal progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(pct)}
+          title={total > 0 ? `${Math.round(pct)}% of your wishlist goal` : "No goal yet"}
+          className="h-2 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary ring-1 ring-inset ring-[var(--frame-border)]"
+        >
           <div
             data-testid="hud-bar"
             className="h-full origin-left rounded-full bg-gradient-to-r from-primary to-gold transition-transform duration-[var(--dur-slow)]"
@@ -63,7 +71,7 @@ export function ProgressHud() {
               <span className="font-bold tabular-nums text-gold">{tokens}</span>
               {tokenTotal > 0 ? `/${tokenTotal}` : null}
             </span>{" "}
-            <span className="text-[11px] sm:text-[13px]">{tokens === 1 && tokenTotal === 0 ? "token" : "tokens"}</span>
+            <span className="text-xs sm:text-[13px]">{tokens === 1 && tokenTotal === 0 ? "token" : "tokens"}</span>
           </span>
         ) : null}
         {total === 0 ? (
