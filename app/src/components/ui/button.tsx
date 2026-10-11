@@ -19,12 +19,12 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
-        // The one filled call to action on a screen. Disabled reads as muted, not as a darker red.
+        // The one filled call to action on a screen. Disabled drops to a dashed outline, so it reads as unavailable by shape, not only by darkness.
         action:
-          "bg-primary text-primary-foreground font-bold shadow-[inset_0_1px_0_oklch(1_0_0/.15)] hover:bg-primary/90 active:translate-y-px active:shadow-none disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100",
+          "bg-primary text-primary-foreground font-bold shadow-[inset_0_1px_0_oklch(1_0_0/.15)] hover:bg-primary/90 active:translate-y-px active:shadow-none disabled:border disabled:border-dashed disabled:border-border disabled:bg-transparent disabled:font-medium disabled:text-muted-foreground disabled:shadow-none disabled:opacity-100",
         // The same action repeated down a list: tinted so a column of rows doesn't shout.
         "action-soft":
-          "border border-primary/60 bg-accent text-accent-foreground font-bold hover:bg-primary hover:text-primary-foreground active:translate-y-px disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100",
+          "border border-primary/60 bg-accent text-accent-foreground font-bold hover:bg-primary hover:text-primary-foreground active:translate-y-px disabled:border-dashed disabled:border-border disabled:bg-transparent disabled:font-medium disabled:text-muted-foreground disabled:opacity-100",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3 pointer-coarse:h-11",
