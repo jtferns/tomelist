@@ -16,7 +16,7 @@ This is a Yarn workspaces monorepo:
 - `app/` (`@tomelist/app`) — the Vite + React app that gets built and deployed.
 - `packages/schema/` (`@tomelist/schema`) — Zod schemas for event content and user state, shared by
   the app and by the data-validation tests.
-- `worker/` (`@tomelist/worker`) — the Cloudflare Worker script: `/api/sync/<token>` routing and
+- `worker/` (`@tomelist/worker`): the Cloudflare Worker script: `/api/sync/<token>` routing and
   the `SyncGroup` Durable Object. Static assets bypass it.
 - `data/` — event content JSON (`manifest.json` + `data/events/*.json`), bundled into the app at
   build time.
