@@ -41,7 +41,7 @@ export function EventSwitcher({ eventId }: { eventId: string }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="group flex max-w-full min-w-0 flex-col items-start rounded-md px-1 py-0.5 text-left transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        className="group flex max-w-full min-w-0 flex-col items-start rounded-md px-1 py-0.5 text-left pointer-coarse:-my-0.5 pointer-coarse:py-1 transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
         data-testid="event-switcher-trigger"
       >
         <span className="flex max-w-full min-w-0 items-center gap-1 font-display text-sm font-semibold">

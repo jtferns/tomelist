@@ -163,7 +163,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
           target="_blank"
           rel="noopener noreferrer"
           data-testid={`eorzeadb-${item.id}`}
-          className="eorzeadb_link underline underline-offset-2"
+          className="eorzeadb_link underline underline-offset-2 pointer-coarse:-mx-2 pointer-coarse:-my-3.5 pointer-coarse:inline-block pointer-coarse:px-2 pointer-coarse:py-3.5"
         >
           db
         </a>
@@ -398,11 +398,11 @@ export function ExchangesPage() {
         onChange={(e) => setQuery(e.target.value)}
         placeholder={`Search ${event.exchanges.length} items`}
         aria-label="Search items"
-        className="h-10 w-full rounded-md border border-input bg-surface-2 px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        className="h-10 w-full rounded-md border border-input bg-surface-2 pointer-coarse:h-11 px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
       />
       <div
         data-testid="type-filter"
-        className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none]"
+        className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-32px),transparent)]"
       >
         {[
           { key: "all", label: "All" },

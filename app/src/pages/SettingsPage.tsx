@@ -124,7 +124,7 @@ export function SettingsPage() {
                 <Link
                   to="/$eventId/overview"
                   params={{ eventId: e.id }}
-                  className="rounded-sm text-gold underline-offset-2 outline-none hover:text-gold-soft hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  className="rounded-sm text-gold underline-offset-2 outline-none hover:text-gold-soft hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 pointer-coarse:py-2.5"
                 >
                   {e.name}
                 </Link>

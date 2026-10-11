@@ -72,7 +72,7 @@ export function RunNext({ eventId }: { eventId: string }) {
         to="/$eventId/planner"
         params={{ eventId }}
         data-testid="see-full-plan"
-        className="text-sm text-gold underline underline-offset-2"
+        className="text-sm text-gold underline underline-offset-2 pointer-coarse:inline-block pointer-coarse:py-3.5 pointer-coarse:-my-3.5"
       >
         See full plan
       </Link>

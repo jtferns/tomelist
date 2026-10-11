@@ -123,7 +123,7 @@ export function ObjectivesPage() {
       {categories.length >= 2 ? (
         <div
           data-testid="category-filters"
-          className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none]"
+          className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-32px),transparent)]"
         >
           <Chip
             active={category === null}

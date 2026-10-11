@@ -34,7 +34,7 @@ export function ProgressHud() {
         <Link
           to="/$eventId/overview"
           params={{ eventId }}
-          className="flex shrink-0 items-center gap-1.5 transition-colors hover:text-primary"
+          className="flex shrink-0 items-center gap-1.5 transition-colors hover:text-primary pointer-coarse:-my-2 pointer-coarse:py-2"
           aria-label={`${event.tomestone.name}: open wallet on Overview`}
         >
           {event.tomestone.icon ? <img src={event.tomestone.icon} alt="" className="size-5" /> : null}
@@ -63,7 +63,7 @@ export function ProgressHud() {
               <span className="font-bold tabular-nums text-gold">{tokens}</span>
               {tokenTotal > 0 ? `/${tokenTotal}` : null}
             </span>{" "}
-            <span className="text-[10px] sm:text-[13px]">{tokens === 1 && tokenTotal === 0 ? "token" : "tokens"}</span>
+            <span className="text-[11px] sm:text-[13px]">{tokens === 1 && tokenTotal === 0 ? "token" : "tokens"}</span>
           </span>
         ) : null}
         {total === 0 ? (
@@ -71,7 +71,7 @@ export function ProgressHud() {
             to="/$eventId/exchanges"
             params={{ eventId }}
             data-testid="hud-set-goal"
-            className="shrink-0 text-[13px] text-gold underline underline-offset-2"
+            className="shrink-0 text-[13px] text-gold underline underline-offset-2 pointer-coarse:inline-block pointer-coarse:py-3.5 pointer-coarse:-my-3.5"
           >
             Set a goal
           </Link>
