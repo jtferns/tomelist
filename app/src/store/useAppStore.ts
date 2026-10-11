@@ -14,6 +14,8 @@ type PersistedState = {
   settings: { theme: ThemeSettings };
   events: Record<string, EventProgress>;
   updatedAt: string;
+  // Device-local: which sync group this device belongs to. Never bumps updatedAt.
+  syncToken?: string;
 };
 
 type AppState = PersistedState & {
@@ -36,6 +38,8 @@ type AppState = PersistedState & {
   undoExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number) => void;
   resetEvent: (eventId: string) => void;
   replaceState: (state: UserState) => void;
+  setSyncToken: (token: string | undefined) => void;
+  adoptRemoteState: (state: UserState) => void;
   getProgress: (eventId: string) => EventProgress;
 };
 
@@ -209,6 +213,11 @@ export const useAppStore = create<AppState>()(
           }),
         replaceState: (state) =>
           set({ settings: state.settings, events: state.events, updatedAt: new Date().toISOString() }),
+        setSyncToken: (token) => set({ syncToken: token }),
+        // Takes a newer state from another device as-is, keeping its updatedAt
+        // so the sync engine does not see a local change and push it back.
+        adoptRemoteState: (state) =>
+          set({ settings: state.settings, events: state.events, updatedAt: state.updatedAt }),
         // Returns a live reference into the store's state (or a fresh empty progress when the
         // event has no entry yet). Callers must treat the result as read-only — do not mutate
         // it in place. Pure consumers (e.g. the optimizer in lib/optimizer.ts) rely on this.
@@ -224,6 +233,7 @@ export const useAppStore = create<AppState>()(
         settings: s.settings,
         events: s.events,
         updatedAt: s.updatedAt,
+        syncToken: s.syncToken,
       }),
     }
   )

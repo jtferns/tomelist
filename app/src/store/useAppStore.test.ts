@@ -246,3 +246,30 @@ describe("migratePersistedState", () => {
     });
   });
 });
+
+describe("sync actions", () => {
+  it("setSyncToken stores the token without touching updatedAt", () => {
+    const before = useAppStore.getState().updatedAt;
+    useAppStore.getState().setSyncToken("AAAAAAAAAAAAAAAAAAAAAA");
+    expect(useAppStore.getState().syncToken).toBe("AAAAAAAAAAAAAAAAAAAAAA");
+    expect(useAppStore.getState().updatedAt).toBe(before);
+    useAppStore.getState().setSyncToken(undefined);
+    expect(useAppStore.getState().syncToken).toBeUndefined();
+  });
+
+  it("adoptRemoteState keeps the remote updatedAt and the local token", () => {
+    useAppStore.getState().setSyncToken("local-token-aaaaaaaaaa");
+    useAppStore.getState().adoptRemoteState({
+      schemaVersion: 2,
+      settings: { theme: { palette: "adder", mode: "light", ornament: "full", density: "comfy" } },
+      events: { [E]: { tomestones: 42, completedObjectives: {}, minimogPicks: [], wishlist: {} } },
+      updatedAt: "2026-10-11T10:00:00.000Z",
+      syncToken: "remote-token-bbbbbbbbb",
+    });
+    const s = useAppStore.getState();
+    expect(s.updatedAt).toBe("2026-10-11T10:00:00.000Z");
+    expect(s.syncToken).toBe("local-token-aaaaaaaaaa");
+    expect(s.settings.theme.palette).toBe("adder");
+    expect(s.getProgress(E).tomestones).toBe(42);
+  });
+});

@@ -1,5 +1,6 @@
 import { Outlet } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { useSync } from "@/lib/useSync";
 import { useAppStore } from "@/store/useAppStore";
 
 export function Layout() {
@@ -10,5 +11,6 @@ export function Layout() {
     document.documentElement.dataset.ornament = theme.ornament;
     document.documentElement.dataset.density = theme.density;
   }, [theme]);
+  useSync();
   return <Outlet />;
 }
