@@ -16,6 +16,8 @@ export const objectiveSchema = z.object({
   tokens: z.number().int().positive().optional(),
   // Clears needed before the reward is paid, e.g. 6 for "Clear Aloalo Island 6 times".
   clears: z.number().int().min(2).optional(),
+  // Duties that count for a moogle-marked objective, for "Pick one". Filled by fetch-duties.ts.
+  duties: z.array(z.string().min(1)).min(1).optional(),
 });
 
 // FFXIV Collect collections that have a per-character "owned" endpoint.

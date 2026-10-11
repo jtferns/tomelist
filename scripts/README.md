@@ -18,8 +18,14 @@ Per new event:
    import can mark them Owned. It writes only unique exact name matches; check what it lists
    and set those by hand (e.g. "The Legendary Beast" roll is "The Legendary Beast
    (Shadowbringers)" there).
-9. `yarn validate:data` must pass. Open a PR; merging deploys.
-10. Add the event's tomestone art as `app/public/tomes/<eventId>.png` and set
+9. `yarn dlx --quiet tsx scripts/check-lodestone.ts data/events/<id>.json <lodestone url>` compares
+   the exchanges with the event's Lodestone page and lists items missing on either side and tome
+   or token costs that differ. It changes nothing; fix what it reports by hand.
+10. `yarn dlx --quiet tsx scripts/fetch-duties.ts data/events/<id>.json "<wiki page title>"` fills
+    `duties` on each moogle-marked objective from the wiki's objectives table, for the Objectives
+    page's "Pick one" button. It lists duties with no matching objective (GATEs, usually).
+11. `yarn validate:data` must pass. Open a PR; merging deploys.
+12. Add the event's tomestone art as `app/public/tomes/<eventId>.png` and set
     `tomestone.icon` to `/tomes/<eventId>.png` in the event JSON. For the newest
     event, also update the static favicon link in `app/index.html` and regenerate
     the PWA icons from it (`sips -z <size> <size> app/public/tomes/<eventId>.png

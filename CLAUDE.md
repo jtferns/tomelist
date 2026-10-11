@@ -85,7 +85,8 @@ tests (`packages/schema/src/data.test.ts`, run via `yarn validate:data`).
 
 **Authoring scripts** (`scripts/fetch-rewards.ts` drafts exchange-item data, `scripts/fetch-icons.ts`
 downloads item icons into `app/public/items/`, `scripts/fetch-tradeable.ts` sets each exchange's
-`tradeable` from XIVAPI) are standalone aids for a new event; they are not
+`tradeable` from XIVAPI, `scripts/check-lodestone.ts` audits exchanges against the Lodestone page,
+`scripts/fetch-duties.ts` fills objective `duties` from the wiki) are standalone aids for a new event; they are not
 wired into any build/test/CI step. See `scripts/README.md` for the
 full per-event authoring flow (draft exchanges → transcribe objectives → add
 `data/events/<id>.json` → register in `data/manifest.json` → `yarn validate:data`).
