@@ -39,7 +39,20 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
   if (!event) return null;
 
   const report = budgetReport(event, progress ?? emptyEventProgress(), new Date());
-  const visibleTiers = report.tiers.filter((tier) => tier.cumulativeCost > 0);
+  // Costs are running totals, so a tier with nothing wishlisted repeats the one before it.
+  const visibleTiers = report.tiers.filter(
+    (tier, index, all) =>
+      tier.cumulativeCost > 0 &&
+      (index === 0 ||
+        tier.cumulativeCost !== all[index - 1].cumulativeCost ||
+        tier.tokenCost !== all[index - 1].tokenCost)
+  );
+  const tierLabel = (index: number) =>
+    index === 0
+      ? TIER_LABELS[visibleTiers[0].tier]
+      : index === visibleTiers.length - 1
+        ? "Everything"
+        : `${TIER_LABELS[visibleTiers[0].tier]} + ${TIER_LABELS[visibleTiers[index].tier]}`;
   const coveredCount = Object.values(progress?.wishlist ?? {}).filter((e) => e.status === "covering").length;
   const coveredLine =
     coveredCount > 0 ? (
@@ -76,7 +89,7 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
           <div key={tier.tier}>
             {index > 0 ? <ListRowDivider /> : null}
             <ListRow data-testid={`budget-tier-${tier.tier}`} className="justify-between">
-              <span className="text-sm font-medium">{TIER_LABELS[tier.tier]}</span>
+              <span className="text-sm font-medium">{tierLabel(index)}</span>
               <span className="text-sm text-gold tabular-nums">
                 <AnimatedCount value={tier.cumulativeCost} format={(n) => n.toLocaleString()} />
                 {tier.tokenCost > 0 ? (

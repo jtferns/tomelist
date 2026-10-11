@@ -48,6 +48,14 @@ describe("OverviewPage", () => {
     expect(page.firstElementChild).toBe(screen.getByTestId("run-next"));
     expect(screen.getByTestId("see-full-plan")).toHaveAttribute("href", `/${E}/planner`);
   });
+  it("drops getting started once the wallet and a goal are set, before any clear", async () => {
+    useAppStore.getState().addTomestones(E, 10);
+    useAppStore.getState().toggleWishlist(E, "fat-cat-parasol");
+    await renderOverview();
+    expect(screen.queryByTestId("first-run")).not.toBeInTheDocument();
+    expect(screen.getByTestId("overview-page").firstElementChild).toBe(screen.getByTestId("run-next"));
+  });
+
   it("shows a getting-started card to a new player and ticks steps off as they happen", async () => {
     await renderOverview();
     const card = screen.getByTestId("first-run");

@@ -40,7 +40,8 @@ export function FirstRunCard({ eventId }: { eventId: string }) {
       label: <>Run what Run Next suggests, then tap Log clear</>,
     },
   ];
-  if (steps.every((s) => s.done)) return null;
+  // Once the wallet and a goal are set, the third step is what Run Next already shows.
+  if (steps[0].done && steps[1].done) return null;
 
   return (
     <FramedCard data-testid="first-run" className="flex flex-col gap-3 p-4">

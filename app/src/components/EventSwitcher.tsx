@@ -3,7 +3,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { getAllEvents, getEvent, isEventEnded } from "@/lib/events";
+import { getAllEvents, getEvent, isEventEnded, shortEventName } from "@/lib/events";
 
 const TABS = ["overview", "objectives", "planner", "exchanges", "settings"] as const;
 
@@ -44,8 +44,8 @@ export function EventSwitcher({ eventId }: { eventId: string }) {
         className="group flex max-w-full min-w-0 flex-col items-start rounded-md px-1 py-0.5 text-left pointer-coarse:-my-0.5 pointer-coarse:py-1 transition-colors outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
         data-testid="event-switcher-trigger"
       >
-        <span className="flex max-w-full min-w-0 items-center gap-1 font-display text-sm font-semibold">
-          <span className="min-w-0 truncate">{event.name}</span>
+        <span className="flex max-w-full min-w-0 items-start gap-1 font-display text-sm font-semibold">
+          <span className="line-clamp-2 min-w-0 leading-tight">{shortEventName(event.name)}</span>
           <ChevronDown className="size-3.5 shrink-0 text-muted-foreground transition-colors group-hover:text-gold" />
         </span>
         <span className="text-[13px] leading-tight text-muted-foreground">{statusLine}</span>

@@ -53,3 +53,8 @@ export function getActiveEvent(now: Date): EventData | undefined {
   );
   return live ?? allEvents()[0];
 }
+
+// For tight spots like the header: "The First Hunt for Astronomy (Sep 2026)" -> "The First Hunt for Astronomy".
+export function shortEventName(name: string): string {
+  return name.replace(/\s*\([^)]*\)$/, "");
+}

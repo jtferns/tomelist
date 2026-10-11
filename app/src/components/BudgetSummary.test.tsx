@@ -114,4 +114,15 @@ describe("BudgetSummary", () => {
     expect(screen.getByTestId("budget-covered")).toHaveTextContent("1 item a friend is covering, not counted here.");
     expect(screen.getByTestId("budget-tier-must")).toHaveTextContent(String(COST));
   });
+
+  it("labels tiers as running totals and skips a tier that adds nothing", async () => {
+    const progress = emptyEventProgress();
+    progress.wishlist[EXCHANGE_ID] = { status: "wanted", tier: "must", quantity: 1 };
+    progress.wishlist["fat-cat-parasol"] = { status: "wanted", tier: "maybe", quantity: 1 };
+    useAppStore.setState({ events: { [E]: progress } });
+    await renderOverview();
+    expect(screen.getByTestId("budget-tier-must")).toHaveTextContent(/^Must/);
+    expect(screen.queryByTestId("budget-tier-want")).toBeNull();
+    expect(screen.getByTestId("budget-tier-maybe")).toHaveTextContent(/^Everything/);
+  });
 });

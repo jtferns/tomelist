@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getActiveEvent, getAllEvents, getEvent, isEventEnded } from "./events";
+import { getActiveEvent, getAllEvents, getEvent, isEventEnded, shortEventName } from "./events";
 
 describe("event loading", () => {
   it("loads events sorted newest-first by start date", () => {
@@ -30,5 +30,13 @@ describe("event loading", () => {
     expect(isEventEnded(e, new Date("2026-04-15T00:00:00Z"))).toBe(false);
     expect(isEventEnded(e, new Date("2026-06-01T00:00:00Z"))).toBe(true);
     expect(isEventEnded({ ...e, ends: null }, new Date("2030-01-01T00:00:00Z"))).toBe(false);
+  });
+});
+
+describe("shortEventName", () => {
+  it("drops a trailing parenthetical, which the countdown already covers", () => {
+    expect(shortEventName("The First Hunt for Astronomy (Sep 2026)")).toBe("The First Hunt for Astronomy");
+    expect(shortEventName("Mogmog Collection")).toBe("Mogmog Collection");
+    expect(shortEventName("A (b) c")).toBe("A (b) c");
   });
 });
