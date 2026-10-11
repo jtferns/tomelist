@@ -98,7 +98,7 @@ function ObjectiveRow({
         ) : null}
       </span>
       <Button
-        variant="action"
+        variant="action-soft"
         size="sm"
         disabled={exhausted}
         onClick={() => logClear(objective)}

@@ -57,7 +57,7 @@ export function RunNext({ eventId }: { eventId: string }) {
                   </div>
                 </div>
                 <Button
-                  variant="action"
+                  variant={index === 0 ? "action" : "action-soft"}
                   size="sm"
                   onClick={() => logClear(objective)}
                 >

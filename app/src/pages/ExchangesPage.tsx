@@ -204,7 +204,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
             Not covered
           </Button>
           <Button
-            variant="action"
+            variant="action-soft"
             size="sm"
             onClick={() => {
               markReceived(eventId, item.id);
@@ -280,7 +280,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
             ) : null}
             {shortNote}
             <Button
-              variant="action"
+              variant="action-soft"
               size="sm"
               className={cn(!shortNote && "ml-auto")}
               disabled={!canExchangeOne}

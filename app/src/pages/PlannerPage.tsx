@@ -53,7 +53,7 @@ export function PlannerPage() {
             <span className="text-sm">
               Earned {plan.earnedThisWeek} / need ~{plan.neededPerWeek} this week
             </span>
-            {plan.onPace ? <Badge variant="tome">On pace</Badge> : <Badge variant="destructive">Behind</Badge>}
+            {plan.onPace ? <Badge variant="tome">On pace</Badge> : <Badge variant="gold-outline">Behind</Badge>}
           </div>
         ) : (
           <p data-testid="pace-line" className="text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ export function PlannerPage() {
                     </div>
                   </div>
                   <Button
-                    variant="action"
+                    variant="action-soft"
                     size="sm"
                     onClick={() => logClear(objective)}
                   >
@@ -134,7 +134,7 @@ export function PlannerPage() {
                     <Badge variant="gold-outline">Claimed</Badge>
                   ) : (
                     <Button
-                      variant="action"
+                      variant="action-soft"
                       size="sm"
                       onClick={() => logClear(objective)}
                     >
