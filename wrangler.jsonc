@@ -13,5 +13,11 @@
   "durable_objects": {
     "bindings": [{ "name": "SYNC_GROUP", "class_name": "SyncGroup" }]
   },
+  // Per-IP limits (simple: 10 or 60 s windows). Connects are checked in the
+  // Worker, accepted writes inside SyncGroup across all groups.
+  "ratelimits": [
+    { "name": "SYNC_CONNECTS", "namespace_id": "1001", "simple": { "limit": 20, "period": 60 } },
+    { "name": "SYNC_WRITES", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }
+  ],
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SyncGroup"] }]
 }

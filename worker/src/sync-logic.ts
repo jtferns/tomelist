@@ -35,3 +35,13 @@ export function handleMessage(raw: string, stored: UserState | null): MessageOut
   }
   return { store: incoming, broadcast: { type: "state", state: incoming } };
 }
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+export const IDLE_TTL_MS = 90 * DAY_MS;
+
+// When to move the idle-expiry alarm after a write, or null to leave it.
+// Each setAlarm is a billed row write, so it moves at most once a day.
+export function alarmDue(now: number, current: number | null): number | null {
+  const target = now + IDLE_TTL_MS;
+  return current === null || target - current >= DAY_MS ? target : null;
+}

@@ -1,10 +1,7 @@
+import type { Env } from "./env";
 import { routeApi } from "./route";
 
 export { SyncGroup } from "./sync-group";
-
-interface Env {
-  SYNC_GROUP: DurableObjectNamespace;
-}
 
 // Only /api/* reaches this handler (run_worker_first); everything else is
 // served from static assets with the SPA fallback.
@@ -15,6 +12,9 @@ export default {
     if (request.headers.get("Upgrade") !== "websocket") {
       return new Response("Expected a WebSocket upgrade", { status: 426 });
     }
+    const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+    const { success } = await env.SYNC_CONNECTS.limit({ key: ip });
+    if (!success) return new Response("Too many connections", { status: 429 });
     const stub = env.SYNC_GROUP.get(env.SYNC_GROUP.idFromName(route.token));
     return stub.fetch(request);
   },

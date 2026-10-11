@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { UserState } from "@tomelist/schema";
-import { MAX_MESSAGE_BYTES, handleMessage } from "./sync-logic";
+import { MAX_MESSAGE_BYTES, alarmDue, handleMessage } from "./sync-logic";
 
 function state(updatedAt: string, extra: Partial<UserState> = {}): UserState {
   return {
@@ -70,5 +70,23 @@ describe("handleMessage", () => {
   it("counts the cap in UTF-8 bytes, not characters", () => {
     const multibyte = "★".repeat(Math.ceil(MAX_MESSAGE_BYTES / 3) + 1);
     expect(handleMessage(multibyte, null)).toEqual({ reply: { type: "error", reason: "too-large" } });
+  });
+});
+
+describe("alarmDue", () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const now = Date.parse("2026-10-11T10:00:00.000Z");
+
+  it("sets an alarm 90 days out when there is none", () => {
+    expect(alarmDue(now, null)).toBe(now + 90 * DAY);
+  });
+
+  it("leaves a recent alarm alone", () => {
+    expect(alarmDue(now, now + 90 * DAY - 1000)).toBeNull();
+    expect(alarmDue(now, now + 89 * DAY + 1)).toBeNull();
+  });
+
+  it("pushes out an alarm that is more than a day stale", () => {
+    expect(alarmDue(now, now + 89 * DAY)).toBe(now + 90 * DAY);
   });
 });

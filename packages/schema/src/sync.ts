@@ -5,7 +5,7 @@ import { userStateSchema } from "./state";
 // only the server sends "error".
 export const syncMessageSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("state"), state: userStateSchema }),
-  z.object({ type: z.literal("error"), reason: z.enum(["invalid", "too-large"]) }),
+  z.object({ type: z.literal("error"), reason: z.enum(["invalid", "too-large", "rate-limited"]) }),
 ]);
 
 export type SyncMessage = z.infer<typeof syncMessageSchema>;
