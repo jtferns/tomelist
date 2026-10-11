@@ -38,6 +38,7 @@ export const sampleEvent = {
       effort: "quick",
       repeatable: true,
       requirement: "min 2,000 points",
+      notes: "GATEs run every 20 minutes.",
     },
     {
       id: "obj-weekly-random",

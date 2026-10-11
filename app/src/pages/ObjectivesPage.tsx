@@ -23,6 +23,11 @@ const kindLabels: Record<(typeof kindOrder)[number], string> = {
   minimog: "Minimog Challenges",
   ultimog: "Ultimog Challenges",
 };
+const kindHelp: Partial<Record<(typeof kindOrder)[number], string>> = {
+  standard:
+    "Moogle-marked duties show the moogle icon in the Duty Finder during the event. Any of them counts, as often as you like.",
+  weekly: "The Mogpendium assigns one task each week. Claim it once per week.",
+};
 
 function ObjectiveRow({
   eventId,
@@ -64,6 +69,9 @@ function ObjectiveRow({
         </div>
         {objective.requirement ? (
           <p className="mt-1 text-xs text-muted-foreground">{objective.requirement}</p>
+        ) : null}
+        {objective.notes ? (
+          <p className="mt-1 text-xs text-muted-foreground">{objective.notes}</p>
         ) : null}
         {undoBlocked ? (
           <p data-testid="undo-blocked" className="mt-1 text-xs text-muted-foreground">
@@ -142,6 +150,11 @@ export function ObjectivesPage() {
         return (
           <section key={kind} className="flex flex-col gap-2">
             <SectionKicker as="h2">{kindLabels[kind]}</SectionKicker>
+            {kindHelp[kind] ? (
+              <p data-testid={`kind-help-${kind}`} className="text-sm text-muted-foreground">
+                {kindHelp[kind]}
+              </p>
+            ) : null}
             <FramedCard corners>
               {group.map((o, index) => (
                 <Fragment key={o.id}>

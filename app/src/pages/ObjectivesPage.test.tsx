@@ -36,6 +36,18 @@ describe("ObjectivesPage", () => {
     expect(screen.getByRole("heading", { level: 2, name: /Standard Objectives/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: /Ultimog Challenges/i })).toBeInTheDocument();
   });
+  it("explains moogle-marked and weekly objectives under their headers", async () => {
+    await renderObjectives();
+    expect(screen.getByTestId("kind-help-standard")).toHaveTextContent(/moogle icon in the Duty Finder/i);
+    expect(screen.getByTestId("kind-help-weekly")).toHaveTextContent(/once per week/i);
+  });
+
+  it("shows objective notes", async () => {
+    await renderObjectives();
+    const row = screen.getByTestId("objective-obj-gates");
+    expect(within(row).getByText("GATEs run every 20 minutes.")).toBeInTheDocument();
+  });
+
   it("did-it increments count and wallet", async () => {
     await renderObjectives();
     const row = screen.getByTestId("objective-obj-moogle-dungeons");

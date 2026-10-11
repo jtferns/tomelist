@@ -15,7 +15,7 @@
     { "id": "obj-pvp", "kind": "standard", "title": "Complete a moogle-marked PvP match", "category": "PvP", "points": 5, "effort": "medium", "repeatable": true, "requirement": "5 pts win/draw, 3 pts loss" },
     { "id": "obj-gates", "kind": "standard", "title": "Complete a GATE at the Gold Saucer", "category": "GATEs", "points": 10, "effort": "quick", "repeatable": true, "requirement": "1–10 pts by MGP earned" },
     { "id": "obj-ocean-fishing", "kind": "standard", "title": "Complete an Ocean Fishing voyage", "category": "Ocean Fishing", "points": 10, "effort": "long", "repeatable": true, "requirement": "min. 2,000 points; 5–10 pts" },
-    { "id": "obj-weekly", "kind": "weekly", "title": "Weekly objective (randomly assigned)", "category": "Weekly", "points": 20, "effort": "medium", "repeatable": "weekly" },
+    { "id": "obj-weekly", "kind": "weekly", "title": "Complete this week's assigned objective", "category": "Weekly", "points": 20, "effort": "medium", "repeatable": "weekly" },
     { "id": "obj-minimog-w1", "kind": "minimog", "week": 1, "title": "Minimog Wk 1: 5 Bozja skirmishes or catch a Caterwauler (Lv50★★)", "category": "Minimog", "points": 10, "effort": "medium", "repeatable": "weekly", "tokens": 1 },
     { "id": "obj-minimog-w2", "kind": "minimog", "week": 2, "title": "Minimog Wk 2: Bozja Critical Engagement or decipher a timeworn map", "category": "Minimog", "points": 10, "effort": "medium", "repeatable": "weekly", "tokens": 1 },
     { "id": "obj-minimog-w3", "kind": "minimog", "week": 3, "title": "Minimog Wk 3: 5 Bozja skirmishes or a Doman Mahjong match", "category": "Minimog", "points": 10, "effort": "medium", "repeatable": "weekly", "tokens": 1 },
