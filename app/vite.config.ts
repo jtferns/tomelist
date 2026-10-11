@@ -12,6 +12,8 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["tomes/*.png", "items/*.png"],
+      // The sync API lives on the same origin; keep the SPA fallback off it.
+      workbox: { navigateFallbackDenylist: [/^\/api\//] },
       manifest: {
         name: "Tomelist",
         short_name: "Tomelist",

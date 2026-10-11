@@ -16,6 +16,8 @@ This is a Yarn workspaces monorepo:
 - `app/` (`@tomelist/app`) — the Vite + React app that gets built and deployed.
 - `packages/schema/` (`@tomelist/schema`) — Zod schemas for event content and user state, shared by
   the app and by the data-validation tests.
+- `worker/` (`@tomelist/worker`) — the Cloudflare Worker script: `/api/sync/<token>` routing and
+  the `SyncGroup` Durable Object. Static assets bypass it.
 - `data/` — event content JSON (`manifest.json` + `data/events/*.json`), bundled into the app at
   build time.
 - `scripts/` — standalone authoring aids (not part of the built app or CI); see `scripts/README.md`.
@@ -35,7 +37,8 @@ Run from the repo root unless noted:
 Package manager is Yarn 4 (Berry, `nodeLinker: node-modules`, see `.yarnrc.yml`). Node version is
 pinned in `.nvmrc`. CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn test`, and
 `yarn build` on every push/PR, and on `main` additionally deploys `app/dist` to a Cloudflare Worker
-(`wrangler.jsonc`, assets-only, SPA fallback) via `cloudflare/wrangler-action`. The deploy job
+(`wrangler.jsonc`: static assets with SPA fallback, plus the `worker/` script for `/api/*` and the
+`SyncGroup` Durable Object for Phase 3 sync) via `cloudflare/wrangler-action`. The deploy job
 needs the `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets and fails without them; nothing
 in the workflow skips it when they are missing. Wrangler is pinned in the root `package.json`. (Pages was
 tried and dropped: wrangler now routes new Pages projects through Workers and refuses to run that

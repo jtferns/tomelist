@@ -1233,6 +1233,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workers-types@npm:5.20260928.1":
+  version: 5.20260928.1
+  resolution: "@cloudflare/workers-types@npm:5.20260928.1"
+  checksum: 10/4abfa86c5e75772acd25bfd9edd8a5e1da644efd2b70135ef326a2dd9e2a40c681a0a56989310170be5c85fcfae9db93ff7cb5b3d11d34af8eb09073fca4d7f5
+  languageName: node
+  linkType: hard
+
 "@cspotcode/source-map-support@npm:0.8.1":
   version: 0.8.1
   resolution: "@cspotcode/source-map-support@npm:0.8.1"
@@ -3934,6 +3941,16 @@ __metadata:
     typescript: "npm:7"
     vitest: "npm:^5.0.3"
     zod: "npm:^4.6.5"
+  languageName: unknown
+  linkType: soft
+
+"@tomelist/worker@workspace:worker":
+  version: 0.0.0-use.local
+  resolution: "@tomelist/worker@workspace:worker"
+  dependencies:
+    "@cloudflare/workers-types": "npm:5.20260928.1"
+    typescript: "npm:7"
+    vitest: "npm:^5.0.3"
   languageName: unknown
   linkType: soft
 
