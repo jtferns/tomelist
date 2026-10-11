@@ -1,7 +1,8 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { emptyEventProgress } from "@tomelist/schema";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";
 
@@ -24,7 +25,46 @@ beforeEach(() => {
   useAppStore.setState({ events: {} });
 });
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("OverviewPage", () => {
+  it("shows pace against the Must-haves and links to the Planner", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-04-10T12:00:00Z"));
+    useAppStore.setState({
+      events: {
+        [E]: {
+          ...emptyEventProgress(),
+          wishlist: { "miners-earring": { status: "wanted", tier: "must", quantity: 20 } },
+        },
+      },
+    });
+    await renderOverview();
+    const pace = screen.getByTestId("overview-pace");
+    expect(pace).toHaveTextContent(/Behind.*Earned 0 of ~\d+ this week/);
+    expect(pace).toHaveAttribute("href", `/${E}/planner`);
+  });
+  it("says Covered when the wallet already covers the Must-haves", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-04-10T12:00:00Z"));
+    useAppStore.setState({
+      events: {
+        [E]: {
+          ...emptyEventProgress(),
+          tomestones: 1000,
+          wishlist: { "fat-cat-parasol": { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    await renderOverview();
+    expect(screen.getByTestId("overview-pace")).toHaveTextContent("CoveredMust-haves covered");
+  });
+  it("hides pace with no goal", async () => {
+    await renderOverview();
+    expect(screen.queryByTestId("overview-pace")).not.toBeInTheDocument();
+  });
   it("shows the wallet and event name", async () => {
     await renderOverview();
     expect(screen.getAllByText(/Mogmog Collection/).length).toBeGreaterThan(0);
