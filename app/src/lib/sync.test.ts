@@ -128,6 +128,16 @@ describe("createSyncClient", () => {
     expect(t.adopt).not.toHaveBeenCalled();
   });
 
+  it("retries a rate-limited push after 10 s", () => {
+    const t = setup();
+    t.sockets[0].open();
+    t.sockets[0].receive({ type: "error", reason: "rate-limited" });
+    vi.advanceTimersByTime(9999);
+    expect(t.sockets[0].sent).toHaveLength(1);
+    vi.advanceTimersByTime(1);
+    expect(t.sockets[0].sent).toEqual([expect.anything(), { type: "state", state: t.get() }]);
+  });
+
   it("reconnects with doubling backoff capped at 30 s", () => {
     const t = setup();
     const delays = [1000, 2000, 4000, 8000, 16000, 30000, 30000];

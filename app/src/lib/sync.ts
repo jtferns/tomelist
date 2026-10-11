@@ -24,6 +24,7 @@ export interface SyncDeps {
 const PUSH_DEBOUNCE_MS = 1000;
 const FIRST_RETRY_MS = 1000;
 const MAX_RETRY_MS = 30000;
+const RATE_LIMIT_RETRY_MS = 10000;
 
 // Keeps one device in step with its sync group. Whole-state last write wins:
 // local changes are pushed after a short debounce, and a remote state is
@@ -52,7 +53,15 @@ export function createSyncClient(deps: SyncDeps): { stop: () => void } {
       return;
     }
     const parsed = syncMessageSchema.safeParse(json);
-    if (!parsed.success || parsed.data.type !== "state") return;
+    if (!parsed.success) return;
+    if (parsed.data.type === "error") {
+      // The server dropped our write; send the latest state again later.
+      if (parsed.data.reason === "rate-limited") {
+        clearTimeout(pushTimer);
+        pushTimer = setTimeout(push, RATE_LIMIT_RETRY_MS);
+      }
+      return;
+    }
     const incoming = parsed.data.state;
     if (Date.parse(incoming.updatedAt) <= Date.parse(deps.getState().updatedAt)) return;
     lastSeen = incoming.updatedAt;
