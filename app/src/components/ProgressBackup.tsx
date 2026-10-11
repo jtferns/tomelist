@@ -11,6 +11,7 @@ export function ProgressBackup({ eventId }: { eventId: string }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const synced = useAppStore((s) => Boolean(s.syncToken));
   const event = getEvent(eventId);
 
   const exportProgress = () => {
@@ -45,7 +46,9 @@ export function ProgressBackup({ eventId }: { eventId: string }) {
     <section className="flex flex-col gap-2">
       <SectionKicker as="h2">Your progress</SectionKicker>
       <p className="text-sm text-muted-foreground">
-        Saved on this device only. Export a backup to move it to another device or keep it safe.
+        {synced
+          ? "Synced with your paired devices. Export a backup to keep a copy safe."
+          : "Saved on this device only. Export a backup to move it to another device or keep it safe."}
       </p>
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" size="sm" onClick={exportProgress}>

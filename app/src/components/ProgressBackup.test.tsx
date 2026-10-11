@@ -12,6 +12,16 @@ beforeEach(() => {
 });
 
 describe("ProgressBackup", () => {
+  it("says where progress lives", () => {
+    useAppStore.setState({ syncToken: undefined });
+    const { unmount } = render(<ProgressBackup eventId={E} />);
+    expect(screen.getByText(/saved on this device only/i)).toBeInTheDocument();
+    unmount();
+    useAppStore.setState({ syncToken: "AAAAAAAAAAAAAAAAAAAAAA" });
+    render(<ProgressBackup eventId={E} />);
+    expect(screen.getByText(/synced with your paired devices/i)).toBeInTheDocument();
+  });
+
   it("imports a valid backup and replaces progress", async () => {
     render(<ProgressBackup eventId={E} />);
     const backup = {
