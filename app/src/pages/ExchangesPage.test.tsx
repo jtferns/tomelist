@@ -38,6 +38,15 @@ describe("ExchangesPage", () => {
     expect(screen.getByTestId("qty-fat-cat-parasol")).toHaveTextContent("1");
   });
 
+  it("says which tier Want picked, with an undo", async () => {
+    await renderExchanges();
+    await userEvent.click(screen.getByRole("button", { name: /want fat cat parasol/i }));
+    const toast = useUndoToast.getState().toast;
+    expect(toast?.message).toBe("Added Fat Cat Parasol as Nice");
+    toast?.onUndo();
+    expect(useAppStore.getState().getProgress(E).wishlist["fat-cat-parasol"]).toBeUndefined();
+  });
+
   it("labels the Want button and keeps wanted names at full strength", async () => {
     await renderExchanges();
     const want = screen.getByRole("button", { name: /want fat cat parasol/i });

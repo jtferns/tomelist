@@ -238,10 +238,20 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
           size="sm"
           aria-pressed={wanted}
           aria-label={`Want ${item.name}`}
-          onClick={() => toggleWishlist(eventId, item.id)}
+          onClick={() => {
+            toggleWishlist(eventId, item.id);
+            if (!entry) showToast(`Added ${item.name} as ${TIER_LABEL.want}`, () => toggleWishlist(eventId, item.id));
+          }}
           className={cn(wanted && "border-gold text-gold")}
         >
-          {wanted ? "✓ Wanted" : "Want"}
+          {wanted ? (
+            <>
+              <Check aria-hidden="true" />
+              Wanted
+            </>
+          ) : (
+            "Want"
+          )}
         </Button>
         {wanted ? (
           <>
