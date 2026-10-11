@@ -13,10 +13,15 @@ Per new event:
 7. `yarn dlx --quiet tsx scripts/fetch-tradeable.ts data/events/<id>.json` records whether each
    exchange can be traded (`tradeable`), from XIVAPI. Set any reported miss by hand. Add `--refresh`
    to refresh values already set. The data tests require it on the newest event.
-8. `yarn validate:data` must pass. Open a PR; merging deploys.
-9. Add the event's tomestone art as `app/public/tomes/<eventId>.png` and set
-   `tomestone.icon` to `/tomes/<eventId>.png` in the event JSON. For the newest
-   event, also update the static favicon link in `app/index.html` and regenerate
-   the PWA icons from it (`sips -z <size> <size> app/public/tomes/<eventId>.png
-   --out app/public/pwa-<size>x<size>.png`, plus the 180px apple-touch and 512px
-   maskable icons).
+8. `yarn dlx --quiet tsx scripts/fetch-collect.ts data/events/<id>.json` links mounts, minions,
+   orchestrion rolls, bardings and hairstyles to FFXIV Collect (`collect`), so the character
+   import can mark them Owned. It writes only unique exact name matches; check what it lists
+   and set those by hand (e.g. "The Legendary Beast" roll is "The Legendary Beast
+   (Shadowbringers)" there).
+9. `yarn validate:data` must pass. Open a PR; merging deploys.
+10. Add the event's tomestone art as `app/public/tomes/<eventId>.png` and set
+    `tomestone.icon` to `/tomes/<eventId>.png` in the event JSON. For the newest
+    event, also update the static favicon link in `app/index.html` and regenerate
+    the PWA icons from it (`sips -z <size> <size> app/public/tomes/<eventId>.png
+    --out app/public/pwa-<size>x<size>.png`, plus the 180px apple-touch and 512px
+    maskable icons).
