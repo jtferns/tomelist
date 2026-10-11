@@ -273,3 +273,22 @@ describe("sync actions", () => {
     expect(s.getProgress(E).tomestones).toBe(42);
   });
 });
+
+describe("sync groups", () => {
+  it("startSyncGroup sets a fresh token and keeps local state as the source", () => {
+    useAppStore.getState().addTomestones(E, 5);
+    const before = useAppStore.getState().updatedAt;
+    useAppStore.getState().startSyncGroup();
+    const s = useAppStore.getState();
+    expect(s.syncToken).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(s.updatedAt).toBe(before);
+    expect(s.getProgress(E).tomestones).toBe(5);
+  });
+
+  it("joinSyncGroup defers to the group by resetting updatedAt", () => {
+    useAppStore.getState().joinSyncGroup("BBBBBBBBBBBBBBBBBBBBBB");
+    const s = useAppStore.getState();
+    expect(s.syncToken).toBe("BBBBBBBBBBBBBBBBBBBBBB");
+    expect(s.updatedAt).toBe(new Date(0).toISOString());
+  });
+});

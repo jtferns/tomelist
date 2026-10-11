@@ -7,6 +7,7 @@ import {
   type WishlistEntry,
 } from "@tomelist/schema";
 import { create } from "zustand";
+import { generateSyncToken } from "@/lib/pairing";
 import { persist } from "zustand/middleware";
 
 type PersistedState = {
@@ -40,6 +41,8 @@ type AppState = PersistedState & {
   replaceState: (state: UserState) => void;
   setSyncToken: (token: string | undefined) => void;
   adoptRemoteState: (state: UserState) => void;
+  startSyncGroup: () => void;
+  joinSyncGroup: (token: string) => void;
   getProgress: (eventId: string) => EventProgress;
 };
 
@@ -214,6 +217,11 @@ export const useAppStore = create<AppState>()(
         replaceState: (state) =>
           set({ settings: state.settings, events: state.events, updatedAt: new Date().toISOString() }),
         setSyncToken: (token) => set({ syncToken: token }),
+        startSyncGroup: () => set({ syncToken: generateSyncToken() }),
+        // A joining device's updatedAt is its install time, newer than the real
+        // progress on the other device. Resetting it lets the group's state win
+        // instead of this device pushing an empty state over it.
+        joinSyncGroup: (token) => set({ syncToken: token, updatedAt: new Date(0).toISOString() }),
         // Takes a newer state from another device as-is, keeping its updatedAt
         // so the sync engine does not see a local change and push it back.
         adoptRemoteState: (state) =>
