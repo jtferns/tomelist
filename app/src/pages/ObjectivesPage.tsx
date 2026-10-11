@@ -1,6 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { UnknownEvent } from "@/components/UnknownEvent";
-import { RotateCcw } from "lucide-react";
+import { Dices, RotateCcw } from "lucide-react";
 import { Fragment, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { ListRow, ListRowDivider } from "@/components/ui/list-row";
 import { SectionKicker } from "@/components/ui/section-header";
 import { clearReward, clearsNeeded } from "@/lib/clears";
 import { getEvent } from "@/lib/events";
+import { pickDuty } from "@/lib/pickDuty";
 import { tokenCount, tomeCount, undoClearBlockedReason } from "@/lib/format";
 import { useLogClear } from "@/lib/useLogClear";
 import { useAppStore } from "@/store/useAppStore";
@@ -53,6 +54,7 @@ function ObjectiveRow({
       ? undoClearBlockedReason(wallet, lastReward.points, tokenBalance, lastReward.tokens, token?.name)
       : null;
   const exhausted = objective.repeatable === false && count >= clearsNeeded(objective);
+  const [picked, setPicked] = useState<string | null>(null);
   return (
     <ListRow data-testid={`objective-${objective.id}`} className="list-enter">
       <div className="min-w-0 flex-1">
@@ -72,6 +74,24 @@ function ObjectiveRow({
         ) : null}
         {objective.notes ? (
           <p className="mt-1 text-xs text-muted-foreground">{objective.notes}</p>
+        ) : null}
+        {objective.duties ? (
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs">
+            <button
+              type="button"
+              data-testid="pick-duty"
+              onClick={() => setPicked(pickDuty(objective.duties!, picked))}
+              className="inline-flex items-center gap-1 rounded-sm text-gold underline-offset-2 outline-none hover:text-gold-soft hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 pointer-coarse:-my-3 pointer-coarse:py-3"
+            >
+              <Dices className="size-3.5" aria-hidden />
+              {picked ? "Pick another" : "Pick one for me"}
+            </button>
+            {picked ? (
+              <span data-testid="picked-duty" aria-live="polite" key={picked} className="list-enter font-medium text-foreground">
+                {picked}
+              </span>
+            ) : null}
+          </p>
         ) : null}
         {undoBlocked ? (
           <p data-testid="undo-blocked" className="mt-1 text-xs text-muted-foreground">

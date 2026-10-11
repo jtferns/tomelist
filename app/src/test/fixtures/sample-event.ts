@@ -28,6 +28,7 @@ export const sampleEvent = {
       points: 10,
       effort: "medium",
       repeatable: true,
+      duties: ["Halatali (Hard)", "Amaurot"],
     },
     {
       id: "obj-gates",

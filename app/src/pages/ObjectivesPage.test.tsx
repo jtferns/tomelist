@@ -25,6 +25,18 @@ beforeEach(() => {
 });
 
 describe("ObjectivesPage", () => {
+  it("picks a random moogle-marked duty and rerolls to a different one", async () => {
+    await renderObjectives();
+    const row = within(screen.getByTestId("objective-obj-moogle-dungeons"));
+    expect(row.queryByTestId("picked-duty")).not.toBeInTheDocument();
+    await userEvent.click(row.getByRole("button", { name: "Pick one for me" }));
+    const first = row.getByTestId("picked-duty").textContent;
+    expect(["Halatali (Hard)", "Amaurot"]).toContain(first);
+    await userEvent.click(row.getByRole("button", { name: "Pick another" }));
+    expect(row.getByTestId("picked-duty").textContent).not.toBe(first);
+    expect(within(screen.getByTestId("objective-obj-gates")).queryByTestId("pick-duty")).not.toBeInTheDocument();
+  });
+
   it("renders kind group headers", async () => {
     await renderObjectives();
     expect(screen.getByText(/Standard Objectives/i)).toBeInTheDocument();
