@@ -63,7 +63,7 @@ at a monorepo root.)
    `localStorage` under the key `"tomelist:v2"`. Event content itself is never mutated; this store
    is the only place user progress is written. `EventProgress`/`WishlistEntry` types come from
    `packages/schema/src/state.ts`. Settings also hold a theme (`{ palette:
-   maelstrom|adder|flames|ishgard|crystarium, mode: dark|light, ornament, density }`), which
+   maelstrom|adder|flames|ishgard|crystarium|heavensward|stormblood|dawntrail, mode: dark|light, ornament, density }`), which
    `Layout` applies to the document as `data-palette`/`data-theme` attributes; the persisted state
    uses zustand-persist `version: 3`,
    with a `migrate` step that upgrades the legacy single-string theme/quantity-less format.

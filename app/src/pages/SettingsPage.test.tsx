@@ -142,6 +142,17 @@ describe("SettingsPage", () => {
     expect(document.documentElement.dataset.palette).toBe("crystarium");
   });
 
+  it("offers the expansion palettes and applies one", async () => {
+    await renderSettings();
+    expect(screen.getByRole("heading", { name: /expansion/i })).toBeInTheDocument();
+    for (const name of ["Heavensward", "Stormblood", "Dawntrail"]) {
+      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+    }
+    await userEvent.click(screen.getByRole("button", { name: "Dawntrail" }));
+    expect(useAppStore.getState().settings.theme.palette).toBe("dawntrail");
+    expect(document.documentElement.dataset.palette).toBe("dawntrail");
+  });
+
   it("discloses AI assistance and links the author's GitHub", async () => {
     await renderSettings();
     const note = screen.getByTestId("ai-disclosure");

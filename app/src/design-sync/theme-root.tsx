@@ -1,3 +1,4 @@
+import type { ThemeSettings } from "@tomelist/schema";
 import { useLayoutEffect, type ReactNode } from "react";
 
 /**
@@ -21,7 +22,7 @@ export function ThemeRoot({
   children,
 }: {
   theme?: "dark" | "light";
-  palette?: "maelstrom" | "adder" | "flames" | "ishgard" | "crystarium";
+  palette?: ThemeSettings["palette"];
   children?: ReactNode;
 }) {
   useLayoutEffect(() => {

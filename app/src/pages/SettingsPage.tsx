@@ -21,6 +21,12 @@ const cityPalettes = [
   { id: "crystarium", label: "The Crystarium", hoverClass: "hover:border-[oklch(0.74_0.13_295)]" },
 ] as const;
 
+const expansionPalettes = [
+  { id: "heavensward", label: "Heavensward", hoverClass: "hover:border-[oklch(0.78_0.1_200)]" },
+  { id: "stormblood", label: "Stormblood", hoverClass: "hover:border-[oklch(0.62_0.19_10)]" },
+  { id: "dawntrail", label: "Dawntrail", hoverClass: "hover:border-[oklch(0.76_0.15_55)]" },
+] as const;
+
 const modes = [
   { id: "dark", label: "Dark" },
   { id: "light", label: "Light" },
@@ -51,6 +57,7 @@ export function SettingsPage() {
         {[
           { title: "Grand Company", options: palettes },
           { title: "City", options: cityPalettes },
+          { title: "Expansion", options: expansionPalettes },
         ].map(({ title, options }) => (
           <section key={title} className="flex flex-col gap-2">
             <SectionKicker as="h2">{title}</SectionKicker>

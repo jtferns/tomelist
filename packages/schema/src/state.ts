@@ -1,7 +1,16 @@
 import { z } from "zod";
 
 export const themeSettingsSchema = z.object({
-  palette: z.enum(["maelstrom", "adder", "flames", "ishgard", "crystarium"]),
+  palette: z.enum([
+    "maelstrom",
+    "adder",
+    "flames",
+    "ishgard",
+    "crystarium",
+    "heavensward",
+    "stormblood",
+    "dawntrail",
+  ]),
   mode: z.enum(["dark", "light"]),
   ornament: z.enum(["full", "reduced", "minimal"]),
   density: z.enum(["comfy", "compact"]),
