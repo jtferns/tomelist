@@ -142,6 +142,16 @@ describe("SettingsPage", () => {
     expect(document.documentElement.dataset.palette).toBe("crystarium");
   });
 
+  it("shows each Grand Company's crest on its palette chip", async () => {
+    await renderSettings();
+    for (const [name, file] of [["Maelstrom", "maelstrom"], ["Twin Adder", "adder"], ["Immortal Flames", "flames"]]) {
+      const img = screen.getByRole("button", { name }).querySelector("img");
+      expect(img).toHaveAttribute("src", `/crests/${file}.png`);
+      expect(img).toHaveAttribute("alt", "");
+    }
+    expect(screen.getByRole("button", { name: "Ishgard" }).querySelector("img")).toBeNull();
+  });
+
   it("offers the expansion palettes and applies one", async () => {
     await renderSettings();
     expect(screen.getByRole("heading", { name: /expansion/i })).toBeInTheDocument();

@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["tomes/*.png", "items/*.png"],
+      includeAssets: ["tomes/*.png", "items/*.png", "crests/*.png"],
       // The sync API lives on the same origin; keep the SPA fallback off it.
       workbox: { navigateFallbackDenylist: [/^\/api\//] },
       manifest: {

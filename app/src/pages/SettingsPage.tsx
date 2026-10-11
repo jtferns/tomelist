@@ -11,9 +11,9 @@ import { useAppStore } from "@/store/useAppStore";
 import type { ThemeSettings } from "@tomelist/schema";
 
 const palettes = [
-  { id: "maelstrom", label: "Maelstrom", hoverClass: "hover:border-[oklch(0.63_0.19_25)]" },
-  { id: "adder", label: "Twin Adder", hoverClass: "hover:border-[oklch(0.65_0.15_130)]" },
-  { id: "flames", label: "Immortal Flames", hoverClass: "hover:border-[oklch(0.7_0.15_60)]" },
+  { id: "maelstrom", label: "Maelstrom", crest: "/crests/maelstrom.png", hoverClass: "hover:border-[oklch(0.63_0.19_25)]" },
+  { id: "adder", label: "Twin Adder", crest: "/crests/adder.png", hoverClass: "hover:border-[oklch(0.65_0.15_130)]" },
+  { id: "flames", label: "Immortal Flames", crest: "/crests/flames.png", hoverClass: "hover:border-[oklch(0.7_0.15_60)]" },
 ] as const;
 
 const cityPalettes = [
@@ -71,6 +71,7 @@ export function SettingsPage() {
                     className={active ? undefined : p.hoverClass}
                     onClick={() => setPalette(p.id)}
                   >
+                    {"crest" in p ? <img src={p.crest} alt="" className="-ml-1 mr-1.5 inline size-5 rounded-sm align-[-0.3em]" /> : null}
                     {p.label}
                   </Chip>
                 );
