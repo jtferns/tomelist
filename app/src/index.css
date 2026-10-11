@@ -269,6 +269,42 @@ body {
   animation: value-pop var(--dur-slow) var(--ease-pop);
 }
 
+/* The Must-haves just became affordable: the HUD bar swells and a light sheen
+   crosses it once. Remount (key) to replay. */
+@keyframes goal-reached {
+  0% {
+    transform: scaleY(1);
+  }
+  30% {
+    transform: scaleY(1.75);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes goal-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animate-goal-reached {
+  animation: goal-reached calc(var(--dur-slow) * 2) var(--ease-out);
+}
+
+.animate-goal-reached::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.55), transparent);
+  transform: translateX(100%);
+  animation: goal-sheen calc(var(--dur-slow) * 3) var(--ease-out);
+}
+
 /* Rows (re)mounting into a filtered or re-sorted list: a one-shot fade up from
    4px. Runs on mount, so re-keying the list replays it. */
 @keyframes list-enter {
@@ -297,6 +333,8 @@ body {
     --dur-slow: 0.01ms;
   }
   .animate-value-pop,
+  .animate-goal-reached,
+  .animate-goal-reached::after,
   .list-enter {
     animation: none;
   }

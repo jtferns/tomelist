@@ -1,5 +1,5 @@
 import { RouterProvider } from "@tanstack/react-router";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it } from "vitest";
 import { getEvent } from "@/lib/events";
@@ -22,6 +22,29 @@ beforeEach(() => {
 });
 
 describe("ProgressHud", () => {
+  it("plays the goal moment once when the wallet first covers the Must-haves", async () => {
+    useAppStore.getState().addTomestones(E, 40);
+    useAppStore.getState().toggleWishlist(E, "fat-cat-parasol");
+    useAppStore.getState().setWishlistTier(E, "fat-cat-parasol", "must"); // 50 tomes
+    await renderAt("overview");
+    const bar = () => screen.getByRole("progressbar");
+    expect(bar()).not.toHaveAttribute("data-must-covered");
+    expect(bar()).not.toHaveClass("animate-goal-reached");
+    act(() => useAppStore.getState().addTomestones(E, 10));
+    expect(bar()).toHaveAttribute("data-must-covered");
+    expect(bar()).toHaveClass("animate-goal-reached");
+    expect(bar()).toHaveAttribute("aria-valuetext", "100%, Must-haves covered");
+  });
+
+  it("does not play the goal moment when the Must-haves are already covered on load", async () => {
+    useAppStore.getState().addTomestones(E, 60);
+    useAppStore.getState().toggleWishlist(E, "fat-cat-parasol");
+    useAppStore.getState().setWishlistTier(E, "fat-cat-parasol", "must");
+    await renderAt("overview");
+    expect(screen.getByRole("progressbar")).toHaveAttribute("data-must-covered");
+    expect(screen.getByRole("progressbar")).not.toHaveClass("animate-goal-reached");
+  });
+
   it("shows wallet count and a Set a goal link on every tab, including objectives", async () => {
     useAppStore.getState().addTomestones(E, 30);
     await renderAt("objectives");

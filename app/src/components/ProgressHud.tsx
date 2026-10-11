@@ -1,8 +1,12 @@
 import { Link, useParams } from "@tanstack/react-router";
+import { emptyEventProgress } from "@tomelist/schema";
+import { useEffect, useRef, useState } from "react";
 import { AnimatedCount } from "@/components/ui/animated-count";
 import { EventSwitcher } from "@/components/EventSwitcher";
 import { getEvent } from "@/lib/events";
 import { tokenCount } from "@/lib/format";
+import { budgetReport } from "@/lib/optimizer";
+import { cn } from "@/lib/utils";
 import { getWishlistTokenTotal, getWishlistTotal } from "@/lib/wishlist";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -11,7 +15,18 @@ export function ProgressHud() {
   const event = getEvent(eventId);
   const tomestones = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
   const tokens = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
-  const wishlist = useAppStore((s) => s.events[eventId]?.wishlist);
+  const progress = useAppStore((s) => s.events[eventId]);
+  const wishlist = progress?.wishlist;
+  const must = event ? budgetReport(event, progress ?? emptyEventProgress(), new Date()).tiers.find((t) => t.tier === "must") : undefined;
+  const mustCovered = !!must && must.cumulativeCost > 0 && must.affordableNow;
+  // Crossing into covered while the app is open plays a one-shot sheen. Loading
+  // already covered does not; dropping back below re-arms it.
+  const wasCovered = useRef(mustCovered);
+  const [celebrate, setCelebrate] = useState(0);
+  useEffect(() => {
+    if (mustCovered && !wasCovered.current) setCelebrate((n) => n + 1);
+    wasCovered.current = mustCovered;
+  }, [mustCovered]);
   if (!event) return null;
   const total = getWishlistTotal(event, wishlist);
   const tokenTotal = event.token ? getWishlistTokenTotal(event, wishlist) : 0;
@@ -30,12 +45,22 @@ export function ProgressHud() {
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(pct)}
-          title={total > 0 ? `${Math.round(pct)}% of your wishlist goal` : "No goal yet"}
-          className="h-2 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary ring-1 ring-inset ring-[var(--frame-border)]"
+          aria-valuetext={mustCovered ? `${Math.round(pct)}%, Must-haves covered` : undefined}
+          title={
+            total > 0
+              ? `${Math.round(pct)}% of your wishlist goal${mustCovered ? ". Must-haves covered" : ""}`
+              : "No goal yet"
+          }
+          data-must-covered={mustCovered || undefined}
+          key={celebrate}
+          className={cn(
+            "relative h-2 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary ring-1 ring-inset ring-[var(--frame-border)] data-[must-covered]:ring-gold/60",
+            celebrate > 0 && "animate-goal-reached"
+          )}
         >
           <div
             data-testid="hud-bar"
-            className="h-full origin-left rounded-full bg-gradient-to-r from-primary to-gold transition-transform duration-[var(--dur-slow)]"
+            className="h-full origin-left rounded-full bg-gradient-to-r from-primary to-gold in-data-[must-covered]:from-gold in-data-[must-covered]:to-gold-soft transition-transform duration-[var(--dur-slow)]"
             style={{ transform: `scaleX(${pct / 100})` }}
           />
         </div>
@@ -47,6 +72,7 @@ export function ProgressHud() {
         >
           {event.tomestone.icon ? <img src={event.tomestone.icon} alt="" className="size-5" /> : null}
           <AnimatedCount
+            key={celebrate}
             data-testid="hud-count"
             value={tomestones}
             className="font-display text-lg font-bold tabular-nums text-gold"
