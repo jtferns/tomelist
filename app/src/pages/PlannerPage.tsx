@@ -75,64 +75,34 @@ export function PlannerPage() {
         ) : null}
       </FramedCard>
 
-      <section className="flex flex-col gap-2">
-        <SectionKicker as="h2">
-          {weekly ? `Minimog · Week ${Math.min(Math.max(plan.currentWeek, 1), weekly)} of ${weekly}` : "Minimog picks"}
-        </SectionKicker>
-        <FramedCard corners>
-          {plan.suggestedMinimogs.length === 0 ? (
-            <p className="p-4 text-center text-sm text-muted-foreground">
-              {!weekly
-                ? "Both picks used this week. New picks open at the weekly reset."
-                : plan.currentWeek < 1
-                  ? "Minimogs open when the event starts."
-                  : plan.currentWeek >= weekly
-                  ? "All Minimog weeks are done."
-                  : "This week's Minimog is done. The next one opens at the weekly reset."}
-            </p>
-          ) : (
-            plan.suggestedMinimogs.map(({ objective }, index) => (
-              <Fragment key={objective.id}>
-                {index > 0 ? <ListRowDivider /> : null}
-                <ListRow data-testid={`pick-${objective.id}`}>
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
-                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                      <Badge variant="tome">{tomeCount(objective.points)}</Badge>
-                      <Badge variant="gold-outline">{objective.effort}</Badge>
-                    </div>
-                  </div>
-                  <Button
-                    variant="action-soft"
-                    size="sm"
-                    onClick={() => logClear(objective)}
-                  >
-                    Log clear
-                  </Button>
-                </ListRow>
-              </Fragment>
-            ))
-          )}
-        </FramedCard>
-      </section>
-
-      {plan.weeklies.length > 0 ? (
+      <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         <section className="flex flex-col gap-2">
-          <SectionKicker as="h2">Weeklies</SectionKicker>
+          <SectionKicker as="h2">
+            {weekly ? `Minimog · Week ${Math.min(Math.max(plan.currentWeek, 1), weekly)} of ${weekly}` : "Minimog picks"}
+          </SectionKicker>
           <FramedCard corners>
-            {plan.weeklies.map(({ objective, doneThisWeek }, index) => (
-              <Fragment key={objective.id}>
-                {index > 0 ? <ListRowDivider /> : null}
-                <ListRow data-testid={`weekly-${objective.id}`}>
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
-                    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                      <Badge variant="tome">{tomeCount(objective.points)}</Badge>
+            {plan.suggestedMinimogs.length === 0 ? (
+              <p className="p-4 text-center text-sm text-muted-foreground">
+                {!weekly
+                  ? "Both picks used this week. New picks open at the weekly reset."
+                  : plan.currentWeek < 1
+                    ? "Minimogs open when the event starts."
+                    : plan.currentWeek >= weekly
+                    ? "All Minimog weeks are done."
+                    : "This week's Minimog is done. The next one opens at the weekly reset."}
+              </p>
+            ) : (
+              plan.suggestedMinimogs.map(({ objective }, index) => (
+                <Fragment key={objective.id}>
+                  {index > 0 ? <ListRowDivider /> : null}
+                  <ListRow data-testid={`pick-${objective.id}`}>
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                        <Badge variant="tome">{tomeCount(objective.points)}</Badge>
+                        <Badge variant="gold-outline">{objective.effort}</Badge>
+                      </div>
                     </div>
-                  </div>
-                  {doneThisWeek ? (
-                    <Badge variant="gold-outline">Claimed</Badge>
-                  ) : (
                     <Button
                       variant="action-soft"
                       size="sm"
@@ -140,13 +110,45 @@ export function PlannerPage() {
                     >
                       Log clear
                     </Button>
-                  )}
-                </ListRow>
-              </Fragment>
-            ))}
+                  </ListRow>
+                </Fragment>
+              ))
+            )}
           </FramedCard>
         </section>
-      ) : null}
+
+        {plan.weeklies.length > 0 ? (
+          <section className="flex flex-col gap-2">
+            <SectionKicker as="h2">Weeklies</SectionKicker>
+            <FramedCard corners>
+              {plan.weeklies.map(({ objective, doneThisWeek }, index) => (
+                <Fragment key={objective.id}>
+                  {index > 0 ? <ListRowDivider /> : null}
+                  <ListRow data-testid={`weekly-${objective.id}`}>
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                        <Badge variant="tome">{tomeCount(objective.points)}</Badge>
+                      </div>
+                    </div>
+                    {doneThisWeek ? (
+                      <Badge variant="gold-outline">Claimed</Badge>
+                    ) : (
+                      <Button
+                        variant="action-soft"
+                        size="sm"
+                        onClick={() => logClear(objective)}
+                      >
+                        Log clear
+                      </Button>
+                    )}
+                  </ListRow>
+                </Fragment>
+              ))}
+            </FramedCard>
+          </section>
+        ) : null}
+      </div>
     </div>
   );
 }
