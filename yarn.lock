@@ -3949,6 +3949,7 @@ __metadata:
   resolution: "@tomelist/worker@workspace:worker"
   dependencies:
     "@cloudflare/workers-types": "npm:5.20260928.1"
+    "@tomelist/schema": "workspace:*"
     typescript: "npm:7"
     vitest: "npm:^5.0.3"
   languageName: unknown
