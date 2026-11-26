@@ -54,6 +54,15 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
+      # The container ships its own node; fail if setup-node's isn't the one on PATH.
+      - name: Node matches .nvmrc
+        run: |
+          want=$(cat .nvmrc)
+          have=$(node -v)
+          if [ "$have" != "$want" ]; then
+            echo "::error::node $have does not match .nvmrc $want."
+            exit 1
+          fi
       - run: corepack enable
       - run: yarn install --immutable
       - run: yarn e2e
