@@ -37,7 +37,7 @@ export function handleMessage(raw: string, stored: UserState | null): MessageOut
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-export const IDLE_TTL_MS = 90 * DAY_MS;
+const IDLE_TTL_MS = 90 * DAY_MS;
 
 // When to move the idle-expiry alarm after a write, or null to leave it.
 // Each setAlarm is a billed row write, so it moves at most once a day.
