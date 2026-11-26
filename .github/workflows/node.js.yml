@@ -34,9 +34,26 @@ jobs:
           yarn fallow report --from fallow-audit.json --format github-annotations
           yarn fallow report --from fallow-audit.json --format github-summary >> "$GITHUB_STEP_SUMMARY"
           exit "$status"
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - run: corepack enable
+      - run: yarn install --immutable
+      - run: yarn workspace @tomelist/app exec playwright install --with-deps chromium webkit
+      - run: yarn e2e
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: app/playwright-report
+          retention-days: 14
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: check
+    needs: [check, e2e]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
