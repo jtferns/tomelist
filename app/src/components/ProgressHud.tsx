@@ -1,5 +1,5 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { emptyEventProgress } from "@tomelist/schema";
+import { emptyEventProgress, type EventData, type EventProgress } from "@tomelist/schema";
 import { useEffect, useRef, useState } from "react";
 import { AnimatedCount } from "@/components/ui/animated-count";
 import { EventSwitcher } from "@/components/EventSwitcher";
@@ -17,55 +17,18 @@ export function ProgressHud() {
   const tokens = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
   const progress = useAppStore((s) => s.events[eventId]);
   const wishlist = progress?.wishlist;
-  const must = event
-    ? budgetReport(event, progress ?? emptyEventProgress(), new Date()).tiers.find((t) => t.tier === "must")
-    : undefined;
-  const mustCovered = !!must && must.cumulativeCost > 0 && must.affordableNow;
-  // Crossing into covered while the app is open plays a one-shot sheen. Loading
-  // already covered does not; dropping back below re-arms it.
-  const wasCovered = useRef(mustCovered);
-  const [celebrate, setCelebrate] = useState(0);
-  useEffect(() => {
-    if (mustCovered && !wasCovered.current) setCelebrate((n) => n + 1);
-    wasCovered.current = mustCovered;
-  }, [mustCovered]);
+  const { mustCovered, celebrate } = useMustCelebration(event, progress);
   if (!event) return null;
   const total = getWishlistTotal(event, wishlist);
   const tokenTotal = event.token ? getWishlistTokenTotal(event, wishlist) : 0;
-  // The bar tracks whichever currency is further from the goal.
-  const tomePct = total > 0 ? Math.min(100, (tomestones / total) * 100) : 0;
-  const pct = tokenTotal > 0 ? Math.min(tomePct, Math.min(100, (tokens / tokenTotal) * 100)) : tomePct;
+  const pct = goalPercent(tomestones, total, tokens, tokenTotal);
   return (
     <div className="sticky top-0 z-10 border-b border-[var(--frame-border)] bg-card/95 backdrop-blur sm:top-14">
       <div className="mx-auto flex max-w-[960px] items-center gap-2 px-4 py-2 sm:gap-3">
         <div className="min-w-0 max-w-[50%]">
           <EventSwitcher eventId={eventId} />
         </div>
-        <div
-          role="progressbar"
-          aria-label="Wishlist goal progress"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(pct)}
-          aria-valuetext={mustCovered ? `${Math.round(pct)}%, Must-haves covered` : undefined}
-          title={
-            total > 0
-              ? `${Math.round(pct)}% of your wishlist goal${mustCovered ? ". Must-haves covered" : ""}`
-              : "No goal yet"
-          }
-          data-must-covered={mustCovered || undefined}
-          key={celebrate}
-          className={cn(
-            "relative h-2 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary ring-1 ring-inset ring-[var(--frame-border)] data-[must-covered]:ring-gold/60",
-            celebrate > 0 && "animate-goal-reached",
-          )}
-        >
-          <div
-            data-testid="hud-bar"
-            className="h-full origin-left rounded-full bg-gradient-to-r from-primary to-gold in-data-[must-covered]:from-gold in-data-[must-covered]:to-gold-soft transition-transform duration-[var(--dur-slow)]"
-            style={{ transform: `scaleX(${pct / 100})` }}
-          />
-        </div>
+        <HudBar pct={pct} hasGoal={total > 0} mustCovered={mustCovered} celebrate={celebrate} />
         <Link
           to="/$eventId/overview"
           params={{ eventId }}
@@ -85,23 +48,7 @@ export function ProgressHud() {
             </span>
           ) : null}
         </Link>
-        {event.token ? (
-          <span
-            data-testid="hud-tokens"
-            aria-label={
-              tokenTotal > 0
-                ? `${tokenCount(tokens, event.token.name)} of ${tokenTotal}`
-                : tokenCount(tokens, event.token.name)
-            }
-            className="flex shrink-0 flex-col items-center text-[13px] leading-tight text-muted-foreground sm:flex-row sm:gap-1"
-          >
-            <span>
-              <span className="font-bold tabular-nums text-gold">{tokens}</span>
-              {tokenTotal > 0 ? `/${tokenTotal}` : null}
-            </span>{" "}
-            <span className="text-xs sm:text-[13px]">{tokens === 1 && tokenTotal === 0 ? "token" : "tokens"}</span>
-          </span>
-        ) : null}
+        {event.token ? <HudTokens tokens={tokens} tokenTotal={tokenTotal} tokenName={event.token.name} /> : null}
         {total === 0 ? (
           <Link
             to="/$eventId/exchanges"
@@ -114,5 +61,81 @@ export function ProgressHud() {
         ) : null}
       </div>
     </div>
+  );
+}
+
+// Crossing into covered while the app is open plays a one-shot sheen. Loading
+// already covered does not; dropping back below re-arms it.
+function useMustCelebration(event: EventData | undefined, progress: EventProgress | undefined) {
+  const must = event
+    ? budgetReport(event, progress ?? emptyEventProgress(), new Date()).tiers.find((t) => t.tier === "must")
+    : undefined;
+  const mustCovered = !!must && must.cumulativeCost > 0 && must.affordableNow;
+  const wasCovered = useRef(mustCovered);
+  const [celebrate, setCelebrate] = useState(0);
+  useEffect(() => {
+    if (mustCovered && !wasCovered.current) setCelebrate((n) => n + 1);
+    wasCovered.current = mustCovered;
+  }, [mustCovered]);
+  return { mustCovered, celebrate };
+}
+
+// The bar tracks whichever currency is further from the goal.
+function goalPercent(tomestones: number, total: number, tokens: number, tokenTotal: number): number {
+  const tomePct = total > 0 ? Math.min(100, (tomestones / total) * 100) : 0;
+  return tokenTotal > 0 ? Math.min(tomePct, Math.min(100, (tokens / tokenTotal) * 100)) : tomePct;
+}
+
+function HudBar({
+  pct,
+  hasGoal,
+  mustCovered,
+  celebrate,
+}: {
+  pct: number;
+  hasGoal: boolean;
+  mustCovered: boolean;
+  celebrate: number;
+}) {
+  const rounded = Math.round(pct);
+  return (
+    <div
+      role="progressbar"
+      aria-label="Wishlist goal progress"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={rounded}
+      aria-valuetext={mustCovered ? `${rounded}%, Must-haves covered` : undefined}
+      title={hasGoal ? `${rounded}% of your wishlist goal${mustCovered ? ". Must-haves covered" : ""}` : "No goal yet"}
+      data-must-covered={mustCovered || undefined}
+      key={celebrate}
+      className={cn(
+        "relative h-2 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary ring-1 ring-inset ring-[var(--frame-border)] data-[must-covered]:ring-gold/60",
+        celebrate > 0 && "animate-goal-reached",
+      )}
+    >
+      <div
+        data-testid="hud-bar"
+        className="h-full origin-left rounded-full bg-gradient-to-r from-primary to-gold in-data-[must-covered]:from-gold in-data-[must-covered]:to-gold-soft transition-transform duration-[var(--dur-slow)]"
+        style={{ transform: `scaleX(${pct / 100})` }}
+      />
+    </div>
+  );
+}
+
+function HudTokens({ tokens, tokenTotal, tokenName }: { tokens: number; tokenTotal: number; tokenName: string }) {
+  const hasGoal = tokenTotal > 0;
+  return (
+    <span
+      data-testid="hud-tokens"
+      aria-label={hasGoal ? `${tokenCount(tokens, tokenName)} of ${tokenTotal}` : tokenCount(tokens, tokenName)}
+      className="flex shrink-0 flex-col items-center text-[13px] leading-tight text-muted-foreground sm:flex-row sm:gap-1"
+    >
+      <span>
+        <span className="font-bold tabular-nums text-gold">{tokens}</span>
+        {hasGoal ? `/${tokenTotal}` : null}
+      </span>{" "}
+      <span className="text-xs sm:text-[13px]">{tokens === 1 && !hasGoal ? "token" : "tokens"}</span>
+    </span>
   );
 }
