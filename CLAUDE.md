@@ -43,7 +43,8 @@ Package manager is Yarn 4 (Berry, `nodeLinker: node-modules`, see `.yarnrc.yml`)
 pinned in `.nvmrc`. `.yarnrc.yml` sets `npmMinimalAgeGate: 10080`, so packages published in the last 7 days do
 not install; `vite-plus` (with `vite` mapped to `@voidzero-dev/vite-plus-core`) is pinned in the Yarn catalog
 there. CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn vp check`, `yarn test`, `yarn build` and a
-report-only `yarn fallow audit` against the pre-push commit on every push/PR, and on `main` additionally deploys
+`yarn fallow audit` against the pre-push commit (it fails on dead code or over-limit complexity that the push
+introduces; new duplication and older findings are reported, not enforced) on every push/PR, and on `main` additionally deploys
 `app/dist` to a Cloudflare Worker
 (`wrangler.jsonc`: static assets with SPA fallback, plus the `worker/` script for `/api/*` and the
 `SyncGroup` Durable Object for Phase 3 sync) via `cloudflare/wrangler-action`. The deploy job

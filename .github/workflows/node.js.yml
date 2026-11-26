@@ -24,8 +24,7 @@ jobs:
       - run: yarn vp check
       - run: yarn test
       - run: yarn build
-      - name: fallow audit (report-only)
-        continue-on-error: true
+      - name: fallow audit
         env:
           BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: yarn fallow audit --base "$BASE"
