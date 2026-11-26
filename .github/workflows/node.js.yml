@@ -36,14 +36,26 @@ jobs:
           exit "$status"
   e2e:
     runs-on: ubuntu-latest
+    # Browsers and their system deps ship in the image, so no `playwright install` step.
+    # Dependabot doesn't bump this tag: the guard below fails when it drifts from @playwright/test.
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --user 1001
     steps:
       - uses: actions/checkout@v7
+      - name: Playwright image matches @playwright/test
+        run: |
+          pinned=$(node -p "require('./app/package.json').devDependencies['@playwright/test']")
+          image=$(grep -oE 'mcr.microsoft.com/playwright:v[0-9.]+' .github/workflows/node.js.yml | head -1 | sed 's/.*:v//')
+          if [ "$pinned" != "$image" ]; then
+            echo "::error::Playwright image v$image does not match @playwright/test $pinned. Update the container tag."
+            exit 1
+          fi
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
       - run: corepack enable
       - run: yarn install --immutable
-      - run: yarn workspace @tomelist/app exec playwright install --with-deps chromium webkit
       - run: yarn e2e
       - if: failure()
         uses: actions/upload-artifact@v7
