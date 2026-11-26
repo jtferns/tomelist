@@ -38,6 +38,8 @@ Run from the repo root unless noted:
   `data/`, `docs/` and `.design-sync/` are not formatted
 - `yarn fallow` — dead code, duplication and complexity report (config in `.fallowrc.json`);
   `yarn fallow audit --base <ref>` reports only what changed since `<ref>`
+- `yarn e2e` — Playwright end-to-end suite (`yarn workspace @tomelist/app run e2e`: `vp build && playwright test`,
+  specs in `app/e2e/`); CI runs it before deploying
 
 Package manager is Yarn 4 (Berry, `nodeLinker: node-modules`, see `.yarnrc.yml`). Node version is
 pinned in `.nvmrc`. `.yarnrc.yml` sets `npmMinimalAgeGate: 10080`, so packages published in the last 7 days do
