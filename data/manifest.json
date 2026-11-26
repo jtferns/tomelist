@@ -5,6 +5,12 @@
       "name": "The First Hunt for Astronomy (Sep 2026)",
       "starts": "2026-09-09T08:00:00Z",
       "ends": "2026-10-19T14:59:00Z"
+    },
+    {
+      "id": "2026-12-astronomy-second-hunt",
+      "name": "The Second Hunt for Astronomy (Dec 2026)",
+      "starts": "2026-12-01T08:00:00Z",
+      "ends": "2027-01-12T07:59:00Z"
     }
   ]
 }

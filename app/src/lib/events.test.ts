@@ -5,7 +5,7 @@ describe("event loading", () => {
   it("loads events sorted newest-first by start date", () => {
     const events = getAllEvents();
     expect(events.length).toBeGreaterThan(0);
-    expect(events[0].id).toBe("2026-09-astronomy-first-hunt");
+    expect(events[0].id).toBe("2026-12-astronomy-second-hunt");
   });
   it("merges the registered fixture with the bundled events", () => {
     const ids = getAllEvents().map((e) => e.id);
@@ -20,10 +20,10 @@ describe("event loading", () => {
     expect(getActiveEvent(new Date("2026-04-15T00:00:00Z"))?.id).toBe("2026-03-mogmog-collection");
   });
   it("active event: between events falls back to most recent", () => {
-    expect(getActiveEvent(new Date("2026-07-09T00:00:00Z"))?.id).toBe("2026-09-astronomy-first-hunt");
+    expect(getActiveEvent(new Date("2026-07-09T00:00:00Z"))?.id).toBe("2026-12-astronomy-second-hunt");
   });
   it("active event: before any event starts falls back to most recent", () => {
-    expect(getActiveEvent(new Date("2020-01-01T00:00:00Z"))?.id).toBe("2026-09-astronomy-first-hunt");
+    expect(getActiveEvent(new Date("2020-01-01T00:00:00Z"))?.id).toBe("2026-12-astronomy-second-hunt");
   });
   it("isEventEnded: false before the end, true after, and a null end never ends", () => {
     const e = getEvent("2026-03-mogmog-collection")!;
