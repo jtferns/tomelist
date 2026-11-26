@@ -39,6 +39,8 @@ export const exchangeSchema = z.object({
   eorzeadbUrl: z.string().url().optional(),
   // Event tokens per unit, on top of `cost`.
   tokenCost: z.number().int().positive().optional(),
+  // Event tokens given per unit, e.g. a Uolon Horn Token bought for 30 tomes.
+  grantsTokens: z.number().int().positive().optional(),
 });
 
 export const eventSchema = z.object({

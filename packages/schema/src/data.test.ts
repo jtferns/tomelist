@@ -48,8 +48,16 @@ describe("bundled event data", () => {
       const event = eventSchema.parse(JSON.parse(readFileSync(join(dataDir, "events", f), "utf8")));
       const usesTokens =
         event.objectives.some((o) => o.tokens !== undefined) ||
-        event.exchanges.some((e) => e.tokenCost !== undefined);
+        event.exchanges.some((e) => e.tokenCost !== undefined || e.grantsTokens !== undefined);
       if (usesTokens) expect(event.token, `${f}: uses tokens without "token"`).toBeDefined();
+    }
+  });
+  it("no exchange both charges and grants tokens", () => {
+    const files = readdirSync(join(dataDir, "events")).filter((f) => f.endsWith(".json"));
+    for (const f of files) {
+      const event = eventSchema.parse(JSON.parse(readFileSync(join(dataDir, "events", f), "utf8")));
+      const both = event.exchanges.filter((e) => e.tokenCost && e.grantsTokens).map((e) => e.id);
+      expect(both, f).toEqual([]);
     }
   });
   it("the newest event records whether every exchange is tradeable", () => {

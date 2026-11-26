@@ -26,7 +26,7 @@
   ],
   "exchanges": [
     { "id": "uolon-horn", "name": "Uolon Horn", "icon": "/items/uolon-horn.png", "cost": 100, "type": "Mount", "tradeable": false, "tokenCost": 10, "collect": { "kind": "mount", "id": 414 }, "notes": "Uolon Horn Tokens from the First Hunt still count." },
-    { "id": "uolon-horn-token", "name": "Uolon Horn Token", "icon": "/items/uolon-horn-token.png", "cost": 30, "type": "Item", "tradeable": false, "notes": "Second Hunt only. Add the token to your wallet after buying it." },
+    { "id": "uolon-horn-token", "name": "Uolon Horn Token", "icon": "/items/uolon-horn-token.png", "cost": 30, "type": "Item", "tradeable": false, "grantsTokens": 1, "notes": "Second Hunt only." },
     { "id": "dodo-horn", "name": "Dodo Horn", "icon": "/items/dodo-horn.png", "cost": 100, "type": "Mount", "tradeable": true, "collect": { "kind": "mount", "id": 159 } },
     { "id": "diamond-gwiber-trumpet", "name": "Diamond Gwiber Trumpet", "icon": "/items/diamond-gwiber-trumpet.png", "cost": 50, "type": "Mount", "tradeable": false, "collect": { "kind": "mount", "id": 249 } },
     { "id": "promises-to-keep-orchestrion-roll", "name": "Promises to Keep Orchestrion Roll", "icon": "/items/promises-to-keep-orchestrion-roll.png", "cost": 50, "type": "Music", "tradeable": true, "collect": { "kind": "orchestrion", "id": 419 } },

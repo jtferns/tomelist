@@ -35,8 +35,8 @@ type AppState = PersistedState & {
   setCovering: (eventId: string, exchangeId: string, covering: boolean) => void;
   markReceived: (eventId: string, exchangeId: string) => void;
   undoReceived: (eventId: string, exchangeId: string) => void;
-  markExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number) => void;
-  undoExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number) => void;
+  markExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number, grantsTokens?: number) => void;
+  undoExchanged: (eventId: string, exchangeId: string, cost: number, tokenCost?: number, grantsTokens?: number) => void;
   resetEvent: (eventId: string) => void;
   replaceState: (state: UserState) => void;
   setSyncToken: (token: string | undefined) => void;
@@ -184,25 +184,29 @@ export const useAppStore = create<AppState>()(
             const entry = p.wishlist[exchangeId];
             if (entry?.status === "exchanged") p.wishlist[exchangeId] = { ...entry, status: "covering" };
           }),
-        markExchanged: (eventId, exchangeId, cost, tokenCost = 0) =>
+        markExchanged: (eventId, exchangeId, cost, tokenCost = 0, grantsTokens = 0) =>
           update(eventId, (p) => {
             const entry = p.wishlist[exchangeId];
             if (entry && entry.status === "wanted") {
               if (p.tomestones < cost || (p.tokens ?? 0) < tokenCost) return;
               p.tomestones -= cost;
               if (tokenCost > 0) p.tokens = (p.tokens ?? 0) - tokenCost;
+              if (grantsTokens > 0) p.tokens = (p.tokens ?? 0) + grantsTokens;
               p.wishlist[exchangeId] =
                 entry.quantity > 1
                   ? { ...entry, quantity: entry.quantity - 1 }
                   : { ...entry, status: "exchanged" };
             }
           }),
-        undoExchanged: (eventId, exchangeId, cost, tokenCost = 0) =>
+        undoExchanged: (eventId, exchangeId, cost, tokenCost = 0, grantsTokens = 0) =>
           update(eventId, (p) => {
             const entry = p.wishlist[exchangeId];
             if (!entry) return;
+            // Refuse rather than clamp: bought tokens already spent can't be taken back.
+            if ((p.tokens ?? 0) < grantsTokens) return;
             p.tomestones += cost;
             if (tokenCost > 0) p.tokens = (p.tokens ?? 0) + tokenCost;
+            if (grantsTokens > 0) p.tokens = (p.tokens ?? 0) - grantsTokens;
             p.wishlist[exchangeId] =
               entry.status === "exchanged"
                 ? { ...entry, status: "wanted" }

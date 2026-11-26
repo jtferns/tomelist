@@ -168,6 +168,31 @@ describe("token actions", () => {
     p = useAppStore.getState().getProgress(E);
     expect([p.tomestones, p.tokens]).toEqual([100, 10]);
   });
+
+  it("a token purchase spends tomes, adds the token, and undo reverses both", () => {
+    useAppStore.getState().addTomestones(E, 30);
+    useAppStore.getState().toggleWishlist(E, "token");
+    useAppStore.getState().markExchanged(E, "token", 30, 0, 1);
+    let p = useAppStore.getState().getProgress(E);
+    expect(p.wishlist["token"].status).toBe("exchanged");
+    expect([p.tomestones, p.tokens]).toEqual([0, 1]);
+
+    useAppStore.getState().undoExchanged(E, "token", 30, 0, 1);
+    p = useAppStore.getState().getProgress(E);
+    expect(p.wishlist["token"].status).toBe("wanted");
+    expect([p.tomestones, p.tokens]).toEqual([30, 0]);
+  });
+
+  it("refuses to undo a token purchase once the bought token is spent", () => {
+    useAppStore.getState().addTomestones(E, 30);
+    useAppStore.getState().toggleWishlist(E, "token");
+    useAppStore.getState().markExchanged(E, "token", 30, 0, 1);
+    useAppStore.getState().addTokens(E, -1);
+    useAppStore.getState().undoExchanged(E, "token", 30, 0, 1);
+    const p = useAppStore.getState().getProgress(E);
+    expect(p.wishlist["token"].status).toBe("exchanged");
+    expect([p.tomestones, p.tokens]).toEqual([0, 0]);
+  });
 });
 
 describe("friend covering", () => {
