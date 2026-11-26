@@ -31,6 +31,7 @@ yarn-error.log*
 .superpowers/
 .wrangler/
 .playwright-mcp/
+.fallow/
 
 # design-sync (claude.ai/design) — staged converter, build output, machine state
 .ds-sync/

@@ -8,6 +8,7 @@ const STATE_KEY = "state";
 // One instance per sync token. Uses the hibernation API, so idle sockets
 // cost nothing between messages.
 export class SyncGroup extends DurableObject<Env> {
+  // fallow-ignore-next-line unused-class-member -- called by the Workers runtime
   async fetch(request: Request): Promise<Response> {
     const { 0: client, 1: server } = new WebSocketPair();
     this.ctx.acceptWebSocket(server);
@@ -18,6 +19,7 @@ export class SyncGroup extends DurableObject<Env> {
     return new Response(null, { status: 101, webSocket: client });
   }
 
+  // fallow-ignore-next-line unused-class-member -- called by the Workers runtime
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     const raw = typeof message === "string" ? message : new TextDecoder().decode(message);
     const stored = (await this.ctx.storage.get<UserState>(STATE_KEY)) ?? null;
@@ -40,6 +42,7 @@ export class SyncGroup extends DurableObject<Env> {
 
   // No writes for 90 days: drop the group. A device that reconnects later
   // uploads its own state again.
+  // fallow-ignore-next-line unused-class-member -- called by the Workers runtime
   async alarm(): Promise<void> {
     await this.ctx.storage.deleteAll();
     for (const ws of this.ctx.getWebSockets()) ws.close(1000, "expired");
