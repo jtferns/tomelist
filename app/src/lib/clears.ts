@@ -9,7 +9,7 @@ export function clearsNeeded(objective: Objective): number {
 export function clearReward(
   objective: Objective,
   countAfter: number,
-  withTokens: boolean
+  withTokens: boolean,
 ): { points: number; tokens: number } {
   if (objective.clears !== undefined && countAfter !== objective.clears) return { points: 0, tokens: 0 };
   return { points: objective.points, tokens: withTokens ? (objective.tokens ?? 0) : 0 };

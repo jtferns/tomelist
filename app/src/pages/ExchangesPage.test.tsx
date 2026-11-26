@@ -165,7 +165,7 @@ describe("ExchangesPage", () => {
     await renderExchanges();
     expect(screen.queryByTestId("eorzeadb-fat-cat-parasol")).not.toBeInTheDocument();
     expect(
-      document.querySelector('script[src="https://lds-img.finalfantasyxiv.com/pc/global/js/eorzeadb/loader.js?v3"]')
+      document.querySelector('script[src="https://lds-img.finalfantasyxiv.com/pc/global/js/eorzeadb/loader.js?v3"]'),
     ).not.toBeInTheDocument();
   });
 
@@ -173,11 +173,7 @@ describe("ExchangesPage", () => {
     await renderExchanges();
     await userEvent.click(screen.getByTestId("sort-cost"));
     const ids = screen.getAllByTestId(/^exchange-/).map((el) => el.getAttribute("data-testid"));
-    expect(ids).toEqual([
-      "exchange-magicked-prism-bundle",
-      "exchange-fat-cat-parasol",
-      "exchange-miners-earring",
-    ]);
+    expect(ids).toEqual(["exchange-magicked-prism-bundle", "exchange-fat-cat-parasol", "exchange-miners-earring"]);
   });
 
   it("sort-tier puts a must-tier wanted item first and an exchanged item last", async () => {
@@ -203,11 +199,7 @@ describe("ExchangesPage", () => {
     await userEvent.click(screen.getByTestId("sort-cost"));
     await userEvent.click(screen.getByTestId("sort-default"));
     const ids = screen.getAllByTestId(/^exchange-/).map((el) => el.getAttribute("data-testid"));
-    expect(ids).toEqual([
-      "exchange-miners-earring",
-      "exchange-fat-cat-parasol",
-      "exchange-magicked-prism-bundle",
-    ]);
+    expect(ids).toEqual(["exchange-miners-earring", "exchange-fat-cat-parasol", "exchange-magicked-prism-bundle"]);
   });
 
   it("sort chips expose aria-pressed and flip pressed state on click", async () => {
@@ -228,10 +220,7 @@ describe("ExchangesPage", () => {
     await userEvent.click(screen.getByRole("button", { name: /more fat cat parasol/i }));
     // still wanted, not toggled off
     expect(screen.getByTestId("wanted-total")).toHaveTextContent("100");
-    expect(screen.getByRole("button", { name: /want fat cat parasol/i })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
+    expect(screen.getByRole("button", { name: /want fat cat parasol/i })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("search narrows the list by name", async () => {
@@ -274,9 +263,7 @@ describe("ExchangesPage", () => {
     });
 
     it("renders an img with empty alt when item.icon is present", () => {
-      render(
-        <ExchangeRow eventId={E} item={{ ...baseItem, icon: "/icons/test-item.png" }} wallet={0} />
-      );
+      render(<ExchangeRow eventId={E} item={{ ...baseItem, icon: "/icons/test-item.png" }} wallet={0} />);
       const row = screen.getByTestId("exchange-test-item");
       const img = within(row).getByRole("presentation", { hidden: true });
       expect(img).toHaveAttribute("src", "/icons/test-item.png");
@@ -294,11 +281,7 @@ describe("ExchangesPage", () => {
 
   it("renders the tome cost once per row", () => {
     render(
-      <ExchangeRow
-        eventId={E}
-        item={{ id: "cost-once", name: "Cost Once", cost: 10, type: "Fashion" }}
-        wallet={0}
-      />
+      <ExchangeRow eventId={E} item={{ id: "cost-once", name: "Cost Once", cost: 10, type: "Fashion" }} wallet={0} />,
     );
     const row = screen.getByTestId("exchange-cost-once");
     expect(within(row).getAllByText(/tomes/i)).toHaveLength(1);
@@ -471,7 +454,7 @@ describe("ExchangesPage", () => {
         "Looking for help with (all tradeable):",
         "- Domakin x2: 14 tomes",
         "Total: 14 tomes",
-      ].join("\n")
+      ].join("\n"),
     );
     expect(within(panel).getByRole("button", { name: "Copied" })).toBeInTheDocument();
   });
@@ -493,7 +476,7 @@ describe("ExchangesPage", () => {
     await userEvent.click(screen.getByRole("button", { name: "Ask a friend" }));
     await userEvent.click(screen.getByRole("button", { name: "Copy list" }));
     expect(await screen.findByTestId("ask-fallback")).toHaveValue(
-      "Tomelist: The First Hunt for Astronomy (Sep 2026)\nLooking for help with (all tradeable):\n- Domakin: 7 tomes\nTotal: 7 tomes"
+      "Tomelist: The First Hunt for Astronomy (Sep 2026)\nLooking for help with (all tradeable):\n- Domakin: 7 tomes\nTotal: 7 tomes",
     );
   });
 

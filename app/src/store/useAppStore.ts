@@ -193,9 +193,7 @@ export const useAppStore = create<AppState>()(
               if (tokenCost > 0) p.tokens = (p.tokens ?? 0) - tokenCost;
               if (grantsTokens > 0) p.tokens = (p.tokens ?? 0) + grantsTokens;
               p.wishlist[exchangeId] =
-                entry.quantity > 1
-                  ? { ...entry, quantity: entry.quantity - 1 }
-                  : { ...entry, status: "exchanged" };
+                entry.quantity > 1 ? { ...entry, quantity: entry.quantity - 1 } : { ...entry, status: "exchanged" };
             }
           }),
         undoExchanged: (eventId, exchangeId, cost, tokenCost = 0, grantsTokens = 0) =>
@@ -247,6 +245,6 @@ export const useAppStore = create<AppState>()(
         updatedAt: s.updatedAt,
         syncToken: s.syncToken,
       }),
-    }
-  )
+    },
+  ),
 );

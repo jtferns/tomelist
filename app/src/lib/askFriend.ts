@@ -35,14 +35,15 @@ export function askTotal(lines: AskLine[]): { tomes: number; tokens: number } {
       tomes: sum.tomes + item.cost * quantity,
       tokens: sum.tokens + (item.tokenCost ?? 0) * quantity,
     }),
-    { tomes: 0, tokens: 0 }
+    { tomes: 0, tokens: 0 },
   );
 }
 
 // Plain text for pasting into Discord or chat. Lists only what friends can actually help with.
 export function askText(eventName: string, lines: AskLine[]): string {
   const total = askTotal(lines);
-  const totalText = total.tokens > 0 ? `${tomeCount(total.tomes)} + ${tokenCount(total.tokens)}` : tomeCount(total.tomes);
+  const totalText =
+    total.tokens > 0 ? `${tomeCount(total.tomes)} + ${tokenCount(total.tokens)}` : tomeCount(total.tomes);
   return [
     `Tomelist: ${eventName}`,
     "Looking for help with (all tradeable):",

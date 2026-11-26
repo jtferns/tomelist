@@ -48,9 +48,7 @@ export function isEventEnded(event: EventData, now: Date): boolean {
 }
 
 export function getActiveEvent(now: Date): EventData | undefined {
-  const live = allEvents().find(
-    (e) => new Date(e.starts) <= now && (e.ends === null || new Date(e.ends) >= now)
-  );
+  const live = allEvents().find((e) => new Date(e.starts) <= now && (e.ends === null || new Date(e.ends) >= now));
   return live ?? allEvents()[0];
 }
 

@@ -16,10 +16,10 @@ describe("undoClearBlockedReason", () => {
 
   it("names whichever balances fall short, tomes first", () => {
     expect(undoClearBlockedReason(4, 10, 1, 1)).toBe(
-      "6 tomes from this clear already went to exchanges. Undo an exchange first."
+      "6 tomes from this clear already went to exchanges. Undo an exchange first.",
     );
     expect(undoClearBlockedReason(4, 10, 0, 1, "Horn Token")).toBe(
-      "6 tomes and 1 Horn Token from this clear already went to exchanges. Undo an exchange first."
+      "6 tomes and 1 Horn Token from this clear already went to exchanges. Undo an exchange first.",
     );
   });
 });

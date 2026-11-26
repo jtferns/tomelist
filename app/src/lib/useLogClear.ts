@@ -26,7 +26,7 @@ export function useLogClear(eventId: string) {
       () => {
         const p = useAppStore.getState().events[eventId];
         return undoClearBlockedReason(p?.tomestones ?? 0, points, p?.tokens ?? 0, tokens, token?.name);
-      }
+      },
     );
   };
 }

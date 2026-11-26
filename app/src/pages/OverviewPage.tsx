@@ -40,7 +40,11 @@ export function OverviewPage() {
         {event.token ? <TokenStepper eventId={eventId} name={event.token.name} /> : null}
         <p data-testid="saving-for" className="text-center text-sm text-muted-foreground">
           {wanted.length > 0 ? `Saving for ${savingFor}. ` : "No goal yet. "}
-          <Link to="/$eventId/exchanges" params={{ eventId }} className="text-gold underline underline-offset-2 pointer-coarse:inline-block pointer-coarse:py-3.5 pointer-coarse:-my-3.5">
+          <Link
+            to="/$eventId/exchanges"
+            params={{ eventId }}
+            className="text-gold underline underline-offset-2 pointer-coarse:inline-block pointer-coarse:py-3.5 pointer-coarse:-my-3.5"
+          >
             {wanted.length > 0 ? "Edit" : "Pick items on Exchanges"}
           </Link>
         </p>
@@ -52,7 +56,9 @@ export function OverviewPage() {
             className="flex items-center justify-center gap-2 text-sm text-muted-foreground pointer-coarse:min-h-11"
           >
             <Badge variant={pace.variant}>{pace.label}</Badge>
-            {plan.neededPerWeek ? `Earned ${plan.earnedThisWeek} of ~${plan.neededPerWeek} this week` : "Must-haves covered"}
+            {plan.neededPerWeek
+              ? `Earned ${plan.earnedThisWeek} of ~${plan.neededPerWeek} this week`
+              : "Must-haves covered"}
           </Link>
         ) : null}
       </FramedCard>

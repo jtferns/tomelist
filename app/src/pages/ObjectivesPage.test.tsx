@@ -137,7 +137,7 @@ describe("ObjectivesPage", () => {
     await userEvent.click(within(row).getByRole("button", { name: /log clear/i }));
     useAppStore.getState().addTomestones(E, -45);
     expect(await within(row).findByTestId("undo-blocked")).toHaveTextContent(
-      "45 tomes from this clear already went to exchanges. Undo an exchange first."
+      "45 tomes from this clear already went to exchanges. Undo an exchange first.",
     );
     expect(within(row).getByRole("button", { name: /undo/i })).toBeDisabled();
   });
@@ -159,7 +159,7 @@ describe("ObjectivesPage", () => {
 
     useAppStore.getState().addTokens(A, -1);
     expect(await within(row).findByTestId("undo-blocked")).toHaveTextContent(
-      "1 Uolon Horn Token from this clear already went to exchanges. Undo an exchange first."
+      "1 Uolon Horn Token from this clear already went to exchanges. Undo an exchange first.",
     );
   });
 

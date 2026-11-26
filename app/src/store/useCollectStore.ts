@@ -14,6 +14,6 @@ export const useCollectStore = create<{
       setImported: (imported) => set({ imported }),
       forget: () => set({ imported: null }),
     }),
-    { name: "tomelist:collect", version: 1 }
-  )
+    { name: "tomelist:collect", version: 1 },
+  ),
 );

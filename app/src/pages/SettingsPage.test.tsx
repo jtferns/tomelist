@@ -144,7 +144,11 @@ describe("SettingsPage", () => {
 
   it("shows each Grand Company's crest on its palette chip", async () => {
     await renderSettings();
-    for (const [name, file] of [["Maelstrom", "maelstrom"], ["Twin Adder", "adder"], ["Immortal Flames", "flames"]]) {
+    for (const [name, file] of [
+      ["Maelstrom", "maelstrom"],
+      ["Twin Adder", "adder"],
+      ["Immortal Flames", "flames"],
+    ]) {
       const img = screen.getByRole("button", { name }).querySelector("img");
       expect(img).toHaveAttribute("src", `/crests/${file}.png`);
       expect(img).toHaveAttribute("alt", "");

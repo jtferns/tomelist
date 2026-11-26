@@ -1,6 +1,7 @@
 # Event authoring
 
 Per new event:
+
 1. Find the irregular tomestone's name (Lodestone event page / in-game).
 2. `yarn dlx --quiet tsx scripts/fetch-rewards.ts "<Tomestone Name>" > draft-exchanges.json`
 3. Audit the draft against the in-game exchange shop; fix costs/names; remove non-event items.

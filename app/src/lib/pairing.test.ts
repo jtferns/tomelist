@@ -12,13 +12,20 @@ describe("pairing", () => {
 
   it("builds a fragment link so the token never reaches the server", () => {
     expect(pairingUrl("https://tomelist.example", "AAAAAAAAAAAAAAAAAAAAAA")).toBe(
-      "https://tomelist.example/#sync=AAAAAAAAAAAAAAAAAAAAAA"
+      "https://tomelist.example/#sync=AAAAAAAAAAAAAAAAAAAAAA",
     );
   });
 
   it("reads a token from the hash and rejects anything else", () => {
     expect(readPairingHash("#sync=AAAAAAAAAAAAAAAAAAAAAA")).toBe("AAAAAAAAAAAAAAAAAAAAAA");
-    for (const hash of ["", "#", "#sync=", "#sync=short", "#other=AAAAAAAAAAAAAAAAAAAAAA", "#sync=AAAAAAAAAAAAAAAAAAAAA="]) {
+    for (const hash of [
+      "",
+      "#",
+      "#sync=",
+      "#sync=short",
+      "#other=AAAAAAAAAAAAAAAAAAAAAA",
+      "#sync=AAAAAAAAAAAAAAAAAAAAA=",
+    ]) {
       expect(readPairingHash(hash)).toBeNull();
     }
   });

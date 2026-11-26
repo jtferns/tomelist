@@ -23,7 +23,7 @@ export function RunNext({ eventId }: { eventId: string }) {
   const ranked = rankRunNext(event, eventProgress, now);
   const top3 = ranked.slice(0, 3);
   const clearCounts = Object.fromEntries(
-    Object.entries(eventProgress.completedObjectives).map(([id, record]) => [id, record.count])
+    Object.entries(eventProgress.completedObjectives).map(([id, record]) => [id, record.count]),
   );
 
   const report = budgetReport(event, eventProgress, now);
@@ -56,11 +56,7 @@ export function RunNext({ eventId }: { eventId: string }) {
                     ) : null}
                   </div>
                 </div>
-                <Button
-                  variant={index === 0 ? "action" : "action-soft"}
-                  size="sm"
-                  onClick={() => logClear(objective)}
-                >
+                <Button variant={index === 0 ? "action" : "action-soft"} size="sm" onClick={() => logClear(objective)}>
                   Log clear
                 </Button>
               </ListRow>
@@ -78,9 +74,7 @@ export function RunNext({ eventId }: { eventId: string }) {
       </Link>
       {showHint && runs !== 0 ? (
         <p data-testid="runs-to-goal" className="text-sm text-muted-foreground">
-          {runs === null
-            ? "Weekly income can't reach your Must goal"
-            : `~${runs} runs to reach your Must goal`}
+          {runs === null ? "Weekly income can't reach your Must goal" : `~${runs} runs to reach your Must goal`}
         </p>
       ) : null}
     </FramedCard>

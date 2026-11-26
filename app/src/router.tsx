@@ -1,9 +1,4 @@
-import {
-  createRootRoute,
-  createRoute,
-  createRouter,
-  redirect,
-} from "@tanstack/react-router";
+import { createRootRoute, createRoute, createRouter, redirect } from "@tanstack/react-router";
 import { EventShell } from "@/components/EventShell";
 import { Layout } from "@/components/Layout";
 import { getActiveEvent } from "@/lib/events";
@@ -33,7 +28,11 @@ const eventRoute = createRoute({
 });
 
 const overviewRoute = createRoute({ getParentRoute: () => eventRoute, path: "/overview", component: OverviewPage });
-const objectivesRoute = createRoute({ getParentRoute: () => eventRoute, path: "/objectives", component: ObjectivesPage });
+const objectivesRoute = createRoute({
+  getParentRoute: () => eventRoute,
+  path: "/objectives",
+  component: ObjectivesPage,
+});
 const plannerRoute = createRoute({ getParentRoute: () => eventRoute, path: "/planner", component: PlannerPage });
 const exchangesRoute = createRoute({ getParentRoute: () => eventRoute, path: "/exchanges", component: ExchangesPage });
 const settingsRoute = createRoute({ getParentRoute: () => eventRoute, path: "/settings", component: SettingsPage });

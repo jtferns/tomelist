@@ -45,8 +45,7 @@ export function SyncSettings() {
         {statusText[status]}
       </p>
       <p className="text-sm text-muted-foreground">
-        Scan this on your other device, or open the link there. Anyone with the link can see and
-        change your progress.
+        Scan this on your other device, or open the link there. Anyone with the link can see and change your progress.
       </p>
       <SyncQr url={link} />
       <p className="break-all font-mono text-xs text-muted-foreground">{link}</p>

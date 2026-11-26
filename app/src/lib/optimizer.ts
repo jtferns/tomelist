@@ -190,10 +190,7 @@ function computeTierCosts(event: EventData, progress: EventProgress): Record<(ty
   return { must, want, maybe };
 }
 
-function computeTierTokenCosts(
-  event: EventData,
-  progress: EventProgress
-): Record<(typeof TIER_ORDER)[number], number> {
+function computeTierTokenCosts(event: EventData, progress: EventProgress): Record<(typeof TIER_ORDER)[number], number> {
   const exchangesById = new Map(event.exchanges.map((exchange) => [exchange.id, exchange]));
   const tierSums = { must: 0, want: 0, maybe: 0 };
   for (const [exchangeId, entry] of Object.entries(progress.wishlist)) {
@@ -210,7 +207,7 @@ function computeTierTokenCosts(
 
 function computeTierGrantedTokens(
   event: EventData,
-  progress: EventProgress
+  progress: EventProgress,
 ): Record<(typeof TIER_ORDER)[number], number> {
   const exchangesById = new Map(event.exchanges.map((exchange) => [exchange.id, exchange]));
   const tierSums = { must: 0, want: 0, maybe: 0 };
@@ -332,7 +329,7 @@ const WEEKLY_RESET_HOUR = 8;
 
 export function lastWeeklyReset(now: Date): Date {
   const reset = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), WEEKLY_RESET_HOUR, 0, 0, 0)
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), WEEKLY_RESET_HOUR, 0, 0, 0),
   );
   const dayDiff = (reset.getUTCDay() - WEEKLY_RESET_DAY + 7) % 7;
   reset.setUTCDate(reset.getUTCDate() - dayDiff);
@@ -403,9 +400,7 @@ export function runsToMustGoal(event: EventData, progress: EventProgress, now: D
   let count = 0;
   for (const { objective } of ranked) {
     sum += objective.points;
-    count += objective.clears
-      ? objective.clears - (progress.completedObjectives[objective.id]?.count ?? 0)
-      : 1;
+    count += objective.clears ? objective.clears - (progress.completedObjectives[objective.id]?.count ?? 0) : 1;
     if (sum >= shortfall) return count;
   }
 

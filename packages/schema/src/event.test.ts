@@ -19,9 +19,7 @@ const validEvent = {
       repeatable: true,
     },
   ],
-  exchanges: [
-    { id: "fat-cat-parasol", name: "Fat Cat Parasol", cost: 50, type: "Fashion" },
-  ],
+  exchanges: [{ id: "fat-cat-parasol", name: "Fat Cat Parasol", cost: 50, type: "Fashion" }],
 };
 
 describe("eventSchema", () => {
@@ -41,7 +39,7 @@ describe("eventSchema", () => {
   });
   it("rejects a zero token award", () => {
     expect(() =>
-      eventSchema.parse({ ...validEvent, objectives: [{ ...validEvent.objectives[0], tokens: 0 }] })
+      eventSchema.parse({ ...validEvent, objectives: [{ ...validEvent.objectives[0], tokens: 0 }] }),
     ).toThrow();
   });
   it("rejects unknown objective kind", () => {

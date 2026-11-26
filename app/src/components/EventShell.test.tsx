@@ -42,18 +42,14 @@ describe("EventShell", () => {
     await renderAt(E, "objectives");
     await screen.findByTestId("objectives-page");
     const links = screen.getAllByRole("link", { name: /objectives/i });
-    const active = links.filter(
-      (l) => l.getAttribute("aria-current") === "page" || l.classList.contains("active")
-    );
+    const active = links.filter((l) => l.getAttribute("aria-current") === "page" || l.classList.contains("active"));
     expect(active.length).toBeGreaterThan(0);
   });
 
   it("aligns the desktop header gutter to the content column (px-4)", async () => {
     await renderAt(E, "overview");
     await screen.findByTestId("overview-page");
-    const desktopNav = screen
-      .getAllByRole("navigation")
-      .find((nav) => nav.className.includes("top-0"));
+    const desktopNav = screen.getAllByRole("navigation").find((nav) => nav.className.includes("top-0"));
     const inner = desktopNav?.firstElementChild;
     expect(inner?.className).toMatch(/(^|\s)px-4(\s|$)/);
   });

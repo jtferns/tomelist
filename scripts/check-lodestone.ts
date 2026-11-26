@@ -31,7 +31,12 @@ export function parseLodestone(html: string): LodestoneItem[] {
     const costs = [...featured[2].matchAll(/<p><span>([^<]+)<\/span><span>(\d+)<\/span><\/p>/g)];
     const tome = costs.find((c) => /tomestone/i.test(c[1]));
     const token = costs.find((c) => !/tomestone/i.test(c[1]));
-    if (tome) items.unshift({ name: decode(featured[1]), cost: Number(tome[2]), tokenCost: token ? Number(token[2]) : undefined });
+    if (tome)
+      items.unshift({
+        name: decode(featured[1]),
+        cost: Number(tome[2]),
+        tokenCost: token ? Number(token[2]) : undefined,
+      });
   }
   return items;
 }
@@ -50,7 +55,7 @@ export function parseLodestone(html: string): LodestoneItem[] {
 
   const key = (s: string) => s.toLowerCase();
   const ours = new Map<string, { name: string; cost: number; tokenCost?: number }>(
-    event.exchanges.map((e: { name: string }) => [key(e.name), e])
+    event.exchanges.map((e: { name: string }) => [key(e.name), e]),
   );
   const problems: string[] = [];
   for (const item of lodestone) {

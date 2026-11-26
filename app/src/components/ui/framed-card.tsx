@@ -1,6 +1,6 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function FramedCard({
   corners = false,
@@ -9,8 +9,8 @@ function FramedCard({
   children,
   ...props
 }: React.ComponentProps<"div"> & {
-  corners?: boolean
-  muted?: boolean
+  corners?: boolean;
+  muted?: boolean;
 }) {
   return (
     <div
@@ -21,7 +21,7 @@ function FramedCard({
           ? "bg-surface-1 border-border shadow-none"
           : "border-[var(--frame-border)] shadow-[var(--frame-inset)] bg-surface-2",
         corners && "relative",
-        className
+        className,
       )}
       {...props}
     >
@@ -41,7 +41,7 @@ function FramedCard({
       )}
       {children}
     </div>
-  )
+  );
 }
 
-export { FramedCard }
+export { FramedCard };

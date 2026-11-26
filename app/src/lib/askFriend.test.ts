@@ -50,7 +50,7 @@ describe("askText", () => {
         "- Ramuh Crystal: 50 tomes",
         "- Toad Head x2: 60 tomes",
         "Total: 110 tomes",
-      ].join("\n")
+      ].join("\n"),
     );
   });
 });

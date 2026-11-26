@@ -10,6 +10,8 @@ describe("SyncQr", () => {
   it("renders the link as a QR image", async () => {
     render(<SyncQr url="https://x.test/#sync=AAAAAAAAAAAAAAAAAAAAAA" />);
     const img = await screen.findByRole("img", { name: /qr code/i });
-    expect(img.getAttribute("src")).toBe(`data:image/png;base64,${btoa("https://x.test/#sync=AAAAAAAAAAAAAAAAAAAAAA")}`);
+    expect(img.getAttribute("src")).toBe(
+      `data:image/png;base64,${btoa("https://x.test/#sync=AAAAAAAAAAAAAAAAAAAAAA")}`,
+    );
   });
 });

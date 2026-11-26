@@ -28,10 +28,7 @@ describe("CharacterImport", () => {
   it("imports from a Lodestone profile URL", async () => {
     vi.mocked(fetchOwned).mockResolvedValue(imported);
     render(<CharacterImport />);
-    await userEvent.type(
-      screen.getByLabelText(/lodestone/i),
-      "https://na.finalfantasyxiv.com/lodestone/character/42/"
-    );
+    await userEvent.type(screen.getByLabelText(/lodestone/i), "https://na.finalfantasyxiv.com/lodestone/character/42/");
     await userEvent.click(screen.getByRole("button", { name: /^import$/i }));
     expect(fetchOwned).toHaveBeenCalledWith("42", ["mount", "minion", "orchestrion", "barding", "hairstyle"]);
     expect(await screen.findByText(/tome lister \(aegis\)/i)).toBeInTheDocument();

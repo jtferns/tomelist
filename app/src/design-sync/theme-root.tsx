@@ -30,9 +30,5 @@ export function ThemeRoot({
     document.documentElement.dataset.palette = palette;
   }, [theme, palette]);
 
-  return (
-    <div className="min-h-screen bg-background p-4 text-foreground">
-      {children}
-    </div>
-  );
+  return <div className="min-h-screen bg-background p-4 text-foreground">{children}</div>;
 }

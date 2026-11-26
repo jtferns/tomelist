@@ -34,7 +34,10 @@ const collectKinds: Record<string, string> = {
   const body = (await res.json()) as { results: { collectables: CollectRow[] } };
 
   const slug = (s: string) =>
-    s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
 
   const seen = new Set<string>();
   const exchanges = body.results.collectables

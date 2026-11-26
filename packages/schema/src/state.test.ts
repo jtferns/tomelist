@@ -9,7 +9,7 @@ describe("themeSettingsSchema", () => {
         mode: "light",
         ornament: "reduced",
         density: "compact",
-      })
+      }),
     ).toEqual({
       palette: "adder",
       mode: "light",
@@ -19,17 +19,17 @@ describe("themeSettingsSchema", () => {
   });
   it("rejects unknown palettes", () => {
     expect(() =>
-      themeSettingsSchema.parse({ palette: "garlean", mode: "dark", ornament: "full", density: "comfy" })
+      themeSettingsSchema.parse({ palette: "garlean", mode: "dark", ornament: "full", density: "comfy" }),
     ).toThrow();
   });
   it("rejects unknown ornament values", () => {
     expect(() =>
-      themeSettingsSchema.parse({ palette: "maelstrom", mode: "dark", ornament: "extra", density: "comfy" })
+      themeSettingsSchema.parse({ palette: "maelstrom", mode: "dark", ornament: "extra", density: "comfy" }),
     ).toThrow();
   });
   it("rejects unknown density values", () => {
     expect(() =>
-      themeSettingsSchema.parse({ palette: "maelstrom", mode: "dark", ornament: "full", density: "roomy" })
+      themeSettingsSchema.parse({ palette: "maelstrom", mode: "dark", ornament: "full", density: "roomy" }),
     ).toThrow();
   });
   it("rejects a theme missing ornament/density", () => {

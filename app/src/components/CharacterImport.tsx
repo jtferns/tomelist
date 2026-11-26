@@ -38,8 +38,8 @@ export function CharacterImport() {
         <>
           <p className="text-sm text-muted-foreground">
             {imported.name} ({imported.server}), imported{" "}
-            {new Date(imported.fetchedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}.
-            Rewards your character already has are marked Owned on Exchanges.
+            {new Date(imported.fetchedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}. Rewards
+            your character already has are marked Owned on Exchanges.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" disabled={busy} onClick={() => void run(imported.characterId)}>

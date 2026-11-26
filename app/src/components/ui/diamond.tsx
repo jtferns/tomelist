@@ -1,14 +1,8 @@
-import * as React from "react"
+import * as React from "react";
 
-function Diamond({
-  size = 14,
-  className,
-}: {
-  size?: number
-  className?: string
-}) {
-  const outerSize = size - 2
-  const innerSize = size / 2
+function Diamond({ size = 14, className }: { size?: number; className?: string }) {
+  const outerSize = size - 2;
+  const innerSize = size / 2;
 
   return (
     <div
@@ -42,7 +36,7 @@ function Diamond({
         }}
       />
     </div>
-  )
+  );
 }
 
-export { Diamond }
+export { Diamond };

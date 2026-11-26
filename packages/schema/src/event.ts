@@ -63,7 +63,7 @@ export const manifestSchema = z.object({
       name: z.string(),
       starts: z.string(),
       ends: z.string().nullable(),
-    })
+    }),
   ),
 });
 

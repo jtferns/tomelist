@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 
-export const EORZEADB_LOADER_SRC =
-  "https://lds-img.finalfantasyxiv.com/pc/global/js/eorzeadb/loader.js?v3";
+export const EORZEADB_LOADER_SRC = "https://lds-img.finalfantasyxiv.com/pc/global/js/eorzeadb/loader.js?v3";
 
 /**
  * Loads the official FFXIV Lodestone "Eorzea DB" tooltip loader script, which
@@ -25,9 +24,7 @@ export function useEorzeaTooltips(enabled: boolean): void {
 
     let script: HTMLScriptElement | undefined;
     try {
-      document
-        .querySelectorAll(`script[src="${EORZEADB_LOADER_SRC}"]`)
-        .forEach((el) => el.remove());
+      document.querySelectorAll(`script[src="${EORZEADB_LOADER_SRC}"]`).forEach((el) => el.remove());
 
       script = document.createElement("script");
       script.src = EORZEADB_LOADER_SRC;

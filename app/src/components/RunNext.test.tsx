@@ -37,9 +37,7 @@ describe("RunNext", () => {
 
   it("wraps long titles to two lines instead of cutting them to one", async () => {
     await renderOverview();
-    const title = within(screen.getByTestId("run-next-obj-ultimog-msq")).getByText(
-      "Ultimog: Complete the event quest"
-    );
+    const title = within(screen.getByTestId("run-next-obj-ultimog-msq")).getByText("Ultimog: Complete the event quest");
     expect(title).toHaveClass("line-clamp-2");
     expect(title).not.toHaveClass("truncate");
   });

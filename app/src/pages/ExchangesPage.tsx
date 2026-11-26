@@ -90,9 +90,7 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
   const markExchanged = useAppStore((s) => s.markExchanged);
   const undoExchanged = useAppStore((s) => s.undoExchanged);
   const showToast = useUndoToast((s) => s.show);
-  const owned = useCollectStore((s) =>
-    Boolean(item.collect && s.imported?.owned.includes(ownedKey(item.collect)))
-  );
+  const owned = useCollectStore((s) => Boolean(item.collect && s.imported?.owned.includes(ownedKey(item.collect))));
   const wanted = entry?.status === "wanted";
   const exchanged = entry?.status === "exchanged";
   const covering = entry?.status === "covering";
@@ -137,7 +135,11 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
       </Badge>
       <span>{item.type}</span>
       {owned ? (
-        <Badge variant="gold-outline" data-testid={`owned-${item.id}`} title="Your character has this, per FFXIV Collect">
+        <Badge
+          variant="gold-outline"
+          data-testid={`owned-${item.id}`}
+          title="Your character has this, per FFXIV Collect"
+        >
           <Check aria-hidden="true" className="size-3" />
           Owned
         </Badge>
@@ -297,10 +299,11 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
               onClick={() => {
                 const granted = item.grantsTokens ?? 0;
                 markExchanged(eventId, item.id, item.cost, tokenCost, granted);
-                const spent = tokenCost > 0 ? `${tomeCount(item.cost)}, −${tokenCount(tokenCost)}` : tomeCount(item.cost);
+                const spent =
+                  tokenCost > 0 ? `${tomeCount(item.cost)}, −${tokenCount(tokenCost)}` : tomeCount(item.cost);
                 const gained = granted > 0 ? `, +${tokenCount(granted)}` : "";
                 showToast(`Exchanged ${item.name}, −${spent}${gained}`, () =>
-                  undoExchanged(eventId, item.id, item.cost, tokenCost, granted)
+                  undoExchanged(eventId, item.id, item.cost, tokenCost, granted),
                 );
               }}
             >
@@ -366,7 +369,7 @@ export function ExchangesPage() {
         <p
           className={cn(
             "text-sm text-muted-foreground",
-            wantedTokenTotal > 0 ? "min-w-0 text-right" : "whitespace-nowrap"
+            wantedTokenTotal > 0 ? "min-w-0 text-right" : "whitespace-nowrap",
           )}
         >
           Wishlist total{" "}
@@ -429,12 +432,7 @@ export function ExchangesPage() {
       </div>
       <div data-testid="sort-options" className="flex flex-wrap items-center gap-1.5">
         {SORT_OPTIONS.map(({ key, label }) => (
-          <Chip
-            key={key}
-            active={sortKey === key}
-            data-testid={`sort-${key}`}
-            onClick={() => setSortKey(key)}
-          >
+          <Chip key={key} active={sortKey === key} data-testid={`sort-${key}`} onClick={() => setSortKey(key)}>
             {label}
           </Chip>
         ))}

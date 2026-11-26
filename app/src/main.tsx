@@ -13,5 +13,5 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={createAppRouter()} />
     <JoinSyncBanner token={pendingJoin} />
-  </StrictMode>
+  </StrictMode>,
 );

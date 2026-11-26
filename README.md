@@ -60,13 +60,13 @@ yarn dev
 
 Commands, run from the repo root:
 
-| Command | What it does |
-| --- | --- |
-| `yarn dev` | Vite dev server for the app |
-| `yarn tsc` | Typecheck every workspace |
-| `yarn test` | Run every workspace's Vitest suite, including the data tests |
-| `yarn build` | Production build into `app/dist` |
-| `yarn validate:data` | Only the tests that validate `data/` |
+| Command              | What it does                                                 |
+| -------------------- | ------------------------------------------------------------ |
+| `yarn dev`           | Vite dev server for the app                                  |
+| `yarn tsc`           | Typecheck every workspace                                    |
+| `yarn test`          | Run every workspace's Vitest suite, including the data tests |
+| `yarn build`         | Production build into `app/dist`                             |
+| `yarn validate:data` | Only the tests that validate `data/`                         |
 
 To try the production build locally, run `yarn build`, then `yarn vite preview` inside `app/`.
 

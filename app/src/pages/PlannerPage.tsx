@@ -84,7 +84,9 @@ export function PlannerPage() {
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
         <section className="flex flex-col gap-2">
           <SectionKicker as="h2">
-            {weekly ? `Minimog · Week ${Math.min(Math.max(plan.currentWeek, 1), weekly)} of ${weekly}` : "Minimog picks"}
+            {weekly
+              ? `Minimog · Week ${Math.min(Math.max(plan.currentWeek, 1), weekly)} of ${weekly}`
+              : "Minimog picks"}
           </SectionKicker>
           <FramedCard corners>
             {plan.suggestedMinimogs.length === 0 ? (
@@ -94,8 +96,8 @@ export function PlannerPage() {
                   : plan.currentWeek < 1
                     ? "Minimogs open when the event starts."
                     : plan.currentWeek >= weekly
-                    ? "All Minimog weeks are done."
-                    : "This week's Minimog is done. The next one opens at the weekly reset."}
+                      ? "All Minimog weeks are done."
+                      : "This week's Minimog is done. The next one opens at the weekly reset."}
               </p>
             ) : (
               plan.suggestedMinimogs.map(({ objective }, index) => (
@@ -109,11 +111,7 @@ export function PlannerPage() {
                         <Badge variant="gold-outline">{objective.effort}</Badge>
                       </div>
                     </div>
-                    <Button
-                      variant="action-soft"
-                      size="sm"
-                      onClick={() => logClear(objective)}
-                    >
+                    <Button variant="action-soft" size="sm" onClick={() => logClear(objective)}>
                       Log clear
                     </Button>
                   </ListRow>
@@ -140,11 +138,7 @@ export function PlannerPage() {
                     {doneThisWeek ? (
                       <Badge variant="gold-outline">Claimed</Badge>
                     ) : (
-                      <Button
-                        variant="action-soft"
-                        size="sm"
-                        onClick={() => logClear(objective)}
-                      >
+                      <Button variant="action-soft" size="sm" onClick={() => logClear(objective)}>
                         Log clear
                       </Button>
                     )}

@@ -1,16 +1,7 @@
 import { z } from "zod";
 
 export const themeSettingsSchema = z.object({
-  palette: z.enum([
-    "maelstrom",
-    "adder",
-    "flames",
-    "ishgard",
-    "crystarium",
-    "heavensward",
-    "stormblood",
-    "dawntrail",
-  ]),
+  palette: z.enum(["maelstrom", "adder", "flames", "ishgard", "crystarium", "heavensward", "stormblood", "dawntrail"]),
   mode: z.enum(["dark", "light"]),
   ornament: z.enum(["full", "reduced", "minimal"]),
   density: z.enum(["comfy", "compact"]),
@@ -36,7 +27,7 @@ export const eventProgressSchema = z.object({
       lastDoneAt: z.string(),
       // Earlier clear times, oldest first, so undo can restore lastDoneAt.
       history: z.array(z.string()).optional(),
-    })
+    }),
   ),
   minimogPicks: z.array(z.string()),
   wishlist: z.record(z.string(), wishlistEntrySchema),

@@ -8,7 +8,7 @@ export function undoClearBlockedReason(
   points: number,
   tokens = 0,
   tokenAward = 0,
-  tokenName = "token"
+  tokenName = "token",
 ): string | null {
   const parts: string[] = [];
   if (wallet < points) parts.push(tomeCount(points - wallet));

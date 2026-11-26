@@ -39,9 +39,7 @@ function ObjectiveRow({
   objective: Objective;
   token: EventData["token"];
 }) {
-  const count = useAppStore(
-    (s) => s.events[eventId]?.completedObjectives[objective.id]?.count ?? 0
-  );
+  const count = useAppStore((s) => s.events[eventId]?.completedObjectives[objective.id]?.count ?? 0);
   const logClear = useLogClear(eventId);
   const undoObjective = useAppStore((s) => s.undoObjective);
   const wallet = useAppStore((s) => s.events[eventId]?.tomestones ?? 0);
@@ -50,9 +48,7 @@ function ObjectiveRow({
   // What undoing the latest clear would take back.
   const lastReward = clearReward(objective, count, Boolean(token));
   const undoBlocked =
-    count > 0
-      ? undoClearBlockedReason(wallet, lastReward.points, tokenBalance, lastReward.tokens, token?.name)
-      : null;
+    count > 0 ? undoClearBlockedReason(wallet, lastReward.points, tokenBalance, lastReward.tokens, token?.name) : null;
   const exhausted = objective.repeatable === false && count >= clearsNeeded(objective);
   const [picked, setPicked] = useState<string | null>(null);
   return (
@@ -69,12 +65,8 @@ function ObjectiveRow({
           <Badge variant="gold-outline">{objective.effort}</Badge>
           <span>{objective.category}</span>
         </div>
-        {objective.requirement ? (
-          <p className="mt-1 text-xs text-muted-foreground">{objective.requirement}</p>
-        ) : null}
-        {objective.notes ? (
-          <p className="mt-1 text-xs text-muted-foreground">{objective.notes}</p>
-        ) : null}
+        {objective.requirement ? <p className="mt-1 text-xs text-muted-foreground">{objective.requirement}</p> : null}
+        {objective.notes ? <p className="mt-1 text-xs text-muted-foreground">{objective.notes}</p> : null}
         {objective.duties ? (
           <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs">
             <button
@@ -87,7 +79,12 @@ function ObjectiveRow({
               {picked ? "Pick another" : "Pick one for me"}
             </button>
             {picked ? (
-              <span data-testid="picked-duty" aria-live="polite" key={picked} className="list-enter font-medium text-foreground">
+              <span
+                data-testid="picked-duty"
+                aria-live="polite"
+                key={picked}
+                className="list-enter font-medium text-foreground"
+              >
                 {picked}
               </span>
             ) : null}
@@ -117,12 +114,7 @@ function ObjectiveRow({
           </span>
         ) : null}
       </span>
-      <Button
-        variant="action-soft"
-        size="sm"
-        disabled={exhausted}
-        onClick={() => logClear(objective)}
-      >
+      <Button variant="action-soft" size="sm" disabled={exhausted} onClick={() => logClear(objective)}>
         {exhausted ? "Cleared" : "Log clear"}
       </Button>
     </ListRow>
@@ -135,9 +127,7 @@ export function ObjectivesPage() {
   const [category, setCategory] = useState<string | null>(null);
   if (!event) return <UnknownEvent testId="objectives-page" />;
   const categories = Array.from(new Set(event.objectives.map((o) => o.category)));
-  const visibleObjectives = category
-    ? event.objectives.filter((o) => o.category === category)
-    : event.objectives;
+  const visibleObjectives = category ? event.objectives.filter((o) => o.category === category) : event.objectives;
   return (
     <div data-testid="objectives-page" className="flex flex-col gap-6">
       {categories.length >= 2 ? (
@@ -145,20 +135,11 @@ export function ObjectivesPage() {
           data-testid="category-filters"
           className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-32px),transparent)]"
         >
-          <Chip
-            active={category === null}
-            data-testid="filter-all"
-            onClick={() => setCategory(null)}
-          >
+          <Chip active={category === null} data-testid="filter-all" onClick={() => setCategory(null)}>
             All
           </Chip>
           {categories.map((c) => (
-            <Chip
-              key={c}
-              active={category === c}
-              data-testid={`filter-${c}`}
-              onClick={() => setCategory(c)}
-            >
+            <Chip key={c} active={category === c} data-testid={`filter-${c}`} onClick={() => setCategory(c)}>
               {c}
             </Chip>
           ))}

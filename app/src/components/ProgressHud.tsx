@@ -17,7 +17,9 @@ export function ProgressHud() {
   const tokens = useAppStore((s) => s.events[eventId]?.tokens ?? 0);
   const progress = useAppStore((s) => s.events[eventId]);
   const wishlist = progress?.wishlist;
-  const must = event ? budgetReport(event, progress ?? emptyEventProgress(), new Date()).tiers.find((t) => t.tier === "must") : undefined;
+  const must = event
+    ? budgetReport(event, progress ?? emptyEventProgress(), new Date()).tiers.find((t) => t.tier === "must")
+    : undefined;
   const mustCovered = !!must && must.cumulativeCost > 0 && must.affordableNow;
   // Crossing into covered while the app is open plays a one-shot sheen. Loading
   // already covered does not; dropping back below re-arms it.
@@ -55,7 +57,7 @@ export function ProgressHud() {
           key={celebrate}
           className={cn(
             "relative h-2 min-w-8 flex-1 overflow-hidden rounded-full bg-secondary ring-1 ring-inset ring-[var(--frame-border)] data-[must-covered]:ring-gold/60",
-            celebrate > 0 && "animate-goal-reached"
+            celebrate > 0 && "animate-goal-reached",
           )}
         >
           <div

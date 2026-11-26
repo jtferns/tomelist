@@ -19,7 +19,7 @@ function oklchToLinearSrgb(l: number, c: number, hDeg: number): [number, number,
 
   const l_ = l + 0.3963377774 * a + 0.2158037573 * b;
   const m_ = l - 0.1055613458 * a - 0.0638541728 * b;
-  const s_ = l - 0.0894841775 * a - 1.2914855480 * b;
+  const s_ = l - 0.0894841775 * a - 1.291485548 * b;
 
   const l3 = l_ ** 3;
   const m3 = m_ ** 3;
@@ -27,7 +27,7 @@ function oklchToLinearSrgb(l: number, c: number, hDeg: number): [number, number,
 
   const r = 4.0767416621 * l3 - 3.3077115913 * m3 + 0.2309699292 * s3;
   const g = -1.2684380046 * l3 + 2.6097574011 * m3 - 0.3413193965 * s3;
-  const bLin = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.7076147010 * s3;
+  const bLin = -0.0041960863 * l3 - 0.7034186147 * m3 + 1.707614701 * s3;
 
   // Colors outside the sRGB gamut can produce out-of-range linear channels;
   // clamp before computing luminance.

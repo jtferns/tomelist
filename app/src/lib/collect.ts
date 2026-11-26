@@ -56,7 +56,7 @@ export async function fetchOwned(characterId: string, kinds: CollectKind[], now 
     kinds.map(async (kind) => {
       const rows = await get<{ id: number }[]>(`/characters/${characterId}/${PATHS[kind]}/owned`);
       return rows.map((row) => `${kind}:${row.id}`);
-    })
+    }),
   );
   return {
     characterId,

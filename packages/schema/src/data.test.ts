@@ -25,8 +25,8 @@ describe("bundled event data", () => {
     const files = readdirSync(join(dataDir, "events")).filter((f) => f.endsWith(".json"));
     for (const f of files) {
       const event = eventSchema.parse(JSON.parse(readFileSync(join(dataDir, "events", f), "utf8")));
-      const icons = [event.tomestone.icon, ...event.exchanges.map((e) => e.icon)].filter(
-        (icon): icon is string => Boolean(icon)
+      const icons = [event.tomestone.icon, ...event.exchanges.map((e) => e.icon)].filter((icon): icon is string =>
+        Boolean(icon),
       );
       for (const icon of icons) expect(existsSync(join(publicDir, icon)), `${f}: ${icon}`).toBe(true);
     }
@@ -34,9 +34,7 @@ describe("bundled event data", () => {
   it("manifest entries match their event file metadata", () => {
     const manifest = manifestSchema.parse(JSON.parse(readFileSync(join(dataDir, "manifest.json"), "utf8")));
     for (const entry of manifest.events) {
-      const event = eventSchema.parse(
-        JSON.parse(readFileSync(join(dataDir, "events", `${entry.id}.json`), "utf8"))
-      );
+      const event = eventSchema.parse(JSON.parse(readFileSync(join(dataDir, "events", `${entry.id}.json`), "utf8")));
       expect(entry.name).toBe(event.name);
       expect(entry.starts).toBe(event.starts);
       expect(entry.ends).toBe(event.ends);

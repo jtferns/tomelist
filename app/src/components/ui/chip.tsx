@@ -1,7 +1,7 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const chipVariants = cva(
   "whitespace-nowrap rounded-full px-3.5 py-[5px] text-[13px] pointer-coarse:min-h-11 pointer-coarse:px-4 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
@@ -16,8 +16,8 @@ const chipVariants = cva(
     defaultVariants: {
       active: false,
     },
-  }
-)
+  },
+);
 
 function Chip({
   className,
@@ -32,7 +32,7 @@ function Chip({
       className={cn(chipVariants({ active }), className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Chip, chipVariants }
+export { Chip, chipVariants };

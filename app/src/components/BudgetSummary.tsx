@@ -45,7 +45,7 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
       tier.cumulativeCost > 0 &&
       (index === 0 ||
         tier.cumulativeCost !== all[index - 1].cumulativeCost ||
-        tier.tokenCost !== all[index - 1].tokenCost)
+        tier.tokenCost !== all[index - 1].tokenCost),
   );
   const tierLabel = (index: number) =>
     index === 0
@@ -57,8 +57,8 @@ export function BudgetSummary({ eventId }: { eventId: string }) {
   const coveredLine =
     coveredCount > 0 ? (
       <p data-testid="budget-covered" className="text-xs text-muted-foreground">
-        {coveredCount === 1 ? "1 item a friend is covering" : `${coveredCount} items friends are covering`}, not
-        counted here.
+        {coveredCount === 1 ? "1 item a friend is covering" : `${coveredCount} items friends are covering`}, not counted
+        here.
       </p>
     ) : null;
 

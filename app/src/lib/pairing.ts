@@ -3,7 +3,10 @@ const TOKEN = /^[A-Za-z0-9_-]{22}$/;
 // 128 random bits as unpadded base64url: 22 chars, matching the Worker's route.
 export function generateSyncToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
 // The token rides in the fragment, which browsers never send to the server.

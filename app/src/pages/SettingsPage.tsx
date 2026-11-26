@@ -11,9 +11,19 @@ import { useAppStore } from "@/store/useAppStore";
 import type { ThemeSettings } from "@tomelist/schema";
 
 const palettes = [
-  { id: "maelstrom", label: "Maelstrom", crest: "/crests/maelstrom.png", hoverClass: "hover:border-[oklch(0.63_0.19_25)]" },
+  {
+    id: "maelstrom",
+    label: "Maelstrom",
+    crest: "/crests/maelstrom.png",
+    hoverClass: "hover:border-[oklch(0.63_0.19_25)]",
+  },
   { id: "adder", label: "Twin Adder", crest: "/crests/adder.png", hoverClass: "hover:border-[oklch(0.65_0.15_130)]" },
-  { id: "flames", label: "Immortal Flames", crest: "/crests/flames.png", hoverClass: "hover:border-[oklch(0.7_0.15_60)]" },
+  {
+    id: "flames",
+    label: "Immortal Flames",
+    crest: "/crests/flames.png",
+    hoverClass: "hover:border-[oklch(0.7_0.15_60)]",
+  },
 ] as const;
 
 const cityPalettes = [
@@ -72,7 +82,9 @@ export function SettingsPage() {
                     className={active ? undefined : p.hoverClass}
                     onClick={() => setPalette(p.id)}
                   >
-                    {"crest" in p ? <img src={p.crest} alt="" className="-ml-1 mr-1.5 inline size-5 rounded-sm align-[-0.3em]" /> : null}
+                    {"crest" in p ? (
+                      <img src={p.crest} alt="" className="-ml-1 mr-1.5 inline size-5 rounded-sm align-[-0.3em]" />
+                    ) : null}
                     {p.label}
                   </Chip>
                 );
@@ -157,12 +169,12 @@ export function SettingsPage() {
           >
             jtferns
           </a>
-          . v2 was rebuilt with Claude, an AI coding assistant. Claude wrote most of the code and drafted the event
-          data from the wiki; jtferns directed the design, decisions and review.
+          . v2 was rebuilt with Claude, an AI coding assistant. Claude wrote most of the code and drafted the event data
+          from the wiki; jtferns directed the design, decisions and review.
         </p>
         <p>
-          FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Item icons come from the game via XIVAPI. Tomelist is a fan
-          project and is not affiliated with Square Enix.
+          FINAL FANTASY XIV © SQUARE ENIX CO., LTD. Item icons come from the game via XIVAPI. Tomelist is a fan project
+          and is not affiliated with Square Enix.
         </p>
       </footer>
     </div>

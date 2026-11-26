@@ -57,9 +57,7 @@ describe("PlannerPage", () => {
 
   it("renders the exact no-target pace copy", async () => {
     await renderPlanner();
-    expect(screen.getByTestId("pace-line")).toHaveTextContent(
-      "No weekly target yet. Earned 0 this week."
-    );
+    expect(screen.getByTestId("pace-line")).toHaveTextContent("No weekly target yet. Earned 0 this week.");
   });
 
   it("clicking a minimog Did-it calls recordObjective and raises the tomestone count by its points", async () => {
@@ -154,7 +152,7 @@ describe("PlannerPage", () => {
     });
     await renderPlanner();
     expect(screen.getByTestId("pace-line")).toHaveTextContent(
-      "The one-time clears you have left cover your Must-haves."
+      "The one-time clears you have left cover your Must-haves.",
     );
   });
 
@@ -186,7 +184,7 @@ describe("PlannerPage", () => {
   it("warns when too few tokens are left and does not call the goal covered", async () => {
     await renderAstronomyPlanner({ tomestones: 500, tokens: 1 });
     expect(screen.getByTestId("token-line")).toHaveTextContent(
-      "Tokens: 1 of 10. Only 8 left to earn, so the Must-haves can't all be reached."
+      "Tokens: 1 of 10. Only 8 left to earn, so the Must-haves can't all be reached.",
     );
     expect(screen.getByTestId("pace-line")).toHaveTextContent("Tomes for your Must-haves are covered.");
     expect(screen.getByTestId("pace-line")).not.toHaveTextContent("Covered");
@@ -224,7 +222,7 @@ describe("PlannerPage", () => {
     expect(line).toHaveTextContent("Tokens: 0 of 10. 6 left to earn. Buy the rest for 120 tomes.");
     expect(line).not.toHaveTextContent("can't all be reached");
     expect(screen.getByTestId("pace-line")).toHaveTextContent(
-      "You have enough tomes for your Must-haves, including the tokens to buy."
+      "You have enough tomes for your Must-haves, including the tokens to buy.",
     );
   });
 
@@ -246,7 +244,7 @@ describe("PlannerPage", () => {
     render(<RouterProvider router={router} />);
     await screen.findByTestId("planner-page");
     expect(screen.getByTestId("pace-line")).toHaveTextContent(
-      "The clears you have left pay for your Must-haves, including the tokens to buy."
+      "The clears you have left pay for your Must-haves, including the tokens to buy.",
     );
   });
 });

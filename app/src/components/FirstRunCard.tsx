@@ -52,7 +52,7 @@ export function FirstRunCard({ eventId }: { eventId: string }) {
             <span
               className={cn(
                 "grid size-6 shrink-0 place-items-center rounded-full border border-gold font-display text-xs text-gold",
-                step.done && "bg-gold text-background"
+                step.done && "bg-gold text-background",
               )}
             >
               {step.done ? <Check aria-label="Done" className="size-3.5" /> : index + 1}

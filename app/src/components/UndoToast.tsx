@@ -15,8 +15,7 @@ type ToastState = {
 
 export const useUndoToast = create<ToastState>((set) => ({
   toast: null,
-  show: (message, onUndo, blockedReason) =>
-    set({ toast: { id: Date.now(), message, onUndo, blockedReason } }),
+  show: (message, onUndo, blockedReason) => set({ toast: { id: Date.now(), message, onUndo, blockedReason } }),
   dismiss: () => set({ toast: null }),
 }));
 

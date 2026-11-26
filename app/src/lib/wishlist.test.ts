@@ -15,7 +15,7 @@ describe("getWishlistTotal", () => {
         "fat-cat-parasol": { status: "wanted", tier: "want", quantity: 2 }, // 50 x 2
         "miners-earring": { status: "exchanged", tier: "want", quantity: 1 }, // ignored
         "magicked-prism-bundle": { status: "wanted", tier: "want", quantity: 20 }, // 1 x 20
-      })
+      }),
     ).toBe(120);
   });
   it("leaves out items a friend is covering", () => {
@@ -23,7 +23,7 @@ describe("getWishlistTotal", () => {
       getWishlistTotal(event, {
         "fat-cat-parasol": { status: "covering", tier: "must", quantity: 1 },
         "miners-earring": { status: "wanted", tier: "want", quantity: 1 },
-      })
+      }),
     ).toBe(getWishlistTotal(event, { "miners-earring": { status: "wanted", tier: "want", quantity: 1 } }));
   });
 });

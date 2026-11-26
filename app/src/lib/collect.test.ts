@@ -13,7 +13,7 @@ function stubFetch(routes: Record<string, { status: number; body: unknown } | Er
       if (!route) throw new Error(`unexpected ${url}`);
       if (route instanceof Error) throw route;
       return new Response(JSON.stringify(route.body), { status: route.status });
-    })
+    }),
   );
   return calls;
 }

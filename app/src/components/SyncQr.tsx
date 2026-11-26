@@ -8,7 +8,7 @@ export function SyncQr({ url }: { url: string }) {
     void import("qrcode").then(({ default: QRCode }) =>
       QRCode.toDataURL(url, { margin: 1, width: 192 }).then((data) => {
         if (live) setSrc(data);
-      })
+      }),
     );
     return () => {
       live = false;

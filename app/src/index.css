@@ -124,7 +124,6 @@
   --ring: oklch(0.48 0.16 295);
 }
 
-
 /* Expansion palettes, same override shape. Hues sit clear of the GC and city sets. */
 :root[data-palette="heavensward"][data-theme="dark"] {
   --primary: oklch(0.78 0.1 200);

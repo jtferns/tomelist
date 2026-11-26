@@ -28,7 +28,17 @@ const KINDS_BY_TYPE: Record<string, Kind[]> = {
 const WRAPPERS = [/ Whistle$/, / Horn$/, / Orchestrion Roll$/, /^Modern Aesthetics - /];
 
 // Exchange types that never give a collectable the import can check.
-const SKIP_TYPES = new Set(["Armor", "Head Gear", "Furnishing", "Map", "Item", "Cosmetic", "Collectible", "Accessory", "Instrument"]);
+const SKIP_TYPES = new Set([
+  "Armor",
+  "Head Gear",
+  "Furnishing",
+  "Map",
+  "Item",
+  "Cosmetic",
+  "Collectible",
+  "Accessory",
+  "Instrument",
+]);
 
 async function search(kind: Kind, name: string): Promise<{ id: number; name: string }[]> {
   const res = await fetch(`${API}/${PATHS[kind]}?name_en_cont=${encodeURIComponent(name)}`);

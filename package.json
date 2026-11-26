@@ -1,7 +1,7 @@
 {
   "name": "tomelist-monorepo",
-  "private": true,
   "version": "2.0.0-dev",
+  "private": true,
   "workspaces": [
     "packages/*",
     "worker",
@@ -14,8 +14,8 @@
     "build": "yarn workspaces foreach -A --topological run build",
     "validate:data": "yarn workspace @tomelist/schema run validate:data"
   },
-  "packageManager": "yarn@4.17.1",
   "devDependencies": {
     "wrangler": "4.149.0"
-  }
+  },
+  "packageManager": "yarn@4.17.1"
 }
