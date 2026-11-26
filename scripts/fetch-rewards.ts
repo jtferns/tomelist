@@ -22,7 +22,7 @@ const collectKinds: Record<string, string> = {
   Hairstyle: "hairstyle",
 };
 
-(async () => {
+void (async () => {
   const tomestone = process.argv[2];
   if (!tomestone) {
     console.error("Usage: tsx scripts/fetch-rewards.ts <tomestone-name>");

@@ -41,7 +41,7 @@ export function parseLodestone(html: string): LodestoneItem[] {
   return items;
 }
 
-(async () => {
+void (async () => {
   const [eventPath, url] = process.argv.slice(2);
   if (!eventPath || !url) {
     console.error("Usage: tsx scripts/check-lodestone.ts data/events/<id>.json <lodestone url>");

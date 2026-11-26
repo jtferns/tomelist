@@ -25,7 +25,7 @@ async function findIconPath(name: string): Promise<string | null> {
   return hit ? hit.fields.Icon.path_hr1 : null;
 }
 
-(async () => {
+void (async () => {
   const eventPath = process.argv[2];
   if (!eventPath) {
     console.error("Usage: tsx scripts/fetch-icons.ts data/events/<id>.json");

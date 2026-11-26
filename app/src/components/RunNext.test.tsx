@@ -9,7 +9,6 @@ import { createAppRouter } from "@/router";
 
 const E = "2026-03-mogmog-collection";
 const EXCHANGE_ID = "miners-earring";
-const COST = 100;
 
 async function renderOverview() {
   const router = createAppRouter();

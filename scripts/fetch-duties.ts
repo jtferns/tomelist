@@ -41,7 +41,7 @@ function setDuties(text: string, id: string, duties: string[]): string {
   return lines.join("\n");
 }
 
-(async () => {
+void (async () => {
   const [eventPath, title] = process.argv.slice(2);
   if (!eventPath || !title) {
     console.error('Usage: tsx scripts/fetch-duties.ts data/events/<id>.json "<wiki page title>"');

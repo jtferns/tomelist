@@ -55,7 +55,7 @@ function setCollect(text: string, id: string, kind: Kind, collectId: number): st
   return lines.join("\n");
 }
 
-(async () => {
+void (async () => {
   const eventPath = process.argv[2];
   const refresh = process.argv.includes("--refresh");
   if (!eventPath) {

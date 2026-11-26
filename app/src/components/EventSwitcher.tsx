@@ -64,7 +64,7 @@ export function EventSwitcher({ eventId }: { eventId: string }) {
                 aria-selected={e.id === eventId}
                 onClick={() => {
                   setOpen(false);
-                  navigate({ to: `/$eventId/${tab}`, params: { eventId: e.id } });
+                  void navigate({ to: `/$eventId/${tab}`, params: { eventId: e.id } });
                 }}
                 className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
               >

@@ -36,7 +36,7 @@ function setTradeable(text: string, id: string, value: boolean): string {
   return lines.join("\n");
 }
 
-(async () => {
+void (async () => {
   const eventPath = process.argv[2];
   const refresh = process.argv.includes("--refresh");
   if (!eventPath) {

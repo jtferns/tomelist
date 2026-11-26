@@ -27,7 +27,7 @@ let events: EventData[] | undefined;
 
 function allEvents(): EventData[] {
   if (!events) {
-    const modules = { ...globModules, ...(globalThis.__tomelistEventModules ?? {}) };
+    const modules = { ...globModules, ...globalThis.__tomelistEventModules };
     events = Object.values(modules)
       .map((m) => eventSchema.parse(m.default))
       .sort((a, b) => (a.starts < b.starts ? 1 : -1));
