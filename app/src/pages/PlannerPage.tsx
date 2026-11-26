@@ -37,9 +37,13 @@ export function PlannerPage() {
             <span className="text-sm">
               {eventProgress.tomestones >= mustCost && haveTokens
                 ? "You have enough for your Must-haves."
-                : plan.mustTokenCost > 0
-                  ? "The clears you have left cover your Must-haves."
-                  : "The one-time clears you have left cover your Must-haves."}{" "}
+                : plan.mustTokenTopUpCost > 0
+                  ? eventProgress.tomestones >= mustCost
+                    ? "You have enough tomes for your Must-haves, including the tokens to buy."
+                    : "The clears you have left pay for your Must-haves, including the tokens to buy."
+                  : plan.mustTokenCost > 0
+                    ? "The clears you have left cover your Must-haves."
+                    : "The one-time clears you have left cover your Must-haves."}{" "}
               Earned {plan.earnedThisWeek} this week.
             </span>
             <Badge variant="tome">Covered</Badge>

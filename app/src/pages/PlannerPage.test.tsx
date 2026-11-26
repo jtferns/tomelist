@@ -223,5 +223,30 @@ describe("PlannerPage", () => {
     const line = screen.getByTestId("token-line");
     expect(line).toHaveTextContent("Tokens: 0 of 10. 6 left to earn. Buy the rest for 120 tomes.");
     expect(line).not.toHaveTextContent("can't all be reached");
+    expect(screen.getByTestId("pace-line")).toHaveTextContent(
+      "You have enough tomes for your Must-haves, including the tokens to buy."
+    );
+  });
+
+  it("says the clears left pay for the Must-haves and the tokens to buy", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2027-01-06T12:00:00Z"));
+    const S = "2026-12-astronomy-second-hunt";
+    useAppStore.setState({
+      events: {
+        [S]: {
+          ...emptyEventProgress(),
+          tomestones: 150,
+          wishlist: { "uolon-horn": { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/planner", params: { eventId: S } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("planner-page");
+    expect(screen.getByTestId("pace-line")).toHaveTextContent(
+      "The clears you have left pay for your Must-haves, including the tokens to buy."
+    );
   });
 });
