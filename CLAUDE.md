@@ -26,17 +26,25 @@ This is a Yarn workspaces monorepo:
 
 Run from the repo root unless noted:
 
-- `yarn dev` — Vite dev server for the app (delegates to `yarn workspace @tomelist/app run dev`)
+- `yarn dev` — Vite dev server for the app (delegates to `yarn workspace @tomelist/app run dev`, which runs `vp dev`)
 - `yarn tsc` — typecheck all workspaces (`yarn workspaces foreach -A --topological run tsc`)
-- `yarn test` — run all workspace test suites (`yarn workspaces foreach -A run test`, Vitest);
-  this includes the `@tomelist/schema` tests, which validate everything under `data/`
+- `yarn test` — run all workspace test suites (`yarn workspaces foreach -A run test`, `vp test` / Vitest; tests
+  import from `vite-plus/test`); this includes the `@tomelist/schema` tests, which validate everything under `data/`
 - `yarn build` — production build across workspaces, outputs `app/dist`
 - `yarn validate:data` — just the data-validation tests (`yarn workspace @tomelist/schema run
   validate:data`), useful when authoring events without rebuilding everything
+- `yarn vp check` — format check (Oxfmt), lint (Oxlint, type-aware) and type check (tsrs) in one pass, configured
+  in the root `vite.config.ts`; `yarn vp check --fix` formats and applies safe fixes, `yarn vp fmt` formats only.
+  `data/`, `docs/` and `.design-sync/` are not formatted
+- `yarn fallow` — dead code, duplication and complexity report (config in `.fallowrc.json`);
+  `yarn fallow audit --base <ref>` reports only what changed since `<ref>`
 
 Package manager is Yarn 4 (Berry, `nodeLinker: node-modules`, see `.yarnrc.yml`). Node version is
-pinned in `.nvmrc`. CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn test`, and
-`yarn build` on every push/PR, and on `main` additionally deploys `app/dist` to a Cloudflare Worker
+pinned in `.nvmrc`. `.yarnrc.yml` sets `npmMinimalAgeGate: 10080`, so packages published in the last 7 days do
+not install; `vite-plus` (with `vite` mapped to `@voidzero-dev/vite-plus-core`) is pinned in the Yarn catalog
+there. CI (`.github/workflows/node.js.yml`) runs `yarn tsc`, `yarn vp check`, `yarn test`, `yarn build` and a
+report-only `yarn fallow audit` against the pre-push commit on every push/PR, and on `main` additionally deploys
+`app/dist` to a Cloudflare Worker
 (`wrangler.jsonc`: static assets with SPA fallback, plus the `worker/` script for `/api/*` and the
 `SyncGroup` Durable Object for Phase 3 sync) via `cloudflare/wrangler-action`. The deploy job
 needs the `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` secrets and fails without them; nothing

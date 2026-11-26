@@ -12,14 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # fallow audit diffs against the pre-push commit, so it needs history.
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
       - run: corepack enable
       - run: yarn install --immutable
       - run: yarn tsc
+      - run: yarn vp check
       - run: yarn test
       - run: yarn build
+      - name: fallow audit (report-only)
+        continue-on-error: true
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: yarn fallow audit --base "$BASE"
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: check
