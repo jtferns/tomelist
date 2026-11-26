@@ -344,6 +344,29 @@ describe("ExchangesPage", () => {
     expect(screen.getByTestId("undo-toast")).toHaveTextContent("−100 tomes, −10 tokens");
   });
 
+  it("adds the tokens an exchange grants and shows them in the toast", async () => {
+    const S = "2026-12-astronomy-second-hunt";
+    useAppStore.setState({
+      events: {
+        [S]: {
+          ...emptyEventProgress(),
+          tomestones: 30,
+          wishlist: { "uolon-horn-token": { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/exchanges", params: { eventId: S } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("exchanges-page");
+
+    const row = screen.getByTestId("exchange-uolon-horn-token");
+    await userEvent.click(within(row).getByRole("button", { name: /^log exchange$/i }));
+    const p = useAppStore.getState().events[S]!;
+    expect([p.tomestones, p.tokens]).toEqual([0, 1]);
+    expect(screen.getByTestId("undo-toast")).toHaveTextContent("−30 tomes, +1 token");
+  });
+
   it("adds the token total to the wishlist total in the header", async () => {
     const A = "2026-09-astronomy-first-hunt";
     useAppStore.getState().toggleWishlist(A, "uolon-horn");

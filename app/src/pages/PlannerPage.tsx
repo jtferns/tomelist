@@ -68,9 +68,11 @@ export function PlannerPage() {
             Tokens: {plan.tokens} of {plan.mustTokenCost}.
             {haveTokens || plan.tokensRemaining === null
               ? null
-              : plan.mustTokensReachable
-                ? ` ${plan.tokensRemaining} left to earn.`
-                : ` Only ${plan.tokensRemaining} left to earn, so the Must-haves can't all be reached.`}
+              : plan.mustTokenTopUpCost > 0
+                ? ` ${plan.tokensRemaining} left to earn. Buy the rest for ${tomeCount(plan.mustTokenTopUpCost)}.`
+                : plan.mustTokensReachable
+                  ? ` ${plan.tokensRemaining} left to earn.`
+                  : ` Only ${plan.tokensRemaining} left to earn, so the Must-haves can't all be reached.`}
           </p>
         ) : null}
       </FramedCard>

@@ -295,10 +295,12 @@ export function ExchangeRow({ eventId, item, wallet }: { eventId: string; item: 
               className={cn(!shortNote && "ml-auto")}
               disabled={!canExchangeOne}
               onClick={() => {
-                markExchanged(eventId, item.id, item.cost, tokenCost);
+                const granted = item.grantsTokens ?? 0;
+                markExchanged(eventId, item.id, item.cost, tokenCost, granted);
                 const spent = tokenCost > 0 ? `${tomeCount(item.cost)}, −${tokenCount(tokenCost)}` : tomeCount(item.cost);
-                showToast(`Exchanged ${item.name}, −${spent}`, () =>
-                  undoExchanged(eventId, item.id, item.cost, tokenCost)
+                const gained = granted > 0 ? `, +${tokenCount(granted)}` : "";
+                showToast(`Exchanged ${item.name}, −${spent}${gained}`, () =>
+                  undoExchanged(eventId, item.id, item.cost, tokenCost, granted)
                 );
               }}
             >

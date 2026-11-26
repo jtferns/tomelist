@@ -202,4 +202,26 @@ describe("PlannerPage", () => {
     await renderPlanner();
     expect(screen.queryByTestId("token-line")).not.toBeInTheDocument();
   });
+
+  it("offers to buy the tokens that can't be earned when the event sells them", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2027-01-06T12:00:00Z"));
+    const S = "2026-12-astronomy-second-hunt";
+    useAppStore.setState({
+      events: {
+        [S]: {
+          ...emptyEventProgress(),
+          tomestones: 500,
+          wishlist: { "uolon-horn": { status: "wanted", tier: "must", quantity: 1 } },
+        },
+      },
+    });
+    const router = createAppRouter();
+    await router.navigate({ to: "/$eventId/planner", params: { eventId: S } });
+    render(<RouterProvider router={router} />);
+    await screen.findByTestId("planner-page");
+    const line = screen.getByTestId("token-line");
+    expect(line).toHaveTextContent("Tokens: 0 of 10. 6 left to earn. Buy the rest for 120 tomes.");
+    expect(line).not.toHaveTextContent("can't all be reached");
+  });
 });
