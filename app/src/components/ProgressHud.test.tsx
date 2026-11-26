@@ -1,7 +1,7 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import { getEvent } from "@/lib/events";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";

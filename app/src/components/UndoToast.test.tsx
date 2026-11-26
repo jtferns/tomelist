@@ -1,5 +1,5 @@
 import { act, render } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { UndoToast, useUndoToast } from "./UndoToast";
 
 function rect(top: number, bottom: number) {

@@ -1,5 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import { EORZEADB_LOADER_SRC, useEorzeaTooltips } from "@/lib/useEorzeaTooltips";
 
 function Harness({ enabled }: { enabled: boolean }) {

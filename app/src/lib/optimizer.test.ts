@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import type { EventData, Exchange, Objective } from "@tomelist/schema";
 import { emptyEventProgress, type EventProgress } from "@tomelist/schema";
 import {

@@ -1,5 +1,5 @@
 import type { EventData, Exchange } from "@tomelist/schema";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { askGroups, askText } from "./askFriend";
 
 const item = (id: string, cost: number, tradeable: boolean, extra: Partial<Exchange> = {}): Exchange => ({

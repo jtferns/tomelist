@@ -1,5 +1,5 @@
 import type { UserState } from "@tomelist/schema";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { createSyncClient, type SyncSocket, type SyncStatus } from "./sync";
 
 class FakeSocket implements SyncSocket {

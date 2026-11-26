@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { getActiveEvent, getAllEvents, getEvent, isEventEnded, shortEventName } from "./events";
 
 describe("event loading", () => {

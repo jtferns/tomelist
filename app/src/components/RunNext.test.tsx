@@ -2,7 +2,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { emptyEventProgress } from "@tomelist/schema";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import { useUndoToast } from "@/components/UndoToast";
 import { useAppStore } from "@/store/useAppStore";
 import { createAppRouter } from "@/router";

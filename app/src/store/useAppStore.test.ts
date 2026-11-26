@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { migratePersistedState, useAppStore } from "./useAppStore";
 
 const E = "2026-03-mogmog-collection";

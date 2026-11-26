@@ -1,6 +1,6 @@
 import { RouterProvider } from "@tanstack/react-router";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { createAppRouter } from "./router";
 
 describe("router", () => {

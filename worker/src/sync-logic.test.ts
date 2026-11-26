@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import type { UserState } from "@tomelist/schema";
 import { MAX_MESSAGE_BYTES, alarmDue, handleMessage } from "./sync-logic";
 

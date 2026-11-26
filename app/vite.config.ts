@@ -1,12 +1,12 @@
-/// <reference types="vitest/config" />
+/// <reference types="vite-plus" />
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vite";
+import { defineConfig, lazyPlugins } from "vite-plus";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  plugins: [
+  plugins: lazyPlugins(() => [
     react(),
     tailwindcss(),
     VitePWA({
@@ -28,7 +28,7 @@ export default defineConfig({
         ],
       },
     }),
-  ],
+  ]),
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   test: {
     environment: "jsdom",

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "tsc": "tsc -p .",
-    "test": "vitest run"
+    "test": "vp test run"
   },
   "dependencies": {
     "@tomelist/schema": "workspace:*"
@@ -13,6 +13,6 @@
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260928.1",
     "typescript": "7",
-    "vitest": "^5.0.3"
+    "vite-plus": "catalog:"
   }
 }

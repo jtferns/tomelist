@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { emptyEventProgress } from "@tomelist/schema";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import { WalletStepper } from "@/components/WalletStepper";
 import { useAppStore } from "@/store/useAppStore";
 

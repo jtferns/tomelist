@@ -5,7 +5,7 @@
 // the test file, per the task-9 brief (culori is not in node_modules).
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 const CSS_PATH = path.resolve(process.cwd(), "src/index.css");
 const css = readFileSync(CSS_PATH, "utf-8");
