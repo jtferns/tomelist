@@ -582,7 +582,71 @@ describe("event tokens", () => {
     const plain = event();
     const report = budgetReport(plain, progress(), WEEK2);
     expect(report.tokens).toBe(0);
-    expect(report.tiers.every((t) => t.tokenCost === 0)).toBe(true);
+    expect(report.tiers.every((t) => t.tokenCost === 0 && t.tokenTopUpCost === 0)).toBe(true);
+  });
+});
+
+describe("buying tokens with tomes", () => {
+  const objectives = [
+    objective({ id: "mm-w2", kind: "minimog", week: 2, tokens: 1, repeatable: "weekly" }),
+    objective({ id: "mm-w3", kind: "minimog", week: 3, tokens: 1, repeatable: "weekly" }),
+  ];
+  const mount = exchange({ id: "mount", cost: 100, tokenCost: 7 });
+  const tok = exchange({ id: "tok", cost: 30, grantsTokens: 1 });
+  const ev = event({
+    token: { name: "Horn Token" },
+    starts: "2026-01-07T08:00:00Z",
+    ends: "2026-02-01T00:00:00Z",
+    objectives,
+    exchanges: [mount, tok],
+  });
+  const WEEK2 = new Date("2026-01-15T00:00:00Z");
+  const want = (extra: EventProgress["wishlist"] = {}) => ({
+    mount: { status: "wanted" as const, tier: "must" as const, quantity: 1 },
+    ...extra,
+  });
+
+  it("prices the tokens left to earn into the tier and keeps it in reach", () => {
+    // 7 tokens needed, 2 left to earn, so 5 are bought at 30 tomes each.
+    const must = budgetReport(ev, progress({ tomestones: 240, wishlist: want() }), WEEK2).tiers[0];
+    expect(must.tokenTopUpCost).toBe(150);
+    expect(must.cumulativeCost).toBe(250);
+    expect(must.affordableNow).toBe(false);
+    expect(must.affordableByEnd).toBe(true);
+    expect(must.weeksNeeded).toBe(0);
+  });
+
+  it("counts wanted token purchases toward the tier's tokens", () => {
+    const p = progress({ tomestones: 240, wishlist: want({ tok: { status: "wanted", tier: "must", quantity: 3 } }) });
+    const must = budgetReport(ev, p, WEEK2).tiers[0];
+    expect(must.tokenTopUpCost).toBe(60);
+    expect(must.cumulativeCost).toBe(250);
+  });
+
+  it("is affordable now when the wallet covers the item plus the missing tokens", () => {
+    const must = budgetReport(ev, progress({ tomestones: 310, wishlist: want() }), WEEK2).tiers[0];
+    expect(must.affordableNow).toBe(true);
+  });
+
+  it("uses the cheapest token offer", () => {
+    const bulk = exchange({ id: "tok5", cost: 140, grantsTokens: 5 });
+    const ev2 = { ...ev, exchanges: [mount, tok, bulk] };
+    const must = budgetReport(ev2, progress({ tomestones: 240, wishlist: want() }), WEEK2).tiers[0];
+    expect(must.tokenTopUpCost).toBe(140);
+  });
+
+  it("weekly plan reports the Must top-up and a reachable token goal", () => {
+    const plan = weeklyPlan(ev, progress({ tomestones: 240, wishlist: want() }), WEEK2);
+    expect(plan.mustTokenTopUpCost).toBe(150);
+    expect(plan.mustTokensReachable).toBe(true);
+  });
+
+  it("adds no top-up when the event sells no tokens", () => {
+    const noShop = { ...ev, exchanges: [mount] };
+    const must = budgetReport(noShop, progress({ tomestones: 240, wishlist: want() }), WEEK2).tiers[0];
+    expect(must.tokenTopUpCost).toBe(0);
+    expect(must.cumulativeCost).toBe(100);
+    expect(must.affordableByEnd).toBe(false);
   });
 });
 

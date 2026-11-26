@@ -48,6 +48,11 @@ import { clearsNeeded } from "@/lib/clears";
  *   tokensRemaining is a number and tokens + tokensRemaining < tokenCost. weeksNeeded stays
  *   tome-only.
  * - weeklyPlan exposes tokens, tokensRemaining, mustTokenCost and mustTokensReachable.
+ * - Token top-up: an exchange with grantsTokens and no tokenCost sells tokens for tomes. Wanted
+ *   token-granting entries count toward a tier's tokens. A token gap left after tokensRemaining
+ *   is priced at the cheapest offer and added to cumulativeCost, also reported as
+ *   tokenTopUpCost, so tokens alone never put the tier out of reach. affordableNow counts
+ *   buying the current gap from the wallet. Events with no such exchange are unaffected.
  *
  * Run-next ranking
  * ----------------
@@ -98,6 +103,8 @@ export type TierVerdict = {
   tier: "must" | "want" | "maybe";
   cumulativeCost: number;
   tokenCost: number;
+  // Tomes inside cumulativeCost for buying tokens that can't be earned in time.
+  tokenTopUpCost: number;
   affordableNow: boolean;
   weeksNeeded: number | null;
   affordableByEnd: boolean | null;
@@ -201,6 +208,40 @@ function computeTierTokenCosts(
   return { must, want, maybe };
 }
 
+function computeTierGrantedTokens(
+  event: EventData,
+  progress: EventProgress
+): Record<(typeof TIER_ORDER)[number], number> {
+  const exchangesById = new Map(event.exchanges.map((exchange) => [exchange.id, exchange]));
+  const tierSums = { must: 0, want: 0, maybe: 0 };
+  for (const [exchangeId, entry] of Object.entries(progress.wishlist)) {
+    if (entry.status !== "wanted") continue;
+    const grants = exchangesById.get(exchangeId)?.grantsTokens;
+    if (!grants) continue;
+    tierSums[entry.tier] += grants * entry.quantity;
+  }
+  const must = tierSums.must;
+  const want = must + tierSums.want;
+  const maybe = want + tierSums.maybe;
+  return { must, want, maybe };
+}
+
+type TokenOffer = { cost: number; grants: number };
+
+function cheapestTokenOffer(event: EventData): TokenOffer | null {
+  let best: TokenOffer | null = null;
+  for (const exchange of event.exchanges) {
+    if (!exchange.grantsTokens || exchange.tokenCost) continue;
+    const offer = { cost: exchange.cost, grants: exchange.grantsTokens };
+    if (!best || offer.cost / offer.grants < best.cost / best.grants) best = offer;
+  }
+  return best;
+}
+
+function offerCost(offer: TokenOffer, tokens: number): number {
+  return Math.ceil(tokens / offer.grants) * offer.cost;
+}
+
 export function tokensRemaining(event: EventData, progress: EventProgress, now: Date): number | null {
   const week = eventWeek(event, now);
   const weeksLeft = event.ends === null ? null : weeksUntil(event.ends, now);
@@ -237,14 +278,22 @@ export function budgetReport(event: EventData, progress: EventProgress, now: Dat
 
   const cumulativeCosts = computeTierCosts(event, progress);
   const tokenCosts = computeTierTokenCosts(event, progress);
+  const grantedTokens = computeTierGrantedTokens(event, progress);
   const tokens = progress.tokens ?? 0;
   const remainingTokens = tokensRemaining(event, progress, now);
+  const offer = cheapestTokenOffer(event);
 
   const tiers: TierVerdict[] = TIER_ORDER.map((tier) => {
-    const cumulativeCost = cumulativeCosts[tier];
+    const tomeCost = cumulativeCosts[tier];
     const tokenCost = tokenCosts[tier];
-    const tokensReachable = remainingTokens === null || tokens + remainingTokens >= tokenCost;
-    const affordableNow = wallet >= cumulativeCost && tokens >= tokenCost;
+    const have = tokens + grantedTokens[tier];
+    const gapNow = Math.max(0, tokenCost - have);
+    const gapByEnd = remainingTokens === null ? 0 : Math.max(0, gapNow - remainingTokens);
+    const tokenTopUpCost = offer && gapByEnd > 0 ? offerCost(offer, gapByEnd) : 0;
+    const tokensReachable = gapByEnd === 0 || offer !== null;
+    const cumulativeCost = tomeCost + tokenTopUpCost;
+    const affordableNow =
+      gapNow === 0 ? wallet >= tomeCost : offer !== null && wallet >= tomeCost + offerCost(offer, gapNow);
     let weeksNeeded: number | null;
     if (affordableNow) {
       weeksNeeded = 0;
@@ -263,7 +312,7 @@ export function budgetReport(event: EventData, progress: EventProgress, now: Dat
       : projectedIncome !== null
         ? projectedIncome >= cumulativeCost
         : null;
-    return { tier, cumulativeCost, tokenCost, affordableNow, weeksNeeded, affordableByEnd };
+    return { tier, cumulativeCost, tokenCost, tokenTopUpCost, affordableNow, weeksNeeded, affordableByEnd };
   });
 
   return {
@@ -381,6 +430,7 @@ export type WeeklyPlan = {
   tokens: number;
   tokensRemaining: number | null;
   mustTokenCost: number;
+  mustTokenTopUpCost: number;
   mustTokensReachable: boolean;
 };
 
@@ -437,8 +487,11 @@ export function weeklyPlan(event: EventData, progress: EventProgress, now: Date)
   const minimogWeeks = weekTags.length > 0 ? Math.max(...weekTags) : null;
 
   const mustTokenCost = mustTier?.tokenCost ?? 0;
+  const mustTokenTopUpCost = mustTier?.tokenTopUpCost ?? 0;
   const mustTokensReachable =
-    report.tokensRemaining === null || report.tokens + report.tokensRemaining >= mustTokenCost;
+    report.tokensRemaining === null ||
+    report.tokens + report.tokensRemaining >= mustTokenCost ||
+    cheapestTokenOffer(event) !== null;
 
   return {
     suggestedMinimogs,
@@ -451,6 +504,7 @@ export function weeklyPlan(event: EventData, progress: EventProgress, now: Date)
     tokens: report.tokens,
     tokensRemaining: report.tokensRemaining,
     mustTokenCost,
+    mustTokenTopUpCost,
     mustTokensReachable,
   };
 }
