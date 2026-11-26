@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
-      - run: corepack enable
+      - run: npm i -g corepack && corepack enable
       - run: yarn install --immutable
       - run: yarn tsc
       - run: yarn vp check
@@ -63,7 +63,7 @@ jobs:
             echo "::error::node $have does not match .nvmrc $want."
             exit 1
           fi
-      - run: corepack enable
+      - run: npm i -g corepack && corepack enable
       - run: yarn install --immutable
       - run: yarn e2e
       - if: failure()
@@ -81,7 +81,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
-      - run: corepack enable
+      - run: npm i -g corepack && corepack enable
       - run: yarn install --immutable
       - run: yarn build
       - uses: cloudflare/wrangler-action@v4
