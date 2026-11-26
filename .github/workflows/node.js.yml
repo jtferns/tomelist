@@ -27,7 +27,13 @@ jobs:
       - name: fallow audit
         env:
           BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
-        run: yarn fallow audit --base "$BASE"
+        # Same steps as fallow-rs/fallow's Action: analyse once to JSON, then render annotations and the job summary.
+        run: |
+          status=0
+          yarn fallow audit --base "$BASE" --format json > fallow-audit.json || status=$?
+          yarn fallow report --from fallow-audit.json --format github-annotations
+          yarn fallow report --from fallow-audit.json --format github-summary >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: check
