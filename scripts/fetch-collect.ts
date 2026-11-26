@@ -6,6 +6,7 @@
  * The JSON is edited in place as text, so its one-line-per-item layout survives.
  */
 import { readFile, writeFile } from "node:fs/promises";
+import { editEntryLine } from "./lib";
 
 const API = "https://ffxivcollect.com/api";
 const KINDS = ["mount", "minion", "orchestrion", "barding", "hairstyle"] as const;
@@ -47,12 +48,11 @@ async function search(kind: Kind, name: string): Promise<{ id: number; name: str
 }
 
 function setCollect(text: string, id: string, kind: Kind, collectId: number): string {
-  const lines = text.split("\n");
-  const index = lines.findIndex((line) => line.includes(`{ "id": "${id}",`));
-  if (index === -1) throw new Error(`Can't find the "${id}" line to set collect`);
-  const line = lines[index].replace(/, "collect": \{[^}]*\}/, "");
-  lines[index] = line.replace(/ \}(,?)$/, `, "collect": { "kind": "${kind}", "id": ${collectId} } }$1`);
-  return lines.join("\n");
+  return editEntryLine(text, id, "collect", (line) =>
+    line
+      .replace(/, "collect": \{[^}]*\}/, "")
+      .replace(/ \}(,?)$/, `, "collect": { "kind": "${kind}", "id": ${collectId} } }$1`),
+  );
 }
 
 void (async () => {

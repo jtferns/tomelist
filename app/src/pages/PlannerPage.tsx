@@ -1,6 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { UnknownEvent } from "@/components/UnknownEvent";
-import { emptyEventProgress } from "@tomelist/schema";
+import { emptyEventProgress, type Objective } from "@tomelist/schema";
 import { Fragment } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -103,18 +103,12 @@ export function PlannerPage() {
               plan.suggestedMinimogs.map(({ objective }, index) => (
                 <Fragment key={objective.id}>
                   {index > 0 ? <ListRowDivider /> : null}
-                  <ListRow data-testid={`pick-${objective.id}`}>
-                    <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
-                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                        <Badge variant="tome">{tomeCount(objective.points)}</Badge>
-                        <Badge variant="gold-outline">{objective.effort}</Badge>
-                      </div>
-                    </div>
-                    <Button variant="action-soft" size="sm" onClick={() => logClear(objective)}>
-                      Log clear
-                    </Button>
-                  </ListRow>
+                  <PlanRow
+                    testId={`pick-${objective.id}`}
+                    objective={objective}
+                    showEffort
+                    onLogClear={() => logClear(objective)}
+                  />
                 </Fragment>
               ))
             )}
@@ -128,21 +122,12 @@ export function PlannerPage() {
               {plan.weeklies.map(({ objective, doneThisWeek }, index) => (
                 <Fragment key={objective.id}>
                   {index > 0 ? <ListRowDivider /> : null}
-                  <ListRow data-testid={`weekly-${objective.id}`}>
-                    <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
-                      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                        <Badge variant="tome">{tomeCount(objective.points)}</Badge>
-                      </div>
-                    </div>
-                    {doneThisWeek ? (
-                      <Badge variant="gold-outline">Claimed</Badge>
-                    ) : (
-                      <Button variant="action-soft" size="sm" onClick={() => logClear(objective)}>
-                        Log clear
-                      </Button>
-                    )}
-                  </ListRow>
+                  <PlanRow
+                    testId={`weekly-${objective.id}`}
+                    objective={objective}
+                    claimed={doneThisWeek}
+                    onLogClear={() => logClear(objective)}
+                  />
                 </Fragment>
               ))}
             </FramedCard>
@@ -150,5 +135,38 @@ export function PlannerPage() {
         ) : null}
       </div>
     </div>
+  );
+}
+
+function PlanRow({
+  testId,
+  objective,
+  showEffort = false,
+  claimed = false,
+  onLogClear,
+}: {
+  testId: string;
+  objective: Objective;
+  showEffort?: boolean;
+  claimed?: boolean;
+  onLogClear: () => void;
+}) {
+  return (
+    <ListRow data-testid={testId}>
+      <div className="min-w-0 flex-1">
+        <p className="line-clamp-2 font-medium leading-snug">{objective.title}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          <Badge variant="tome">{tomeCount(objective.points)}</Badge>
+          {showEffort ? <Badge variant="gold-outline">{objective.effort}</Badge> : null}
+        </div>
+      </div>
+      {claimed ? (
+        <Badge variant="gold-outline">Claimed</Badge>
+      ) : (
+        <Button variant="action-soft" size="sm" onClick={onLogClear}>
+          Log clear
+        </Button>
+      )}
+    </ListRow>
   );
 }

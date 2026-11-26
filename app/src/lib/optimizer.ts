@@ -1,4 +1,4 @@
-import type { EventData, EventProgress, Objective } from "@tomelist/schema";
+import type { EventData, EventProgress, Exchange, Objective } from "@tomelist/schema";
 import { clearsNeeded } from "@/lib/clears";
 
 /**
@@ -175,47 +175,17 @@ function computeWeeklyRate(event: EventData): number {
   return total;
 }
 
-function computeTierCosts(event: EventData, progress: EventProgress): Record<(typeof TIER_ORDER)[number], number> {
+type TierSums = Record<(typeof TIER_ORDER)[number], number>;
+
+// Running totals over wanted wishlist entries: each tier includes the tiers above it.
+function sumWantedByTier(event: EventData, progress: EventProgress, perUnit: (exchange: Exchange) => number): TierSums {
   const exchangesById = new Map(event.exchanges.map((exchange) => [exchange.id, exchange]));
   const tierSums = { must: 0, want: 0, maybe: 0 };
   for (const [exchangeId, entry] of Object.entries(progress.wishlist)) {
     if (entry.status !== "wanted") continue;
     const exchange = exchangesById.get(exchangeId);
     if (!exchange) continue;
-    tierSums[entry.tier] += exchange.cost * entry.quantity;
-  }
-  const must = tierSums.must;
-  const want = must + tierSums.want;
-  const maybe = want + tierSums.maybe;
-  return { must, want, maybe };
-}
-
-function computeTierTokenCosts(event: EventData, progress: EventProgress): Record<(typeof TIER_ORDER)[number], number> {
-  const exchangesById = new Map(event.exchanges.map((exchange) => [exchange.id, exchange]));
-  const tierSums = { must: 0, want: 0, maybe: 0 };
-  for (const [exchangeId, entry] of Object.entries(progress.wishlist)) {
-    if (entry.status !== "wanted") continue;
-    const tokenCost = exchangesById.get(exchangeId)?.tokenCost;
-    if (!tokenCost) continue;
-    tierSums[entry.tier] += tokenCost * entry.quantity;
-  }
-  const must = tierSums.must;
-  const want = must + tierSums.want;
-  const maybe = want + tierSums.maybe;
-  return { must, want, maybe };
-}
-
-function computeTierGrantedTokens(
-  event: EventData,
-  progress: EventProgress,
-): Record<(typeof TIER_ORDER)[number], number> {
-  const exchangesById = new Map(event.exchanges.map((exchange) => [exchange.id, exchange]));
-  const tierSums = { must: 0, want: 0, maybe: 0 };
-  for (const [exchangeId, entry] of Object.entries(progress.wishlist)) {
-    if (entry.status !== "wanted") continue;
-    const grants = exchangesById.get(exchangeId)?.grantsTokens;
-    if (!grants) continue;
-    tierSums[entry.tier] += grants * entry.quantity;
+    tierSums[entry.tier] += perUnit(exchange) * entry.quantity;
   }
   const must = tierSums.must;
   const want = must + tierSums.want;
@@ -273,9 +243,9 @@ export function budgetReport(event: EventData, progress: EventProgress, now: Dat
   const weeksLeft = event.ends === null ? null : weeksUntil(event.ends, now);
   const projectedIncome = weeksLeft === null ? null : wallet + oneTimeRemaining + weeklyRate * weeksLeft;
 
-  const cumulativeCosts = computeTierCosts(event, progress);
-  const tokenCosts = computeTierTokenCosts(event, progress);
-  const grantedTokens = computeTierGrantedTokens(event, progress);
+  const cumulativeCosts = sumWantedByTier(event, progress, (exchange) => exchange.cost);
+  const tokenCosts = sumWantedByTier(event, progress, (exchange) => exchange.tokenCost ?? 0);
+  const grantedTokens = sumWantedByTier(event, progress, (exchange) => exchange.grantsTokens ?? 0);
   const tokens = progress.tokens ?? 0;
   const remainingTokens = tokensRemaining(event, progress, now);
   const offer = cheapestTokenOffer(event);
@@ -370,6 +340,13 @@ function isAvailableForRunNext(event: EventData, objective: Objective, progress:
   return (record?.count ?? 0) < clearsNeeded(objective);
 }
 
+// Score desc, then points desc, then id asc, so equal scores keep a stable order.
+function byScore(a: RankedObjective, b: RankedObjective): number {
+  if (b.score !== a.score) return b.score - a.score;
+  if (b.objective.points !== a.objective.points) return b.objective.points - a.objective.points;
+  return a.objective.id.localeCompare(b.objective.id);
+}
+
 export function rankRunNext(event: EventData, progress: EventProgress, now: Date): RankedObjective[] {
   const ranked: RankedObjective[] = event.objectives
     .filter((objective) => isAvailableForRunNext(event, objective, progress, now))
@@ -379,11 +356,7 @@ export function rankRunNext(event: EventData, progress: EventProgress, now: Date
       score: objective.points / clearsNeeded(objective) / EFFORT_WEIGHTS[objective.effort],
     }));
 
-  ranked.sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score;
-    if (b.objective.points !== a.objective.points) return b.objective.points - a.objective.points;
-    return a.objective.id.localeCompare(b.objective.id);
-  });
+  ranked.sort(byScore);
 
   return ranked;
 }
@@ -448,11 +421,7 @@ export function weeklyPlan(event: EventData, progress: EventProgress, now: Date)
       return !doneThisWeek(progress, objective.id, now);
     })
     .map((objective) => ({ objective, score: objective.points / EFFORT_WEIGHTS[objective.effort] }))
-    .sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
-      if (b.objective.points !== a.objective.points) return b.objective.points - a.objective.points;
-      return a.objective.id.localeCompare(b.objective.id);
-    })
+    .sort(byScore)
     .slice(0, 2);
 
   const weeklies = event.objectives

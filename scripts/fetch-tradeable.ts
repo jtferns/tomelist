@@ -5,35 +5,22 @@
  * The JSON is edited in place as text, so its one-line-per-item layout survives.
  */
 import { readFile, writeFile } from "node:fs/promises";
-
-const API = "https://v2.xivapi.com/api";
-
-type SearchResult = { results: { fields: { Name: string; IsUntradable: boolean } }[] };
+import { editEntryLine, findItem } from "./lib";
 
 async function findUntradable(name: string): Promise<boolean | null> {
-  const params = new URLSearchParams({
-    sheets: "Item",
-    query: `Name="${name.replace(/"/g, '\\"')}"`,
-    fields: "Name,IsUntradable",
-  });
-  const res = await fetch(`${API}/search?${params}`);
-  if (!res.ok) throw new Error(`XIVAPI search returned ${res.status} for "${name}"`);
-  const body = (await res.json()) as SearchResult;
-  const hit = body.results.find((r) => r.fields.Name.toLowerCase() === name.toLowerCase());
-  return hit ? hit.fields.IsUntradable : null;
+  const item = await findItem<{ Name: string; IsUntradable: boolean }>(name, "IsUntradable");
+  return item ? item.IsUntradable : null;
 }
 
 // Sets `"tradeable": <value>` on the item's line, right after its `"type"` field, replacing any
 // existing value on that line.
 function setTradeable(text: string, id: string, value: boolean): string {
-  const lines = text.split("\n");
-  const index = lines.findIndex((line) => line.includes(`{ "id": "${id}",`));
-  if (index === -1) throw new Error(`Can't find the "${id}" line to set tradeable`);
-  const line = lines[index].replace(/, "tradeable": (?:true|false)/, "");
-  const type = /(, "type": "(?:[^"\\]|\\.)*")/;
-  if (!type.test(line)) throw new Error(`The "${id}" line has no "type" field`);
-  lines[index] = line.replace(type, `$1, "tradeable": ${value}`);
-  return lines.join("\n");
+  return editEntryLine(text, id, "tradeable", (original) => {
+    const line = original.replace(/, "tradeable": (?:true|false)/, "");
+    const type = /(, "type": "(?:[^"\\]|\\.)*")/;
+    if (!type.test(line)) throw new Error(`The "${id}" line has no "type" field`);
+    return line.replace(type, `$1, "tradeable": ${value}`);
+  });
 }
 
 void (async () => {

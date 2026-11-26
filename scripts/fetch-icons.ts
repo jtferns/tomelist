@@ -6,23 +6,13 @@
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { XIVAPI, findItem } from "./lib";
 
-const API = "https://v2.xivapi.com/api";
 const OUT_DIR = "app/public/items";
 
-type SearchResult = { results: { fields: { Name: string; Icon: { path: string; path_hr1: string } } }[] };
-
 async function findIconPath(name: string): Promise<string | null> {
-  const params = new URLSearchParams({
-    sheets: "Item",
-    query: `Name="${name.replace(/"/g, '\\"')}"`,
-    fields: "Name,Icon",
-  });
-  const res = await fetch(`${API}/search?${params}`);
-  if (!res.ok) throw new Error(`XIVAPI search returned ${res.status} for "${name}"`);
-  const body = (await res.json()) as SearchResult;
-  const hit = body.results.find((r) => r.fields.Name.toLowerCase() === name.toLowerCase());
-  return hit ? hit.fields.Icon.path_hr1 : null;
+  const item = await findItem<{ Name: string; Icon: { path: string; path_hr1: string } }>(name, "Icon");
+  return item ? item.Icon.path_hr1 : null;
 }
 
 void (async () => {
@@ -45,7 +35,7 @@ void (async () => {
       missing.push(item.name);
       continue;
     }
-    const res = await fetch(`${API}/asset?path=${encodeURIComponent(iconPath)}&format=png`);
+    const res = await fetch(`${XIVAPI}/asset?path=${encodeURIComponent(iconPath)}&format=png`);
     if (!res.ok) throw new Error(`XIVAPI asset returned ${res.status} for "${item.name}"`);
     await writeFile(join(OUT_DIR, `${item.id}.png`), Buffer.from(await res.arrayBuffer()));
     const nameField = new RegExp(`("id": "${item.id}", "name": "(?:[^"\\\\]|\\\\.)*")`);

@@ -8,6 +8,7 @@
  * replaced. The JSON is edited in place as text, so its one-line-per-item layout survives.
  */
 import { readFile, writeFile } from "node:fs/promises";
+import { editEntryLine } from "./lib";
 
 const WIKI = "https://ffxiv.consolegameswiki.com/mediawiki/index.php";
 
@@ -33,12 +34,11 @@ export function parseDuties(wikitext: string): { name: string; type: string }[] 
 
 // Sets `"duties": [...]` at the end of the objective's line, replacing any existing list.
 function setDuties(text: string, id: string, duties: string[]): string {
-  const lines = text.split("\n");
-  const index = lines.findIndex((line) => line.includes(`{ "id": "${id}",`));
-  if (index === -1) throw new Error(`Can't find the "${id}" line to set duties`);
-  const line = lines[index].replace(/, "duties": \[[^\]]*\]/, "");
-  lines[index] = line.replace(/ \}(,?)$/, `, "duties": ${JSON.stringify(duties).replace(/","/g, '", "')} }$1`);
-  return lines.join("\n");
+  return editEntryLine(text, id, "duties", (line) =>
+    line
+      .replace(/, "duties": \[[^\]]*\]/, "")
+      .replace(/ \}(,?)$/, `, "duties": ${JSON.stringify(duties).replace(/","/g, '", "')} }$1`),
+  );
 }
 
 void (async () => {
