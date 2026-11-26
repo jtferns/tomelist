@@ -12,7 +12,8 @@
     "tsc": "yarn workspaces foreach -A --topological run tsc",
     "test": "yarn workspaces foreach -A run test",
     "build": "yarn workspaces foreach -A --topological run build",
-    "validate:data": "yarn workspace @tomelist/schema run validate:data"
+    "validate:data": "yarn workspace @tomelist/schema run validate:data",
+    "e2e": "yarn workspace @tomelist/app run e2e"
   },
   "devDependencies": {
     "fallow": "3.43.2",

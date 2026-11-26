@@ -1,1 +1,3 @@
 .vitest/
+test-results/
+playwright-report/

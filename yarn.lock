@@ -2254,6 +2254,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@playwright/test@npm:1.65.1":
+  version: 1.65.1
+  resolution: "@playwright/test@npm:1.65.1"
+  dependencies:
+    playwright: "npm:1.65.1"
+  bin:
+    playwright: cli.js
+  checksum: 10/07ed24cf24c018e3f190a9d57efca3a131e8ad4ccbb5b1ec02d4bb5687edc6443a35b6bcac1139a03903add8b0cf33968422a6ca36ef50b929392748de8a423b
+  languageName: node
+  linkType: hard
+
 "@polka/url@npm:^1.0.0-next.24":
   version: 1.0.0-next.29
   resolution: "@polka/url@npm:1.0.0-next.29"
@@ -4158,6 +4169,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tomelist/app@workspace:app"
   dependencies:
+    "@playwright/test": "npm:1.65.1"
     "@tailwindcss/vite": "npm:^4.3.3"
     "@tanstack/react-router": "npm:^1.170.41"
     "@testing-library/dom": "npm:^10.4.2"
@@ -7279,6 +7291,26 @@ __metadata:
   version: 4.0.7
   resolution: "picomatch@npm:4.0.7"
   checksum: 10/66e1df34bc39c72fa3756be4069f7887ea3e35e94bba1c3f6167763007698cb04b8a0a365161d186fda6e9571a2d3efb606b2966eb6a7dea6252911224dc2f48
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.65.1":
+  version: 1.65.1
+  resolution: "playwright-core@npm:1.65.1"
+  bin:
+    playwright-core: cli.js
+  checksum: 10/aa79963cd789367a2ad882cce60e74dd5006129651da8395106b8b1c1a718b95565501943dd35c9d71944698d4afd122f59a0a930635b634841a0b38fe66255d
+  languageName: node
+  linkType: hard
+
+"playwright@npm:1.65.1":
+  version: 1.65.1
+  resolution: "playwright@npm:1.65.1"
+  dependencies:
+    playwright-core: "npm:1.65.1"
+  bin:
+    playwright: cli.js
+  checksum: 10/41ffd721fe18ddc907abbe61479aa0c1ecb16719d7a6840f4f530a61e6c737f757d8ba0935dac10d9e80f308fd3f2eba47e2e9a0a8ceb8fdc0588af08d08fcba
   languageName: node
   linkType: hard
 
